@@ -1,0 +1,16 @@
+.savage-app-drawer {
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: space-between;
+	align-items: stretch;
+	height: 100%;
+
+	&-title {
+		font-size: 16px;
+	}
+
+	&-subtitle {
+		font-size: 14px;
+		color: var(--subtext);
+	}
+}

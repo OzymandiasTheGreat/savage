@@ -1,1 +1,39 @@
 /* You can add global styles to this file, and also import other style files */
+@import '~@circlon/angular-tree-component/css/angular-tree-component.css';
+
+:root {
+	--text: #221122;
+	--subtext: #9e9e9e;
+	--list-item-selected: #bdbdbd;
+	--list-item-focused: #e0e0e0;
+}
+
+html, body {
+	height: 100%;
+	margin: 0;
+	color: var(--text);
+}
+
+.savage-app-toolbar-menu.mat-menu-panel {
+	min-width: 48px;
+
+	.mat-menu-content {
+		padding: 0;
+
+		.mat-menu-item {
+			padding: 8px;
+
+			.mat-icon {
+				padding: 8px;
+				margin: 0;
+				vertical-align: unset;
+			}
+		}
+	}
+}
+
+.node-drop-slot.is-dragging-over {
+	background-color: var(--list-item-focused);
+	height: 40px;
+	border: none;
+}

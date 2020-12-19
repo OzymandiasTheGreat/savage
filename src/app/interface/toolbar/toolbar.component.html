@@ -1,0 +1,37 @@
+<mat-toolbar color="primary">
+	<mat-button-toggle-group [vertical]="true" >
+		<mat-button-toggle matTooltip="Select and move" [checked]="true" >
+			<mat-icon svgIcon="cursor-default" ></mat-icon>
+		</mat-button-toggle>
+		<mat-button-toggle matTooltip="Paths and curves" >
+			<mat-icon svgIcon="vector-curve" ></mat-icon>
+		</mat-button-toggle>
+		<mat-button-toggle matTooltip="Lines" [matMenuTriggerFor]="lineMenu" >
+			<mat-icon svgIcon="vector-line" ></mat-icon>
+			<mat-menu #lineMenu class="savage-app-toolbar-menu" [overlapTrigger]="true" >
+				<button mat-menu-item matTooltip="Line" ><mat-icon svgIcon="vector-line" ></mat-icon></button>
+				<button mat-menu-item matTooltip="Polyline" ><mat-icon svgIcon="vector-polyline" ></mat-icon></button>
+			</mat-menu>
+		</mat-button-toggle>
+		<mat-button-toggle matTooltip="Shapes" [matMenuTriggerFor]="shapeMenu" >
+			<mat-icon svgIcon="vector-rectangle" ></mat-icon>
+			<mat-menu #shapeMenu class="savage-app-toolbar-menu" [overlapTrigger]="true" >
+				<button mat-menu-item matTooltip="Rectangle" ><mat-icon svgIcon="vector-rectangle" ></mat-icon></button>
+				<button mat-menu-item matTooltip="Circle" ><mat-icon svgIcon="vector-circle-variant" ></mat-icon></button>
+				<button mat-menu-item matTooltip="Ellipse" ><mat-icon svgIcon="vector-ellipse" ></mat-icon></button>
+				<button mat-menu-item matTooltip="Polygon" ><mat-icon svgIcon="vector-polygon" ></mat-icon></button>
+			</mat-menu>
+		</mat-button-toggle>
+		<mat-button-toggle matTooltip="Transform" [matMenuTriggerFor]="transformMenu" >
+			<mat-icon svgIcon="resize" ></mat-icon>
+			<mat-menu #transformMenu class="savage-app-toolbar-menu" [overlapTrigger]="true" >
+				<button mat-menu-item matTooltip="Resize" ><mat-icon svgIcon="resize" ></mat-icon></button>
+				<button mat-menu-item matTooltip="Rotate" ><mat-icon svgIcon="crop-rotate" ></mat-icon></button>
+				<button mat-menu-item matTooltip="Skew" ><mat-icon svgIcon="skew-more" ></mat-icon></button>
+			</mat-menu>
+		</mat-button-toggle>
+		<mat-button-toggle matTooltip="Gradients" >
+			<mat-icon svgIcon="gradient" ></mat-icon>
+		</mat-button-toggle>
+	</mat-button-toggle-group>
+</mat-toolbar>

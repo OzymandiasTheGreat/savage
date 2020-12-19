@@ -1,0 +1,14 @@
+.savage-app-menubar {
+	height: 48px;
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: space-between;
+	align-items: center;
+
+	.savage-app-menubar-left, .savage-app-menubar-center, .savage-app-menubar-right {
+		display: flex;
+		flex-flow: row nowrap;
+		justify-content: space-around;
+		align-items: center;
+	}
+}

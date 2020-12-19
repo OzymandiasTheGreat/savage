@@ -1,0 +1,21 @@
+<mat-toolbar color="primary" class="savage-app-menubar">
+	<span class="savage-app-menubar-left" >
+		<button mat-icon-button matTooltip="Open Sidedrawer" (click)="sidedrawer.toggle()" ><mat-icon svgIcon="menu" ></mat-icon></button>
+		<mat-divider [vertical]="true" ></mat-divider>
+		<button mat-icon-button matTooltip="Save" ><mat-icon svgIcon="content-save" ></mat-icon></button>
+	</span>
+	<span class="savage-app-menubar-center" ></span>
+	<span class="savage-app-menubar-right" >
+		<iframe src="https://ghbtns.com/github-btn.html?user=OzymandiasTheGreat&repo=savage-app&type=star&count=true&size=large"
+			frameborder="0"
+			scrolling="0"
+			width="170"
+			height="30"
+			title="GitHub"
+		></iframe>
+		<mat-divider [vertical]="true" ></mat-divider>
+		<button mat-icon-button [matTooltip]="sidebar.opened ? 'Close sidebar' : 'Open sidebar'" (click)="sidebar.toggle()" >
+			<mat-icon [svgIcon]="sidebar.opened ? 'chevron-right' : 'chevron-left'" ></mat-icon>
+		</button>
+	</span>
+</mat-toolbar>

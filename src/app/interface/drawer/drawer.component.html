@@ -1,0 +1,94 @@
+<div class="savage-app-drawer">
+	<mat-accordion>
+		<mat-expansion-panel [expanded]="true">
+			<mat-expansion-panel-header>
+				<mat-panel-title class="savage-app-drawer-header" >
+					<mat-icon svgIcon="file-image" class="savage-app-drawer-header-icon" ></mat-icon>
+					<span class="savage-app-drawer-header-text" >New</span>
+				</mat-panel-title>
+			</mat-expansion-panel-header>
+
+			<mat-action-list>
+				<button mat-list-item >
+					<mat-icon mat-list-icon svgIcon="file-image-outline" ></mat-icon>
+					<span>Empty Document</span>
+				</button>
+			</mat-action-list>
+		</mat-expansion-panel>
+		<mat-expansion-panel>
+			<mat-expansion-panel-header>
+				<mat-panel-title class="savage-app-drawer-header" >
+					<mat-icon svgIcon="file-upload" class="savage-app-drawer-header-icon" ></mat-icon>
+					<span class="savage-app-drawer-header-text" >Open</span>
+				</mat-panel-title>
+			</mat-expansion-panel-header>
+
+			<mat-list>
+				<mat-list-item>
+					<div mat-line class="savage-app-drawer-subheader" >Upload</div>
+					<div mat-line >
+						<mat-form-field>
+							<ngx-mat-file-input accept="image/svg+xml" [formControl]="openControl" >
+								<mat-icon ngxMatFileInputIcon svgIcon="upload" ></mat-icon>
+							</ngx-mat-file-input>
+						</mat-form-field>
+					</div>
+				</mat-list-item>
+				<mat-list-item>
+					<div mat-line class="savage-app-drawer-subheader" >URL</div>
+					<div mat-line >
+						<mat-form-field>
+							<input matInput type="url" >
+							<mat-icon matSuffix svgIcon="cloud-upload" ></mat-icon>
+						</mat-form-field>
+					</div>
+				</mat-list-item>
+			</mat-list>
+		</mat-expansion-panel>
+		<mat-expansion-panel>
+			<mat-expansion-panel-header>
+				<mat-panel-title class="savage-app-drawer-header" >
+					<mat-icon svgIcon="download" class="savage-app-drawer-header-icon" ></mat-icon>
+					<span class="savage-app-drawer-header-text">Download</span>
+				</mat-panel-title>
+			</mat-expansion-panel-header>
+
+			<mat-action-list>
+				<button mat-list-item >
+					<mat-icon mat-list-icon svgIcon="xml" ></mat-icon>
+					<span>SVG</span>
+				</button>
+				<button mat-list-item >
+					<mat-icon mat-list-icon svgIcon="xml" ></mat-icon>
+					<span>Optimized SVG</span>
+				</button>
+				<button mat-list-item >
+					<mat-icon mat-list-icon svgIcon="language-css3" ></mat-icon>
+					<span>CSS</span>
+				</button>
+			</mat-action-list>
+		</mat-expansion-panel>
+		<mat-expansion-panel>
+			<mat-expansion-panel-header>
+				<mat-panel-title class="savage-app-drawer-header" >
+					<mat-icon svgIcon="history" class="savage-app-drawer-header-icon" ></mat-icon>
+					<span class="savage-app-drawer-header-text" >Recent</span>
+				</mat-panel-title>
+			</mat-expansion-panel-header>
+
+			<mat-action-list>
+				<button mat-list-item *ngFor="let recent of file.recent" (click)="file.openRecentSVG(recent)" >
+					<mat-icon mat-list-icon svgIcon="file-image" ></mat-icon>
+					<div mat-line class="savage-app-drawer-title"> {{ recent.name }}</div>
+					<div mat-line class="savage-app-drawer-subtitle">{{ recent.modified | date }}</div>
+				</button>
+			</mat-action-list>
+		</mat-expansion-panel>
+	</mat-accordion>
+	<mat-list>
+		<mat-list-item>
+			<mat-icon mat-list-icon svgIcon="theme-light-dark" ></mat-icon>
+			<mat-slide-toggle labelPosition="before" >Dark Mode</mat-slide-toggle>
+		</mat-list-item>
+	</mat-list>
+</div>

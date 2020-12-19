@@ -1,0 +1,123 @@
+<nav mat-tab-nav-bar mat-stretch-tabs class="savage-app-sidebar-tabs" >
+	<a mat-tab-link [active]="activeView === 'shapes'" (click)="switchView('shapes'); tree.treeModel.setFocus(true)" >Shapes</a>
+	<a mat-tab-link [active]="activeView === 'defs'" (click)="switchView('defs'); tree.treeModel.setFocus(true)" >Defs</a>
+</nav>
+
+<mat-toolbar class="savage-app-sidebar-toolbar" >
+	<span class="savage-app-sidebar-toolbar-left">
+		<button mat-icon-button [matMenuTriggerFor]="addMenu" matTooltip="Add element" ><mat-icon svgIcon="plus" ></mat-icon></button>
+		<mat-menu #addMenu >
+			<button mat-menu-item (click)="addNode('g', tree.treeModel)" >Group</button>
+			<mat-divider ></mat-divider>
+
+			<button mat-menu-item *ngIf="activeView === 'shapes'" (click)="addNode('use', tree.treeModel)" >Symbol reference (&lt;use&gt;)</button>
+			<button mat-menu-item *ngIf="activeView === 'shapes'" (click)="addNode('image', tree.treeModel)" >Image</button>
+
+			<button mat-menu-item *ngIf="activeView === 'defs'" (click)="addNode('linearGradient', tree.treeModel)" >Linear gradient</button>
+			<button mat-menu-item *ngIf="activeView === 'defs'" (click)="addNode('radialGradient', tree.treeModel)" >Radial gradient</button>
+			<button mat-menu-item *ngIf="activeView === 'defs'" (click)="addNode('pattern', tree.treeModel)" >Pattern</button>
+			<button mat-menu-item *ngIf="activeView === 'defs'" (click)="addNode('mask', tree.treeModel)" >Mask</button>
+			<button mat-menu-item *ngIf="activeView === 'defs'" [matMenuTriggerFor]="filterMenu" >Filter</button>
+			<button mat-menu-item *ngIf="activeView === 'defs'" (click)="addNode('symbol', tree.treeModel)" >Symbol</button>
+		</mat-menu>
+		<mat-menu #filterMenu >
+			<button mat-menu-item  (click)="addNode('filter', tree.treeModel)" >New filter</button>
+			<mat-divider ></mat-divider>
+			<button mat-menu-item *ngFor="let primitive of primitives" (click)="addNode(primitive, tree.treeModel)" >{{ primitive }}</button>
+		</mat-menu>
+
+		<button mat-icon-button matTooltip="Remove element" (click)="removeNodes(tree.treeModel)" ><mat-icon svgIcon="minus" ></mat-icon></button>
+		<button mat-icon-button matTooltip="Duplicate element" (click)="dupeNode(tree.treeModel)" ><mat-icon svgIcon="content-duplicate" ></mat-icon></button>
+		<button mat-icon-button *ngIf="activeView === 'shapes'" matTooltip="Convert element to path" ><mat-icon svgIcon="vector-triangle" ></mat-icon></button>
+		<button mat-icon-button *ngIf="activeView === 'shapes'" [matMenuTriggerFor]="refMenu" matTooltip="Move element to references" ><mat-icon svgIcon="image-move" ></mat-icon></button>
+		<mat-menu #refMenu >
+			<button mat-menu-item (click)="move2ref(tree.treeModel, 'defs')" >Defs</button>
+			<button mat-menu-item [matMenuTriggerFor]="refSymbolMenu" >Symbol</button>
+			<button mat-menu-item [matMenuTriggerFor]="refPatternMenu" >Pattern</button>
+			<button mat-menu-item [matMenuTriggerFor]="refMaskMenu" >Mask</button>
+		</mat-menu>
+		<mat-menu #refSymbolMenu >
+			<button mat-menu-item *ngFor="let symbol of definitions?.symbols" (click)="move2ref(tree.treeModel, symbol.nid)" >{{ symbol.id }}</button>
+		</mat-menu>
+		<mat-menu #refPatternMenu >
+			<button mat-menu-item *ngFor="let pattern of definitions?.patterns" (click)="move2ref(tree.treeModel, pattern.nid)" >{{ pattern.id }}</button>
+		</mat-menu>
+		<mat-menu #refMaskMenu >
+			<button mat-menu-item *ngFor="let mask of definitions?.masks" (click)="move2ref(tree.treeModel, mask.nid)" >{{ mask.id }}</button>
+		</mat-menu>
+	</span>
+	<span class="savage-app-sidebar-toolbar-right">
+		<button mat-icon-button matTooltip="Collapse tree" (click)="tree.treeModel.collapseAll()" ><mat-icon svgIcon="unfold-less-horizontal" ></mat-icon></button>
+		<button mat-icon-button matTooltip="Expand tree" (click)="tree.treeModel.expandAll()" ><mat-icon svgIcon="unfold-more-horizontal" ></mat-icon></button>
+	</span>
+</mat-toolbar>
+
+<div class="savage-app-sidebar-el-tree">
+	<tree-root #tree [nodes]="data" [options]="options" [(state)]="state" >
+		<ng-template #treeNodeWrapperTemplate let-node let-index="index" >
+			<div class="node-wrapper" [style.padding-left]="node.getNodePadding()" >
+				<button mat-icon-button [disabled]="!node.hasChildren" (click)="node.toggleExpanded()" >
+					<mat-icon *ngIf="node.hasChildren" [svgIcon]="node.isExpanded ? 'chevron-down' : 'chevron-right'" ></mat-icon>
+				</button>
+
+				<div class="node-content-wrapper"
+					[class.node-content-wrapper-active]="node.isActive"
+					[class.node-content-wrapper-focused]="node.isFocused"
+					(click)="node.mouseAction('click', $event)"
+					(dblclick)="node.mouseAction('dblClick', $event)"
+					(contextmenu)="node.mouseAction('contextMenu', $event)"
+					(treeDrop)="node.onDrop($event)"
+					[treeAllowDrop]="node.allowDrop"
+					[treeDrag]="node"
+					[treeDragEnabled]="node.allowDrag()"
+				>
+					<div class="node-content" >
+						<div class="node-content-left">
+							<ng-container [ngSwitch]="getPreviewKey(node.data)" >
+								<span *ngSwitchCase="'render'" [innerHTML]="generatePreview('render', node.data) | safeHtml" [style.opacity]="node.data.attributes.display === 'none' ? 0.35 : 1" ></span>
+								<span *ngSwitchCase="'ref'" [innerHTML]="generatePreview('ref', node.data) | safeHtml" [style.opacity]="node.data.attributes.display === 'none' ? 0.35 : 1" ></span>
+								<mat-icon *ngSwitchCase="'icon'" class="node-preview" [svgIcon]="pickPreviewIcon(node.data)" [style.opacity]="node.data.attributes.display === 'none' ? 0.35 : 1" ></mat-icon>
+								<mat-icon *ngSwitchDefault class="node-preview" svgIcon="help" [style.opacity]="node.data.attributes.display === 'none' ? 0.35 : 1" ></mat-icon>
+							</ng-container>
+							<span class="node-name" >{{ node.data.name }}</span>
+							<ng-container *ngIf="!primitives.includes(node.data.name)">
+								<editable class="node-editable" (save)="updateIdentifier(node.data, 'id', controls[node.id].id)" >
+									<ng-template viewMode >
+										<span class="node-editable-id" >{{ formatIdentifier('id', node.data.attributes.id) }}</span>
+									</ng-template>
+									<ng-template editMode >
+										<div class="node-editable-input-wrapper" >
+											<mat-form-field>
+												<input matInput editableOnEnter editableOnEscape type="text" [formControl]="controls[node.id].id" >
+											</mat-form-field>
+										</div>
+									</ng-template>
+								</editable>
+								<editable class="node-editable" (save)="updateIdentifier(node.data, 'class', controls[node.id].class)" >
+									<ng-template viewMode >
+										<span class="node-editable-class" >{{ formatIdentifier('class', node.data.attributes.class) }}</span>
+									</ng-template>
+									<ng-template editMode >
+										<div class="node-editable-input-wrapper" >
+											<mat-form-field>
+												<input matInput editableOnEnter editableOnEscape type="text" [formControl]="controls[node.id].class" >
+											</mat-form-field>
+										</div>
+									</ng-template>
+								</editable>
+							</ng-container>
+						</div>
+						<div class="node-content-right">
+							<button mat-icon-button (click)="toggleVisibility(node)" >
+								<mat-icon
+									[svgIcon]="node.data.attributes.display === 'none' ? 'eye-off' : 'eye'"
+									[style.opacity]="node.data.attributes.display === 'none' ? 0.35 : 1" >
+								</mat-icon>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</ng-template>
+	</tree-root>
+</div>

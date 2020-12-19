@@ -1,0 +1,88 @@
+.savage-app-sidebar-toolbar {
+	height: 40px;
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.savage-app-sidebar-el-tree {
+	height: 325px;
+	overflow: auto;
+
+	.node-wrapper {
+		.node-content-wrapper {
+			width: 100%;
+			padding: 0;
+
+			&:hover {
+				box-shadow: var(--list-item-focused);
+			}
+
+			&-active {
+				background-color: var(--list-item-selected);
+				box-shadow: none;
+			}
+
+			&-focused {
+				background-color: var(--list-item-focused);
+				box-shadow: none;
+			}
+
+			.node-content {
+				display: flex;
+				flex-flow: row nowrap;
+				justify-content: space-between;
+				align-items: center;
+
+				&-left {
+					flex: 1 0 auto;
+					display: flex;
+					flex-flow: row nowrap;
+					justify-content: flex-start;
+					align-items: center;
+				}
+
+				&-right {
+					flex: 0 1 auto;
+				}
+
+				.node-preview {
+					width: 40px;
+					height: 40px;
+				}
+
+				.node-name {
+					font-size: 15px;
+					width: 60px;
+					margin-left: 5px;
+					overflow: hidden;
+					white-space: nowrap;
+					text-overflow: ellipsis;
+				}
+
+				.node-editable {
+					display: inline-block;
+					font-size: 14px;
+					color: var(--subtext);
+					width: 90px;
+					margin-left: 10px;
+					overflow: hidden;
+					white-space: nowrap;
+					text-overflow: ellipsis;
+
+					&-input-wrapper {
+						height: 40px;
+						position: relative;
+
+						.mat-form-field {
+							width: 90px;
+							position: absolute;
+							top: -8px;
+						}
+					}
+				}
+			}
+		}
+	}
+}
