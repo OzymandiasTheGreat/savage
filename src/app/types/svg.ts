@@ -1,3 +1,64 @@
+import { INode} from "svgson";
+import { Matrix, inverse, applyToPoint, applyToPoints, Point as ArrayPoint } from "transformation-matrix";
+
+import { Observable } from "./observer";
+
+
+export interface SavageSVG extends Omit<INode, "attributes" | "children"> {
+	nid: string;
+	attributes: Observable<Record<string, string>>;
+	children: Observable<Observable<SavageSVG>[]>;
+}
+
+
+export interface SavageRecentSVG {
+	name: string;
+	data: string;
+	modified: number;
+}
+
+
+export function findParent(root: Observable<SavageSVG>, nid: string): Observable<SavageSVG> | null {
+	let node: Observable<SavageSVG>;
+
+	root.children?.some((n) => {
+		if (n.nid === nid) {
+			return node = root;
+		}
+		return node = findParent(n, nid);
+	});
+	return node || null;
+}
+
+
+export interface Point {
+	x: number;
+	y: number;
+}
+
+
+export function screen2svg(svg: SVGSVGElement, screen: Point): Point {
+	const ctm = svg.getScreenCTM();
+	const point = svg.createSVGPoint();
+	point.x = screen.x;
+	point.y = screen.y;
+	const target = point.matrixTransform(ctm.inverse());
+	return { x: target.x, y: target.y };
+}
+
+
+export function applyTransformed(xy: Point, d: Point, matrix: Matrix): Point {
+	xy = applyToPoint(matrix, xy);
+	return applyToPoint(inverse(matrix), { x: xy.x + d.x, y: xy.y + d.y });
+}
+
+
+export function applyTransformedPoly(points: ArrayPoint[], d: Point, matrix: Matrix): ArrayPoint[] {
+	points = applyToPoints(matrix, points);
+	return applyToPoints(inverse(matrix), points.map((p) => <ArrayPoint> [p[0] + d.x, p[1] + d.y]));
+}
+
+
 export const SVGElements = {
 	render: ["a", "circle", "ellipse", "g", "image", "line", "path", "polygon",
 		"polyline", "rect", "svg", "use"],
@@ -47,94 +108,3 @@ export const KNOWN_ELEMENTS = SVGElements.render.concat(
 
 
 export const ELEMENTS_SKIP = SVGElements.unsupported.concat(SVGElements.deprecated);
-
-
-// export interface SVGCoreAttributes {
-// 	"id": string;
-// 	"tabindex": number;
-// }
-
-
-// export interface SVGStyleAttributes {
-// 	"class": string;
-// 	"style": string;
-// }
-
-
-// export interface SVGPresentationAttributes {
-// 	"clip-path": string;
-// 	"clip-rule": "nonzero" | "evenodd" | "inherit";
-// 	"color": string;
-// 	"color-interpolation": "auto" | "sRGB" | "linearRGB";
-// 	"display": "none" | "contents" | "block" | "inline" | "run-in" | "flow" | "flow-root" | "table"
-// 		| "flex" | "grid" | "ruby" | "list-item" | "table-row-group" | "table-header-group"
-// 		| "table-footer-group" | "table-row" | "table-cell" | "table-column-group"
-// 		| "table-column" | "table-caption" | "ruby-base" | "ruby-text" | "ruby-base-container"
-// 		| "ruby-text-container";
-// 	"overflow": "visible" | "hidden" | "scroll" | "auto";
-// 	"pointer-events": "bounding-box" | "visiblePainted" | "visibleFill" | "visibleStroke"
-// 		| "visible" | "painted" | "fill" | "stroke" | "all" | "none";
-// }
-
-
-// export interface SVGShapeAttributes {
-// 	"cursor": string |  "auto" | "crosshair" | "default" | "pointer" | "move"
-// 		| "e-resize" | "ne-resize" | "nw-resize" | "n-resize" | "se-resize"
-// 		| "sw-resize" | "s-resize" | "w-resize"| "text" | "wait" | "help" | "inherit";
-// 	"fill": string;
-// 	"fill-opacity": number | string;
-// 	"fill-rule": "nonzero" | "evenodd";
-// 	"filter": string;
-// 	"marker-end": string;
-// 	"marker-mid": string;
-// 	"marker-start": string;
-// 	"mask": string;
-// 	"mask-image": string;
-// 	"mask-mode": "alpha" | "luminance" | "match-source";
-// 	"mask-repeat": string;
-// 	"mask-position": string;
-// 	"mask-clip": "no-clip" | "fill-box" | "stroke-box" | "view-box" | "margin-box"
-// 		| "border-box" | "padding-box" | "content-box";
-// 	"mask-origin": "fill-box" | "stroke-box" | "view-box" | "margin-box" | "border-box"
-// 		| "padding-box" | "content-box";
-// 	"mask-size": string | "cover" | "contain";
-// 	"mask-composite": "add" | "subtract" | "intersect" | "exclude";
-// 	"opacity": number;
-// 	"shape-rendering": "auto" | "optimizeSpeed" | "crispEdges" | "geometricPrecision";
-// 	"stroke": string;
-// }
-
-
-// export interface SVGTextAttributes {
-// 	"alignment-baseline": "baseline" | "text-before-edge" | "middle" | "central"
-// 		| "text-after-edge" | "ideographic" | "alphabetic" | "hanging" | "mathematical"
-// 		| "top" | "center" | "bottom";
-// 	"direction": "ltr" | "rtl";
-// 	"dominant-baseline": "auto" | "text-bottom" | "alphabetic" | "ideographic"
-// 		| "middle" | "central" | "mathematical" | "hanging" | "text-top";
-// 	"font-family": string;
-// 	"font-size": number | string;
-// 	"font-size-adjust": number;
-// 	"font-stretch": string | "normal" | "ultra-condensed" | "extra-condensed"
-// 		| "condensed" | "semi-condensed" | "semi-expanded" | "expanded" | 'extra-expanded'
-// 		| "ultra-expanded";
-// 	"font-style": "normal" | "italic" | "oblique";
-// 	"font-variant": string | "small-caps" | "all-small-caps" | "petite-caps"
-// 		| "all-petite-caps" | "unicase" | "titling-caps" | "ordinal" | "slashed-zero";
-// 	"font-weight": number | "normal" | "bold" | "bolder" | "lighter";
-// 	"letter-spacing": "normal" | number;
-// }
-
-
-// export interface SVGFilterAttributes {
-// 	"color-interpolation-filters": "auto" | "sRGB" | "linearRGB";
-// 	"flood-color": string;
-// 	"flood-opacity": number;
-// 	"lighting-color": string;
-// }
-
-
-// export interface SVGGradientAttributes {
-// 	"stop-color": "currentcolor" | string;
-// 	"stop-opacity": number;
-// }

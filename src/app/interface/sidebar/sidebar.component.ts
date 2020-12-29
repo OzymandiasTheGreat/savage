@@ -1,7 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 
 import { Observable } from "../../types/observer";
-import { SvgFileService, SavageSVG } from "../../services/svg-file.service";
+import { SavageSVG } from "../../types/svg";
+import { SvgFileService } from "../../services/svg-file.service";
 
 
 

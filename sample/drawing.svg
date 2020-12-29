@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="450" height="450" version="1.1" viewBox="0 0 119.06 119.06" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+ <metadata>
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <rect x="4.4913" y="4.2812" width="41.026" height="33.19" ry=".45834" fill-rule="evenodd"/>
+ <g stroke-width=".26458">
+  <circle cx="55" cy="5" r="30"/>
+  <path d="m16.495 53.333-4.6368-2.7274-4.8754 2.2735 1.161-5.2527-3.6688-3.9343 5.3544-0.51895 2.608-4.705 2.1481 4.9319 5.2806 1.0264-4.0267 3.5671z"/>
+  <path d="m63.06 87.175-29.587-3.1053-6.1895-29.098 25.761-14.878 22.111 19.903z"/>
+ </g>
+ <text fill="#000000" font-family="sans-serif" font-size="10.583px" style="line-height:1.25;shape-inside:url(#rect845);white-space:pre" xml:space="preserve"><tspan x="9.9902344" y="103.53757">Blah blah</tspan></text>
+</svg>

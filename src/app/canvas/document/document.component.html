@@ -1,0 +1,924 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+	class="savage-app-canvas-svg-document"
+	overflow="visible"
+	pointer-events="all"
+	[appAttrs]="document"
+	[skipAttrs]="['overflow', 'pointer-events']" >
+
+	<ng-template #animation let-nodes >
+		<ng-container *ngFor="let node of nodes" >
+			<ng-container [ngSwitch]="node.name" >
+				<svg:animate *ngSwitchCase="'animate'" [appAttrs]="node" ></svg:animate>
+				<svg:animateMotion *ngSwitchCase="'animateMotion'" [appAttrs]="node" >
+					<svg:mpath *ngFor="let n of node.children" [appAttrs]="n" ></svg:mpath>
+				</svg:animateMotion>
+				<svg:animateTransform *ngSwitchCase="'animateTransform'" [appAttrs]="node" ></svg:animateTransform>
+				<svg:discard *ngSwitchCase="'discard'" [appAttrs]="node" ></svg:discard>
+				<svg:set *ngSwitchCase="'set'" [appAttrs]="node" ></svg:set>
+			</ng-container>
+		</ng-container>
+	</ng-template>
+
+	<ng-template #text let-nodes >
+		<ng-container *ngFor="let node of nodes" >
+			<ng-container [ngSwitch]="node.name" >
+				<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+				<svg:text *ngSwitchCase="'text'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="text; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:text>
+				<svg:tspan *ngSwitchCase="'tspan'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+				>
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="text; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:tspan>
+				<svg:textPath *ngSwitchCase="'textPath'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+				>
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="text; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:textPath>
+				<ng-container *ngSwitchCase="''" >
+					<ng-container *ngIf="node.type === 'text'" >{{ node.value }}</ng-container>
+				</ng-container>
+			</ng-container>
+		</ng-container>
+	</ng-template>
+
+	<ng-template #graphics let-nodes >
+		<ng-container *ngFor="let node of nodes" >
+			<ng-container [ngSwitch]="node.name" >
+				<svg:circle *ngSwitchCase="'circle'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[disabled]="!canMove()"
+					[transform]="node.attributes.transform"
+					(dragging)="onDrag($event, node)"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:circle>
+				<svg:ellipse *ngSwitchCase="'ellipse'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[disabled]="!canMove()"
+					[transform]="node.attributes.transform"
+					(dragging)="onDrag($event, node)"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:ellipse>
+				<svg:image *ngSwitchCase="'image'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[disabled]="!canMove()"
+					[transform]="node.attributes.transform"
+					(dragging)="onDrag($event, node)"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:image>
+				<svg:line *ngSwitchCase="'line'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[disabled]="!canMove()"
+					[transform]="node.attributes.transform"
+					(dragging)="onDrag($event, node)"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:line>
+				<svg:path *ngSwitchCase="'path'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[disabled]="!canMove()"
+					[transform]="node.attributes.transform"
+					(dragging)="onDrag($event, node)"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:path>
+				<svg:polygon *ngSwitchCase="'polygon'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[disabled]="!canMove()"
+					[transform]="node.attributes.transform"
+					(dragging)="onDrag($event, node)"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:polygon>
+				<svg:polyline *ngSwitchCase="'polyline'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[disabled]="!canMove()"
+					[transform]="node.attributes.transform"
+					(dragging)="onDrag($event, node)"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:polyline>
+				<svg:rect *ngSwitchCase="'rect'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[disabled]="!canMove()"
+					[transform]="node.attributes.transform"
+					(dragging)="onDrag($event, node)"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:rect>
+				<svg:text *ngSwitchCase="'text'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[disabled]="!canMove()"
+					[transform]="node.attributes.transform"
+					(dragging)="onDrag($event, node)"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+						<ng-container *ngTemplateOutlet="text; context: { $implicit: node.children }"></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:text>
+				<svg:use *ngSwitchCase="'use'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[disabled]="!canMove()"
+					[transform]="node.attributes.transform"
+					(dragging)="onDrag($event, node)"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:use>
+			</ng-container>
+		</ng-container>
+	</ng-template>
+
+	<ng-template #container let-nodes >
+		<ng-container *ngFor="let node of nodes" >
+			<ng-container [ngSwitch]="node.name" >
+				<svg:a *ngSwitchCase="'a'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="graphics; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="gradient; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="misc; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:a>
+				<svg:defs *ngSwitchCase="'defs'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="graphics; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="gradient; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="misc; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:defs>
+				<svg:g *ngSwitchCase="'g'" [appAttrs]="node" [appRegistry]="node.nid" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="graphics; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="gradient; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="misc; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:g>
+				<svg:marker *ngSwitchCase="'marker'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="graphics; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="gradient; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="misc; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:marker>
+				<svg:mask *ngSwitchCase="'mask'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="graphics; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="gradient; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="misc; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:mask>
+				<svg:pattern *ngSwitchCase="'pattern'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="graphics; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="gradient; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="misc; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:pattern>
+				<svg:svg *ngSwitchCase="'svg'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="graphics; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="gradient; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="misc; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:svg>
+				<svg:switch *ngSwitchCase="'switch'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="graphics; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:switch>
+				<svg:symbol *ngSwitchCase="'symbol'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="graphics; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="gradient; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="misc; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:symbol>
+			</ng-container>
+		</ng-container>
+	</ng-template>
+
+	<ng-template #gradient let-nodes >
+		<ng-container *ngFor="let node of nodes" >
+			<ng-container [ngSwitch]="node.name" >
+				<svg:linearGradient *ngSwitchCase="'linearGradient'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+						<ng-container *ngFor="let n of node.children" >
+							<svg:stop [appAttrs]="node" >
+								<ng-container *ngIf="n.children.length > 0" >
+									<ng-container *ngTemplateOutlet="animation; context: { $implicit: n.children }" ></ng-container>
+								</ng-container>
+							</svg:stop>
+						</ng-container>
+					</ng-container>
+				</svg:linearGradient>
+				<svg:radialGradient *ngSwitchCase="'radialGradient'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+						<ng-container *ngFor="let n of node.children" >
+							<svg:stop [appAttrs]="node" >
+								<ng-container *ngIf="n.children.length > 0" >
+									<ng-container *ngTemplateOutlet="animation; context: { $implicit: n.children }" ></ng-container>
+								</ng-container>
+							</svg:stop>
+						</ng-container>
+					</ng-container>
+				</svg:radialGradient>
+			</ng-container>
+		</ng-container>
+	</ng-template>
+
+	<ng-template #misc let-nodes >
+		<ng-container *ngFor="let node of nodes" >
+			<ng-container [ngSwitch]="node.name" >
+				<svg:clipPath *ngSwitchCase="'clipPath'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+						<ng-container *ngTemplateOutlet="graphics; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:clipPath>
+				<svg:filter *ngSwitchCase="'filter'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+						<ng-container *ngTemplateOutlet="filter; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:filter>
+				<svg:foreignObject *ngSwitchCase="'foreignObject'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="root; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:foreignObject>
+				<style *ngSwitchCase="'style'" [appAttrs]="node" ></style>
+			</ng-container>
+		</ng-container>
+	</ng-template>
+
+	<ng-template #filter let-nodes >
+		<ng-container *ngFor="let node of nodes" >
+			<ng-container [ngSwitch]="node.name" >
+				<svg:feBlend *ngSwitchCase="'feBlend'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:feBlend>
+				<svg:feColorMatrix *ngSwitchCase="'feColorMatrix'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:feColorMatrix>
+				<svg:feComponentTransfer *ngSwitchCase="'feComponentTransfer'" [appAttrs]="node" >
+					<ng-container *ngFor="let n of node.children" >
+						<ng-container [ngSwitch]="n.name" >
+							<svg:feFuncA *ngSwitchCase="'feFuncA'" [appAttrs]="n" >
+								<ng-container *ngIf="n.children.length > 0">
+									<ng-container *ngTemplateOutlet="animation; context: { $implicit: n.children }"></ng-container>
+								</ng-container>
+							</svg:feFuncA>
+							<svg:feFuncB *ngSwitchCase="'feFuncB'" [appAttrs]="n" >
+								<ng-container *ngIf="n.children.length > 0">
+									<ng-container *ngTemplateOutlet="animation; context: { $implicit: n.children }"></ng-container>
+								</ng-container>
+							</svg:feFuncB>
+							<svg:feFuncG *ngSwitchCase="'feFuncG'" [appAttrs]="n" >
+								<ng-container *ngIf="n.children.length > 0">
+									<ng-container *ngTemplateOutlet="animation; context: { $implicit: n.children }"></ng-container>
+								</ng-container>
+							</svg:feFuncG>
+							<svg:feFuncR *ngSwitchCase="'feFuncR'" [appAttrs]="n" >
+								<ng-container *ngIf="n.children.length > 0">
+									<ng-container *ngTemplateOutlet="animation; context: { $implicit: n.children }"></ng-container>
+								</ng-container>
+							</svg:feFuncR>
+						</ng-container>
+					</ng-container>
+				</svg:feComponentTransfer>
+				<svg:feComposite *ngSwitchCase="'feComposite'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:feComposite>
+				<svg:feConvolveMatrix *ngSwitchCase="'feConvolveMatrix'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:feConvolveMatrix>
+				<svg:feDiffuseLighting *ngSwitchCase="'feDiffuseLighting'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container [ngSwitch]="node.children[0].name">
+							<svg:feDistantLight *ngSwitchCase="'feDistantLight'" [appAttrs]="node.children[0]" >
+								<ng-container *ngIf="node.children.length > 0">
+									<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children[0].children }"></ng-container>
+								</ng-container>
+							</svg:feDistantLight>
+							<svg:fePointLight *ngSwitchCase="'fePointLight'" [appAttrs]="node.children[0]" >
+								<ng-container *ngIf="node.children.length > 0">
+									<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children[0].children }"></ng-container>
+								</ng-container>
+							</svg:fePointLight>
+							<svg:feSpotLight *ngSwitchCase="'feSpotLight'" [appAttrs]="node.children[0]" >
+								<ng-container *ngIf="node.children.length > 0">
+									<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children[0].children }"></ng-container>
+								</ng-container>
+							</svg:feSpotLight>
+						</ng-container>
+					</ng-container>
+				</svg:feDiffuseLighting>
+				<svg:feDisplacementMap *ngSwitchCase="'feDisplacementMap'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:feDisplacementMap>
+				<svg:feDropShadow *ngSwitchCase="'feDropShadow'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:feDropShadow>
+				<svg:feFlood *ngSwitchCase="'feFlood'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:feFlood>
+				<svg:feGaussianBlur *ngSwitchCase="'feGaussianBlur'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:feGaussianBlur>
+				<svg:feImage *ngSwitchCase="'feImage'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:feImage>
+				<svg:feMerge *ngSwitchCase="'feMerge'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngFor="let n of node.children" >
+							<svg:feMergeNode [appAttrs]="n" >
+								<ng-container *ngIf="n.children.length > 0">
+									<ng-container *ngTemplateOutlet="animation; context: { $implicit: n.children }"></ng-container>
+								</ng-container>
+							</svg:feMergeNode>
+						</ng-container>
+					</ng-container>
+				</svg:feMerge>
+				<svg:feMorphology *ngSwitchCase="'feMorphology'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:feMorphology>
+				<svg:feOffset *ngSwitchCase="'feOffset'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:feOffset>
+				<svg:feSpecularLighting *ngSwitchCase="'feSpecularLighting'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container [ngSwitch]="node.children[0].name">
+							<svg:feDistantLight *ngSwitchCase="'feDistantLight'" [appAttrs]="node.children[0]" >
+								<ng-container *ngIf="node.children.length > 0">
+									<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children[0].children }"></ng-container>
+								</ng-container>
+							</svg:feDistantLight>
+							<svg:fePointLight *ngSwitchCase="'fePointLight'" [appAttrs]="node.children[0]" >
+								<ng-container *ngIf="node.children.length > 0">
+									<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children[0].children }"></ng-container>
+								</ng-container>
+							</svg:fePointLight>
+							<svg:feSpotLight *ngSwitchCase="'feSpotLight'" [appAttrs]="node.children[0]" >
+								<ng-container *ngIf="node.children.length > 0">
+									<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children[0].children }"></ng-container>
+								</ng-container>
+							</svg:feSpotLight>
+						</ng-container>
+					</ng-container>
+				</svg:feSpecularLighting>
+				<svg:feTile *ngSwitchCase="'feTile'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:feTile>
+				<svg:feTurbulence *ngSwitchCase="'feTurbulence'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:feTurbulence>
+			</ng-container>
+		</ng-container>
+	</ng-template>
+
+	<ng-template #root let-nodes >
+		<ng-container *ngFor="let node of nodes" >
+			<ng-container [ngSwitch]="node.name" >
+				<svg:animate *ngSwitchCase="'animate'" [appAttrs]="node" ></svg:animate>
+				<svg:animateMotion *ngSwitchCase="'animateMotion'" [appAttrs]="node" >
+					<svg:mpath *ngFor="let n of node.children" [appAttrs]="n" ></svg:mpath>
+				</svg:animateMotion>
+				<svg:animateTransform *ngSwitchCase="'animateTransform'" [appAttrs]="node" ></svg:animateTransform>
+				<svg:discard *ngSwitchCase="'discard'" [appAttrs]="node" ></svg:discard>
+				<svg:set *ngSwitchCase="'set'" [appAttrs]="node" ></svg:set>
+
+				<svg:circle *ngSwitchCase="'circle'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[disabled]="!canMove()"
+					[transform]="node.attributes.transform"
+					(dragging)="onDrag($event, node)"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:circle>
+				<svg:ellipse *ngSwitchCase="'ellipse'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[disabled]="!canMove()"
+					[transform]="node.attributes.transform"
+					(dragging)="onDrag($event, node)"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:ellipse>
+				<svg:image *ngSwitchCase="'image'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[disabled]="!canMove()"
+					[transform]="node.attributes.transform"
+					(dragging)="onDrag($event, node)"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:image>
+				<svg:line *ngSwitchCase="'line'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[disabled]="!canMove()"
+					[transform]="node.attributes.transform"
+					(dragging)="onDrag($event, node)"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:line>
+				<svg:path *ngSwitchCase="'path'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[disabled]="!canMove()"
+					[transform]="node.attributes.transform"
+					(dragging)="onDrag($event, node)"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:path>
+				<svg:polygon *ngSwitchCase="'polygon'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[disabled]="!canMove()"
+					[transform]="node.attributes.transform"
+					(dragging)="onDrag($event, node)"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:polygon>
+				<svg:polyline *ngSwitchCase="'polyline'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[disabled]="!canMove()"
+					[transform]="node.attributes.transform"
+					(dragging)="onDrag($event, node)"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:polyline>
+				<svg:rect *ngSwitchCase="'rect'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[disabled]="!canMove()"
+					[transform]="node.attributes.transform"
+					(dragging)="onDrag($event, node)"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:rect>
+				<svg:text *ngSwitchCase="'text'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[disabled]="!canMove()"
+					[transform]="node.attributes.transform"
+					(dragging)="onDrag($event, node)"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+						<ng-container *ngTemplateOutlet="text; context: { $implicit: node.children }"></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:text>
+				<svg:use *ngSwitchCase="'use'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[disabled]="!canMove()"
+					[transform]="node.attributes.transform"
+					(dragging)="onDrag($event, node)"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:use>
+
+				<svg:a *ngSwitchCase="'a'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="graphics; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="gradient; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="misc; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:a>
+				<svg:defs *ngSwitchCase="'defs'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="graphics; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="gradient; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="misc; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:defs>
+				<svg:g *ngSwitchCase="'g'" [appAttrs]="node" [appRegistry]="node.nid" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="graphics; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="gradient; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="misc; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:g>
+				<svg:marker *ngSwitchCase="'marker'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="graphics; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="gradient; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="misc; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:marker>
+				<svg:mask *ngSwitchCase="'mask'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="graphics; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="gradient; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="misc; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:mask>
+				<svg:pattern *ngSwitchCase="'pattern'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="graphics; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="gradient; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="misc; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:pattern>
+				<svg:svg *ngSwitchCase="'svg'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="graphics; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="gradient; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="misc; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:svg>
+				<svg:switch *ngSwitchCase="'switch'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="graphics; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:switch>
+				<svg:symbol *ngSwitchCase="'symbol'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0" >
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="graphics; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="container; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="gradient; context: { $implicit: node.children }" ></ng-container>
+						<ng-container *ngTemplateOutlet="misc; context: { $implicit: node.children }" ></ng-container>
+					</ng-container>
+				</svg:symbol>
+
+				<svg:linearGradient *ngSwitchCase="'linearGradient'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+						<ng-container *ngFor="let n of node.children" >
+							<svg:stop [appAttrs]="node" >
+								<ng-container *ngIf="n.children.length > 0" >
+									<ng-container *ngTemplateOutlet="animation; context: { $implicit: n.children }" ></ng-container>
+								</ng-container>
+							</svg:stop>
+						</ng-container>
+					</ng-container>
+				</svg:linearGradient>
+				<svg:radialGradient *ngSwitchCase="'radialGradient'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+						<ng-container *ngFor="let n of node.children" >
+							<svg:stop [appAttrs]="node" >
+								<ng-container *ngIf="n.children.length > 0" >
+									<ng-container *ngTemplateOutlet="animation; context: { $implicit: n.children }" ></ng-container>
+								</ng-container>
+							</svg:stop>
+						</ng-container>
+					</ng-container>
+				</svg:radialGradient>
+
+				<svg:clipPath *ngSwitchCase="'clipPath'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+						<ng-container *ngTemplateOutlet="graphics; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:clipPath>
+				<svg:filter *ngSwitchCase="'filter'" [appAttrs]="node" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="animation; context: { $implicit: node.children }"></ng-container>
+						<ng-container *ngTemplateOutlet="filter; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:filter>
+				<svg:foreignObject *ngSwitchCase="'foreignObject'"
+					[appAttrs]="node"
+					[skipAttrs]="['tabindex', 'pointer-events']"
+					[appRegistry]="node.nid"
+					tabindex="-1"
+					(click)="onClick($event, node)"
+					(mousedown)="onMouseDown($event, node)"
+					(keydown)="onKeyDown($event, node)" >
+					<ng-container *ngIf="node.children.length > 0">
+						<ng-container *ngTemplateOutlet="root; context: { $implicit: node.children }"></ng-container>
+					</ng-container>
+				</svg:foreignObject>
+			</ng-container>
+		</ng-container>
+	</ng-template>
+
+	<ng-container *ngTemplateOutlet="root; context: { $implicit: document.children }"></ng-container>
+</svg>

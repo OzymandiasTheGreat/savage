@@ -4,6 +4,7 @@ import { NgModule } from "@angular/core";
 import { AppRoutingModule } from "./app-routing.module";
 import { MaterialModule } from "./material.module";
 import { InterfaceModule } from "./interface/interface.module";
+import { CanvasModule } from "./canvas/canvas.module";
 import { AppComponent } from "./app.component";
 
 
@@ -17,6 +18,7 @@ import { AppComponent } from "./app.component";
 		AppRoutingModule,
 		MaterialModule,
 		InterfaceModule,
+		CanvasModule,
 	],
 	providers: [],
 	bootstrap: [AppComponent]

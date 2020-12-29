@@ -1,3 +1,6 @@
+import { SavageSVG } from "./svg";
+
+
 export interface Change {
 	type: "insert" | "update" | "delete" | "shuffle" | "reverse";
 	path: string[];
@@ -18,3 +21,11 @@ export type Observable<T> = Partial<T> & {
 	}) => void;
 	unobserve: (func?: ObserveFunction) => void;
 };
+
+
+export function recursiveUnobserve(tree: Observable<SavageSVG>): void {
+	tree.unobserve();
+	tree.attributes.unobserve();
+	tree.children.unobserve();
+	tree.children.forEach((child) => recursiveUnobserve(child));
+}

@@ -5,8 +5,9 @@ import { stringify, INode } from "svgson";
 import { nanoid } from "nanoid/non-secure";
 
 import { SVGElements, KNOWN_ELEMENTS, CONTAINMENT_MAP } from "../../types/svg";
-import { Observable } from "../../types/observer";
-import { SvgFileService, SavageSVG, recursiveUnobserve, IDefinitions } from "../../services/svg-file.service";
+import { Observable, recursiveUnobserve } from "../../types/observer";
+import { SavageSVG } from "../../types/svg";
+import { SvgFileService, IDefinitions } from "../../services/svg-file.service";
 
 
 const recursiveIgnore = (node: Observable<SavageSVG>, map: object) => {
@@ -235,7 +236,7 @@ export class SidebarElementsComponent implements OnInit {
 	generatePreview(key: string, data: Observable<SavageSVG>): string {
 		const width = (this.root.attributes.width && parseFloat(this.root.attributes.width));
 		const height = (this.root.attributes.height && parseFloat(this.root.attributes.height));
-		const origViewbox = this.root.attributes.viewbox?.split(" ").map((u) => parseFloat(u));
+		const origViewbox = this.root.attributes.viewBox?.split(" ").map((u) => parseFloat(u));
 		const viewboxWidth = (origViewbox && origViewbox[2]) || width || 40;
 		const viewboxHeight = (origViewbox && origViewbox[3]) || height || 40;
 		const viewbox = [0, 0, viewboxWidth, viewboxHeight].join(" ");
@@ -286,7 +287,7 @@ export class SidebarElementsComponent implements OnInit {
 							y: "0",
 							width: viewboxWidth.toString(),
 							height: viewboxHeight.toString(),
-							href: `url(#${data.attributes.id})`,
+							href: `#${data.attributes.id}`,
 							display: "inline",
 						},
 						children: [],

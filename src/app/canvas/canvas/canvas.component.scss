@@ -1,0 +1,33 @@
+.savage-app-canvas {
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+
+	&-scrollable {
+		display: flex;
+		flex-flow: row nowrap;
+		justify-content: center;
+		align-items: center;
+		background-color: #bdbdbd66;
+		background-image:
+		linear-gradient(45deg, #21212133 25%, transparent 25%,
+			transparent 75%, #21212133 75%, #21212133),
+		linear-gradient(45deg, #21212133 25%, transparent 25%,
+			transparent 75%, #21212133 75%, #21212133);
+		background-size: 10px 10px;
+		background-position: 0 0, 5px 5px;
+		width: calc(100% * 3);
+		height: calc(100% * 3);
+	}
+
+	&-document {
+		flex: 0 0 auto;
+		border: 1px solid black;
+		box-shadow: 0 0 3px 1px #212121;
+		position: relative;
+
+		& > * {
+			position: absolute;
+		}
+	}
+}

@@ -1,0 +1,21 @@
+<div #element
+	class="savage-app-canvas" >
+	<div #scrollable
+		class="savage-app-canvas-scrollable"
+		(mousedown)="onMouseDown($event)"
+	>
+		<div #doc *ngIf="!!document"
+			class="savage-app-canvas-document"
+			[style.width.px]="width"
+			[style.height.px]="height" >
+			<app-document
+				[document]="document"
+				[scrollable]="scrollable"
+				(dragging)="handleDrag($event)"
+				(handleClick)="handleClick($event)"
+				(handleMouseDown)="handleMouseDown($event)"
+				(handleKeyDown)="handleKeyDown($event)" ></app-document>
+			<app-object-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" ></app-object-tool>
+		</div>
+	</div>
+</div>
