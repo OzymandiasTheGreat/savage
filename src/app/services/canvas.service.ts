@@ -3,15 +3,17 @@ import { Injectable } from "@angular/core";
 import { Observable } from "../types/observer";
 import { SavageSVG } from "../types/svg";
 import { IDocumentEvent } from "../canvas/document/document.component";
-import { ISnapTarget, DragEvent } from "../canvas/directives/draggable.directive";
+import { ISnapTarget } from "../canvas/directives/draggable.directive";
 
 
 export interface ICanvasTool {
 	name: string;
-	multiselect: boolean;
 	handleDrag: (event: IDocumentEvent) => void;
 	handleClick: (event: IDocumentEvent) => void;
+	handleDblClick: (event: IDocumentEvent) => void;
 	handleMouseDown: (event: IDocumentEvent) => void;
+	handleMouseMove: (event: MouseEvent) => void;
+	handleMouseUp: (event: MouseEvent) => void;
 	handleKeyDown: (event: IDocumentEvent) => void;
 }
 

@@ -1,79 +1,54 @@
 <svg #overlay xmlns="http://www.w3.org/2000/svg"
-	class="savage-app-canvas-select-tool"
+	class="savage-app-canvas-object-tool"
 	overflow="visible"
 	pointer-events="none"
 	[appAttrs]="document"
 	[skipAttrs]="['overflow', 'pointer-events']"
 >
-	<ng-container *ngFor="let node of selection" >
-		<svg:rect
-			[attr.x]="bbox(node).x"
-			[attr.y]="bbox(node).y"
-			[attr.width]="bbox(node).width"
-			[attr.height]="bbox(node).height"
-			fill="none"
-			stroke="#212121"
-			stroke-width="2px"
-			stroke-dasharray="2px 3px"
-			vector-effect="non-scaling-size"
-		></svg:rect>
-		<!-- Scale handles -->
-		<ng-container *ngIf="mode === 'scale'" >
-			<svg:svg *ngFor="let corner of ['topLeft', 'topRight', 'bottomRight', 'bottomLeft']"
-				pointer-events="all"
-				appDraggable
-				[containment]="scrollable"
-				[autoScroll]="scrollable"
-				[snap]="canvas.snap"
-				(dragging)="scaleNode(node, corner, $event)"
-				(mousedown)="onMouseDown($event, node)"
-				[attr.x]="corner.endsWith('Left') ? bbox(node).x - 7 : bbox(node).right - 11"
-				[attr.y]="corner.startsWith('top') ? bbox(node).y - 7 : bbox(node).bottom - 11"
-				width="18"
-				height="18"
-				viewBox="0 0 24 24"
-				fill="#212121"
+	<ng-container *ngIf="canvas.activeTool === name">
+		<ng-container *ngFor="let node of selection" >
+			<svg:rect
+				[attr.x]="bbox(node).x"
+				[attr.y]="bbox(node).y"
+				[attr.width]="bbox(node).width"
+				[attr.height]="bbox(node).height"
+				fill="none"
 				stroke="#212121"
-				stroke-width="1"
+				[attr.stroke-width]="2 * wx"
+				[attr.stroke-dasharray]="[2 * wx, 3 * wx].join(' ')"
 				vector-effect="non-scaling-size"
-			>
-				<ng-container [ngSwitch]="corner" >
-					<svg:path *ngSwitchCase="'topLeft'" d="M5.83,8.66L3,11.5V3H11.5L8.66,5.83L18.17,15.34L21,12.5V21H12.5L15.34,18.17L5.83,8.66Z" ></svg:path>
-					<svg:path *ngSwitchCase="'bottomRight'" d="M5.83,8.66L3,11.5V3H11.5L8.66,5.83L18.17,15.34L21,12.5V21H12.5L15.34,18.17L5.83,8.66Z" ></svg:path>
-					<svg:path *ngSwitchCase="'topRight'" d="M18.17,8.66L21,11.5V3H12.5L15.34,5.83L5.83,15.34L3,12.5V21H11.5L8.66,18.17L18.17,8.66Z" ></svg:path>
-					<svg:path *ngSwitchCase="'bottomLeft'" d="M18.17,8.66L21,11.5V3H12.5L15.34,5.83L5.83,15.34L3,12.5V21H11.5L8.66,18.17L18.17,8.66Z" ></svg:path>
-				</ng-container>
-				<svg:rect x="0" y="0" width="18" height="18" fill="transparent" stroke="transparent" ></svg:rect>
-			</svg:svg>
-		</ng-container>
-		<!-- Rotate handle -->
-		<ng-container *ngIf="mode === 'rotate'" >
-			<svg:svg
-				pointer-events="all"
-				overflow="visible"
-				appDraggable
-				[containment]="scrollable"
-				[autoScroll]="scrollable"
-				[snap]="canvas.snap"
-				(dragging)="rotateNode(node, $event)"
-				(mousedown)="onMouseDown($event, node)"
-				[attr.x]="bbox(node).x - 11"
-				[attr.y]="bbox(node).y - 11"
-				width="18"
-				height="18"
-				viewBox="0 0 24 24"
-				fill="#212121"
-				stroke="#212121"
-				stroke-width="1"
-				vector-effect="non-scaling-size"
-			>
-				<svg:path transform="translate(-2, -2) rotate(-45, 7, 7)" d="M18.4,10.6C16.55,9 14.15,8 11.5,8C6.85,8 2.92,11.03 1.54,15.22L3.9,16C4.95,12.81 7.95,10.5 11.5,10.5C13.45,10.5 15.23,11.22 16.62,12.38L13,16H22V7L18.4,10.6Z" ></svg:path>
-				<svg:rect transform="translate(-2, -2)" x="0" y="0" width="18" height="18" fill="transparent" stroke="transparent" ></svg:rect>
-			</svg:svg>
-		</ng-container>
-		<!-- Skew handles -->
-		<ng-container *ngIf="mode === 'skew'" >
-			<ng-container *ngFor="let axis of ['x', 'y']" >
+			></svg:rect>
+			<!-- Scale handles -->
+			<ng-container *ngIf="mode === 'scale'" >
+				<svg:svg *ngFor="let corner of ['topLeft', 'topRight', 'bottomRight', 'bottomLeft']"
+					pointer-events="all"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					(dragging)="scaleNode(node, corner, $event)"
+					(mousedown)="onMouseDown($event, node)"
+					[attr.x]="corner.endsWith('Left') ? bbox(node).x - 7 * wx : bbox(node).right - 11 * wx"
+					[attr.y]="corner.startsWith('top') ? bbox(node).y - 7 * hx : bbox(node).bottom - 11 * hx"
+					[attr.width]="18 * wx"
+					[attr.height]="18 * hx"
+					viewBox="0 0 24 24"
+					fill="#212121"
+					stroke="#212121"
+					stroke-width="1"
+					vector-effect="non-scaling-size"
+				>
+					<ng-container [ngSwitch]="corner" >
+						<svg:path *ngSwitchCase="'topLeft'" d="M5.83,8.66L3,11.5V3H11.5L8.66,5.83L18.17,15.34L21,12.5V21H12.5L15.34,18.17L5.83,8.66Z" ></svg:path>
+						<svg:path *ngSwitchCase="'bottomRight'" d="M5.83,8.66L3,11.5V3H11.5L8.66,5.83L18.17,15.34L21,12.5V21H12.5L15.34,18.17L5.83,8.66Z" ></svg:path>
+						<svg:path *ngSwitchCase="'topRight'" d="M18.17,8.66L21,11.5V3H12.5L15.34,5.83L5.83,15.34L3,12.5V21H11.5L8.66,18.17L18.17,8.66Z" ></svg:path>
+						<svg:path *ngSwitchCase="'bottomLeft'" d="M18.17,8.66L21,11.5V3H12.5L15.34,5.83L5.83,15.34L3,12.5V21H11.5L8.66,18.17L18.17,8.66Z" ></svg:path>
+					</ng-container>
+					<svg:rect x="0" y="0" [attr.width]="18 * wx" [attr.height]="18 * hx" fill="transparent" stroke="transparent" ></svg:rect>
+				</svg:svg>
+			</ng-container>
+			<!-- Rotate handle -->
+			<ng-container *ngIf="mode === 'rotate'" >
 				<svg:svg
 					pointer-events="all"
 					overflow="visible"
@@ -81,23 +56,63 @@
 					[containment]="scrollable"
 					[autoScroll]="scrollable"
 					[snap]="canvas.snap"
-					(dragging)="skewNode(node, axis, $event)"
+					(dragging)="rotateNode(node, $event)"
 					(mousedown)="onMouseDown($event, node)"
-					[attr.x]="axis === 'x' ? bbox(node).x + bbox(node).width / 2 - 9 : bbox(node).right - 9"
-					[attr.y]="axis === 'y' ? bbox(node).y + bbox(node).height / 2 - 9 : bbox(node).bottom - 9"
-					width="18"
-					height="18"
+					[attr.x]="bbox(node).x - 11 * wx"
+					[attr.y]="bbox(node).y - 11 * hx"
+					[attr.width]="18 * wx"
+					[attr.height]="18 * hx"
 					viewBox="0 0 24 24"
 					fill="#212121"
 					stroke="#212121"
 					stroke-width="1"
 					vector-effect="non-scaling-size"
 				>
-					<svg:path *ngIf="axis === 'x'" d="M8,14V18L2,12L8,6V10H16V6L22,12L16,18V14H8Z" ></svg:path>
-					<svg:path *ngIf="axis === 'y'" d="M10,8H6L12,2L18,8H14V16H18L12,22L6,16H10V8Z" ></svg:path>
-					<svg:rect x="0" y="0" width="18" height="18" fill="transparent" stroke="transparent" ></svg:rect>
+					<svg:path transform="translate(-2, -2) rotate(-45, 7, 7)" d="M18.4,10.6C16.55,9 14.15,8 11.5,8C6.85,8 2.92,11.03 1.54,15.22L3.9,16C4.95,12.81 7.95,10.5 11.5,10.5C13.45,10.5 15.23,11.22 16.62,12.38L13,16H22V7L18.4,10.6Z" ></svg:path>
+					<svg:rect transform="translate(-2, -2)" x="0" y="0" width="18" height="18" fill="transparent" stroke="transparent" ></svg:rect>
 				</svg:svg>
 			</ng-container>
+			<!-- Skew handles -->
+			<ng-container *ngIf="mode === 'skew'" >
+				<ng-container *ngFor="let axis of ['x', 'y']" >
+					<svg:svg
+						pointer-events="all"
+						overflow="visible"
+						appDraggable
+						[containment]="scrollable"
+						[autoScroll]="scrollable"
+						[snap]="canvas.snap"
+						(dragging)="skewNode(node, axis, $event)"
+						(mousedown)="onMouseDown($event, node)"
+						[attr.x]="axis === 'x' ? bbox(node).x + bbox(node).width / 2 - 9 * wx : bbox(node).right - 9 * wx"
+						[attr.y]="axis === 'y' ? bbox(node).y + bbox(node).height / 2 - 9 * hx : bbox(node).bottom - 9 * hx"
+						[attr.width]="18 * wx"
+						[attr.height]="18 * hx"
+						viewBox="0 0 24 24"
+						fill="#212121"
+						stroke="#212121"
+						stroke-width="1"
+						vector-effect="non-scaling-size"
+					>
+						<svg:path *ngIf="axis === 'x'" d="M8,14V18L2,12L8,6V10H16V6L22,12L16,18V14H8Z" ></svg:path>
+						<svg:path *ngIf="axis === 'y'" d="M10,8H6L12,2L18,8H14V16H18L12,22L6,16H10V8Z" ></svg:path>
+						<svg:rect x="0" y="0" width="18" height="18" fill="transparent" stroke="transparent" ></svg:rect>
+					</svg:svg>
+				</ng-container>
+			</ng-container>
+		</ng-container>
+		<ng-container *ngIf="!!selectbox" >
+			<svg:rect
+				[attr.x]="selectbox.x"
+				[attr.y]="selectbox.y"
+				[attr.width]="selectbox.width"
+				[attr.height]="selectbox.height"
+				fill="#42424233"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				[attr.stroke-dasharray]="[1 * wx, 2 * wx].join(' ')"
+				vector-effect="non-scaling-size"
+			></svg:rect>
 		</ng-container>
 	</ng-container>
 </svg>

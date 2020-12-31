@@ -8,6 +8,7 @@ import { CanvasComponent } from "./canvas/canvas.component";
 import { DocumentComponent } from "./document/document.component";
 import { ObjectToolComponent } from "./object-tool/object-tool.component";
 import { PathToolComponent } from "./path-tool/path-tool.component";
+import { TextToolComponent } from "./text-tool/text-tool.component";
 
 
 @NgModule({
@@ -19,6 +20,7 @@ import { PathToolComponent } from "./path-tool/path-tool.component";
 		DocumentComponent,
 		ObjectToolComponent,
 		PathToolComponent,
+		TextToolComponent,
 	],
 	imports: [
 		CommonModule,

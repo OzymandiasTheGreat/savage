@@ -17,7 +17,7 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
 	@ViewChild("doc", { static: false }) container: ElementRef<SVGSVGElement>;
 	document: Observable<SavageSVG>;
 	pointerMoved = false;
-	panning: { enabled: boolean, prevX: number, prevY: number } = { enabled: false, prevX: null, prevY: null };
+	panning = false;
 
 	protected globalListeners: Record<string, Array<(event: Event) => void>> = {};
 	protected canvasListeners: Record<string, Array<(event: Event) => void>> = {};
@@ -29,6 +29,7 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
 	) {
 		this.globalListeners.keyup = [this.onKeyUp.bind(this)];
 		this.globalListeners.mousemove = [this.onMouseMove.bind(this)];
+		this.globalListeners.mouseup = [this.onMouseUp.bind(this)];
 		this.canvasListeners.click = [
 			(event: MouseEvent) => this.handleClick({ node: null, event }),
 		];
@@ -95,26 +96,38 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
 		if (Math.abs(event.movementX) > 5 || Math.abs(event.movementY) > 5) {
 			this.pointerMoved = true;
 		}
-		if (this.panning.enabled) {
-			const dx = ((this.panning.prevX || event.screenX) - event.screenX) * 15;
-			const dy = ((this.panning.prevY || event.screenY) - event.screenY) * 15;
-			this.panning.prevX = event.screenX;
-			this.panning.prevY = event.screenY;
-			this.element.nativeElement.scrollBy({ behavior: "smooth", top: dy, left: dx });
+		if (this.panning) {
+			if ((Math.abs(event.movementX) > 5 || Math.abs(event.movementY) > 12)) {
+				const dx = Math.min(Math.max(event.movementX * 7, -75), 75);
+				const dy = Math.min(Math.max(event.movementY * 7, -75), 75);
+				this.element.nativeElement.scrollBy({ behavior: "smooth", top: dy, left: dx });
+			}
+		} else {
+			this.canvas.tools[this.canvas.activeTool]?.handleMouseMove(event);
 		}
+	}
+
+	onMouseUp(event: MouseEvent): void {
+		this.canvas.tools[this.canvas.activeTool]?.handleMouseUp(event);
+	}
+
+	onDblClick(event: MouseEvent): void {
+		this.handleDblClick({ node: null, event });
 	}
 
 	onKeyDown(event: KeyboardEvent): void {
 		if (event.key === " ") {
 			event.preventDefault();
-			this.panning = { enabled: true, prevX: null, prevY: null };
+			this.panning = true;
+		} else {
+			this.handleKeyDown({ node: null, event });
 		}
 	}
 
 	onKeyUp(event: KeyboardEvent): void {
 		if (event.key === " ") {
 			// event.preventDefault();
-			this.panning = { enabled: false, prevX: null, prevY: null };
+			this.panning = false;
 		}
 	}
 
@@ -129,46 +142,12 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.pointerMoved = false;
 	}
 
+	handleDblClick(event: IDocumentEvent): void {
+		this.canvas.tools[this.canvas.activeTool]?.handleDblClick(event);
+	}
+
 	handleMouseDown(event: IDocumentEvent): void {
-		const multiselect = this.canvas.tools[this.canvas.activeTool]?.multiselect;
-		const node = event.node;
-		const ctrl = (<MouseEvent> event.event).ctrlKey;
-		const shift = (<MouseEvent> event.event).shiftKey;
-		const alt = (<MouseEvent> event.event).altKey;
-		if (!node) {
-			if (!shift) {
-				this.canvas.selection = [];
-			}
-		} else if (shift && ctrl) {
-			return;
-		} else if (shift && alt && multiselect) {
-			const parent = findParent(this.document, node.nid);
-			if (!this.canvas.selection.includes(parent)) {
-				this.canvas.selection = [...this.canvas.selection, parent];
-			}
-		} else if (ctrl && alt) {
-			if (multiselect) {
-				const parent = findParent(this.document, node.nid);
-				this.canvas.selection = this.canvas.selection.filter((n) => n.nid !== parent.nid);
-			} else {
-				this.canvas.selection = [];
-			}
-		} else if (ctrl) {
-			if (multiselect) {
-				this.canvas.selection = this.canvas.selection.filter((n) => n.nid !== node.nid);
-			} else {
-				this.canvas.selection = [];
-			}
-		} else if (alt) {
-			const parent = findParent(this.document, node.nid);
-			this.canvas.selection = [parent];
-		} else if (shift && multiselect) {
-			if (!this.canvas.selection.includes(node)) {
-				this.canvas.selection = [...this.canvas.selection, node];
-			}
-		} else {
-			this.canvas.selection = [node];
-		}
+		this.canvas.tools[this.canvas.activeTool]?.handleMouseDown(event);
 	}
 
 	handleKeyDown(event: IDocumentEvent): void {

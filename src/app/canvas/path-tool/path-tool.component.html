@@ -1,1 +1,100 @@
-<p>path-tool works!</p>
+<svg #overlay xmlns="http://www.w3.org/2000/svg"
+	class="savage-app-canvas-path-tool"
+	overflow="visible"
+	pointer-events="none"
+	[appAttrs]="document"
+	[skipAttrs]="['overflow', 'pointer-events']"
+>
+	<ng-container *ngIf="canvas.activeTool === name" >
+		<ng-container *ngIf="!!path" >
+			<ng-container *ngFor="let segment of segments" >
+				<ng-container *ngIf="selection.includes(segment)" >
+					<svg:line
+						[attr.x1]="segment.point.x + 4 * wx"
+						[attr.y1]="segment.point.y + 4 * hx"
+						[attr.x2]="segment.point.x + segment.handleIn.x - (15 * wx)"
+						[attr.y2]="segment.point.y + segment.handleIn.y"
+						vector-effect="non-scaling-size"
+						stroke="#212121"
+						[attr.stroke-width]="wx"
+						fill="none"
+					></svg:line>
+					<svg:line
+						[attr.x1]="segment.point.x + 4 * wx"
+						[attr.y1]="segment.point.y + 4 * hx"
+						[attr.x2]="segment.point.x + segment.handleOut.x + (15 * wx)"
+						[attr.y2]="segment.point.y + segment.handleOut.y"
+						vector-effect="non-scaling-size"
+						stroke="#212121"
+						[attr.stroke-width]="wx"
+						fill="none"
+					></svg:line>
+				</ng-container>
+				<svg:polygon
+					pointer-events="all"
+					tabindex="-1"
+					[attr.points]="(segment.point.x + 4 * wx) + ',' + (segment.point.y) + ' ' + (segment.point.x + 8 * wx) + ',' + (segment.point.y + 4 * hx) + ' ' + (segment.point.x + 4 * wx) + ',' + (segment.point.y + 8 * hx) + ' ' + (segment.point.x) + ',' + (segment.point.y + 4 * hx)"
+					[attr.transform]="'translate(' + (-4 * wx) + ', ' + (-4 * hx) + ')'"
+					vector-effect="non-scaling-size"
+					stroke="#212121"
+					[attr.stroke-width]="wx"
+					fill="#424242"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[transform]="'translate(' + (-4 * wx) + ', ' + (-4 * hx) + ')'"
+					(dragging)="handleSegmentDrag(segment.index, $event)"
+					(mousedown)="onSegmentDown(segment, $event)"
+					(keydown)="onKeyDown(segment, $event)"
+					[ngClass]="{ selected: selection.includes(segment) }"
+				></svg:polygon>
+				<ng-container *ngIf="selection.includes(segment)" >
+					<svg:circle
+						pointer-events="all"
+						[attr.cx]="segment.point.x + segment.handleIn.x - (15 * wx)"
+						[attr.cy]="segment.point.y + segment.handleIn.y"
+						[attr.r]="3 * wx"
+						vector-effect="non-scaling-size"
+						stroke="#212121"
+						[attr.stroke-width]="wx"
+						fill="#424242"
+						appDraggable
+						[containment]="scrollable"
+						[autoScroll]="scrollable"
+						[snap]="canvas.snap"
+						(dragging)="handleHandleDrag(segment, 'in', $event)"
+					></svg:circle>
+					<svg:circle
+						pointer-events="all"
+						[attr.cx]="segment.point.x + segment.handleOut.x + (15 * wx)"
+						[attr.cy]="segment.point.y + segment.handleOut.y"
+						[attr.r]="3 * wx"
+						vector-effect="non-scaling-size"
+						stroke="#212121"
+						[attr.stroke-width]="wx"
+						fill="#424242"
+						appDraggable
+						[containment]="scrollable"
+						[autoScroll]="scrollable"
+						[snap]="canvas.snap"
+						(dragging)="handleHandleDrag(segment, 'out', $event)"
+					></svg:circle>
+				</ng-container>
+			</ng-container>
+			<ng-container *ngIf="!!selectbox" >
+				<svg:rect
+					[attr.x]="selectbox.x"
+					[attr.y]="selectbox.y"
+					[attr.width]="selectbox.size.width"
+					[attr.height]="selectbox.size.height"
+					fill="#42424233"
+					stroke="@212121"
+					[attr.stroke-width]="1 * wx"
+					[attr.stroke-dasharray]="[1 * wx, 2 * wx].join(' ')"
+					vector-effect="non-scaling-size"
+				></svg:rect>
+			</ng-container>
+		</ng-container>
+	</ng-container>
+</svg>

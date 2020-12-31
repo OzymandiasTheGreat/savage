@@ -22,6 +22,7 @@ export class DocumentComponent implements OnInit {
 	@Input() scrollable: HTMLElement;
 	@Output() dragging: EventEmitter<IDocumentEvent>;
 	@Output() handleClick: EventEmitter<IDocumentEvent>;
+	@Output() handleDblClick: EventEmitter<IDocumentEvent>;
 	@Output() handleMouseDown: EventEmitter<IDocumentEvent>;
 	@Output() handleKeyDown: EventEmitter<IDocumentEvent>;
 
@@ -30,14 +31,21 @@ export class DocumentComponent implements OnInit {
 	) {
 		this.dragging = new EventEmitter<IDocumentEvent>();
 		this.handleClick = new EventEmitter<IDocumentEvent>();
+		this.handleDblClick = new EventEmitter<IDocumentEvent>();
 		this.handleMouseDown = new EventEmitter<IDocumentEvent>();
 		this.handleKeyDown = new EventEmitter<IDocumentEvent>();
 	}
 
 	ngOnInit(): void { }
 
-	canMove(): boolean {
-		return this.canvas.activeTool === "OBJECT";
+	canMove(node: Observable<SavageSVG>): boolean {
+		if (this.canvas.activeTool === "OBJECT") {
+			return true;
+		}
+		if (this.canvas.activeTool === "PATH" && node.name === "path") {
+			return true;
+		}
+		return false;
 	}
 
 	onDrag(event: DragEvent, node: Observable<SavageSVG>): void {
@@ -47,6 +55,11 @@ export class DocumentComponent implements OnInit {
 	onClick(event: MouseEvent, node: Observable<SavageSVG>): void {
 		event.stopPropagation();
 		this.handleClick.emit({ event, node });
+	}
+
+	onDblClick(event: MouseEvent, node: Observable<SavageSVG>): void {
+		event.stopPropagation();
+		this.handleDblClick.emit({ event, node });
 	}
 
 	onMouseDown(event: MouseEvent, node: Observable<SavageSVG>): void {
@@ -66,7 +79,9 @@ export class DocumentComponent implements OnInit {
 	}
 
 	onKeyDown(event: KeyboardEvent, node: Observable<SavageSVG>): void {
-		event.stopPropagation();
-		this.handleKeyDown.emit({ event, node });
+		if (event.key !== " ") {
+			event.stopPropagation();
+			this.handleKeyDown.emit({ event, node });
+		}
 	}
 }

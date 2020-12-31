@@ -3,6 +3,9 @@
 	<div #scrollable
 		class="savage-app-canvas-scrollable"
 		(mousedown)="onMouseDown($event)"
+		(dblclick)="onDblClick($event)"
+		(keydown)="onKeyDown($event)"
+		tabindex="-1"
 	>
 		<div #doc *ngIf="!!document"
 			class="savage-app-canvas-document"
@@ -13,9 +16,11 @@
 				[scrollable]="scrollable"
 				(dragging)="handleDrag($event)"
 				(handleClick)="handleClick($event)"
+				(handleDblClick)="handleDblClick($event)"
 				(handleMouseDown)="handleMouseDown($event)"
 				(handleKeyDown)="handleKeyDown($event)" ></app-document>
 			<app-object-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" ></app-object-tool>
+			<app-path-tool [document]="document" [scrollable]="scrollable" [node]="canvas.selection" ></app-path-tool>
 		</div>
 	</div>
 </div>

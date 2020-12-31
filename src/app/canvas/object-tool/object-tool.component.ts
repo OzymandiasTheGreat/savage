@@ -2,19 +2,20 @@ import { Component, OnInit, OnDestroy, Input, ViewChild, ElementRef } from "@ang
 import * as equal from "fast-deep-equal/es6";
 import { klona } from "klona";
 import { nanoid } from "nanoid/non-secure";
-import { Path, Point as PathPoint, Matrix as PathMatrix } from "paper";
+import { Path, Point as PathPoint, Matrix as PathMatrix, Rectangle } from "paper";
 import {
 	compose, fromDefinition, fromTransformAttribute, Matrix, applyToPoint, applyToPoints,
 	translate, scale, toSVG, inverse, smoothMatrix, rotateDEG, skew } from "transformation-matrix";
 import { parse as pointsParse, serialize as pointsSerialize } from "svg-numbers";
 
 import { Observable, recursiveUnobserve } from "../../types/observer";
-import { findParent, SavageSVG, screen2svg, applyTransformed, applyTransformedPoly, Point } from "../../types/svg";
+import { find, findParent, SavageSVG, screen2svg, applyTransformed, applyTransformedPoly, Point } from "../../types/svg";
 import { ICanvasTool, CanvasService } from "../../services/canvas.service";
 import { IDocumentEvent } from "../document/document.component";
 import { DragEvent } from "../directives/draggable.directive";
 
 
+const selectableNodes: string[] = ["a", "circle", "ellipse", "foreignObject", "g", "image", "line", "path", "polygon", "polyline", "rect", "svg", "switch", "text", "use"];
 const movableNodes: string[] = ["circle",  "ellipse", "image", "rect",  "use", "line", "path", "polygon", "polyline"];
 const scalableNodes: string[] = ["circle",  "ellipse", "image", "rect", "line", "path", "polygon", "polyline"];
 const rotatableNodes: string[] = ["line", "path", "polygon", "polyline"];
@@ -29,7 +30,6 @@ const skewableNodes: string[] = ["line", "path", "polygon", "polyline"];
 export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	private _selection: Observable<SavageSVG>[];
 	name: "OBJECT" = "OBJECT";
-	multiselect = true;
 	applyTransform = true;
 	mode: "scale" | "rotate" | "skew" = "scale";
 	@Input() document: Observable<SavageSVG>;
@@ -40,8 +40,15 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		}
 		this._selection = value;
 	}
-	get selection(): Observable<SavageSVG>[] { return this._selection; }
+	get selection(): Observable<SavageSVG>[] { return this._selection.filter((n) => selectableNodes.includes(n.name)); }
+	get wx(): number {
+		return (parseFloat(this.document.attributes.viewBox?.split(" ")[2]) || parseFloat(this.document.attributes.width)) / 350;
+	}
+	get hx(): number {
+		return (parseFloat(this.document.attributes.viewBox?.split(" ")[3]) || parseFloat(this.document.attributes.height)) / 350;
+	}
 	@ViewChild("overlay", { static: true }) overlay: ElementRef<SVGSVGElement>;
+	selectbox: paper.Rectangle = null;
 
 	constructor(
 		public canvas: CanvasService,
@@ -74,6 +81,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	handleDrag(event: IDocumentEvent): void {
+		this.selectbox = null;
 		const drag = <DragEvent> event.event;
 		const position = screen2svg(this.overlay.nativeElement, { x: drag.x, y: drag.y });
 		const previous = screen2svg(this.overlay.nativeElement, { x: drag.prevX, y: drag.prevY });
@@ -103,8 +111,68 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		}
 	}
 
+	handleDblClick(event: IDocumentEvent): void { }
+
 	handleMouseDown(event: IDocumentEvent): void {
-		//
+		const ev: MouseEvent = <MouseEvent> event.event;
+		const node = event.node;
+		const ctrl = ev.ctrlKey;
+		const shift = ev.shiftKey;
+		const alt = ev.altKey;
+		if (!node) {
+			if (!shift) {
+				const point = screen2svg(this.overlay.nativeElement, { x: ev.clientX, y: ev.clientY });
+				this.selectbox = new Rectangle(point.x, point.y, 0, 0);
+				this.canvas.selection = [];
+			}
+		} else if (shift && ctrl) {
+			return;
+		} else if (shift && alt) {
+			const parent = findParent(this.document, node.nid);
+			if (!this.canvas.selection.includes(parent)) {
+				this.canvas.selection = [...this.canvas.selection, parent];
+			}
+		} else if (ctrl && alt) {
+			const parent = findParent(this.document, node.nid);
+			this.canvas.selection = this.canvas.selection.filter((n) => n.nid !== parent.nid);
+		} else if (ctrl) {
+			this.canvas.selection = this.canvas.selection.filter((n) => n.nid !== node.nid);
+		} else if (alt) {
+			const parent = findParent(this.document, node.nid);
+			this.canvas.selection = [parent];
+		} else if (shift) {
+			if (!this.canvas.selection.includes(node)) {
+				this.canvas.selection = [...this.canvas.selection, node];
+			}
+		} else {
+			this.canvas.selection = [node];
+		}
+	}
+
+	handleMouseMove(event: MouseEvent): void {
+		if (this.selectbox) {
+			const point = screen2svg(this.overlay.nativeElement, { x: event.clientX, y:  event.clientY });
+			this.selectbox.set(this.selectbox.x, this.selectbox.y, point.x - this.selectbox.x, point.y - this.selectbox.y);
+		}
+	}
+
+	handleMouseUp(event: MouseEvent): void {
+		if (this.selectbox) {
+			this.canvas.selection = [];
+			for (const [nid, el ]of Object.entries(this.canvas.registry)) {
+				const node = find(this.document, nid);
+				if (node && selectableNodes.includes(node.name)) {
+					const bbox = this.bbox(node);
+					if (new PathPoint(bbox.x, bbox.y).isInside(this.selectbox)
+						|| new PathPoint(bbox.right, bbox.y).isInside(this.selectbox)
+						|| new PathPoint(bbox.right, bbox.bottom).isInside(this.selectbox)
+						|| new PathPoint(bbox.x, bbox.bottom).isInside(this.selectbox)) {
+						this.canvas.selection.push(node);
+					}
+				}
+			}
+			this.selectbox = null;
+		}
 	}
 
 	handleKeyDown(event: IDocumentEvent): void {
@@ -115,42 +183,52 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		switch (ev.key) {
 			case "ArrowLeft":
 				ev.preventDefault();
-				if (movableNodes.includes(node.name) && this.applyTransform) {
-					this.moveNodeApplied(node, { x: ev.altKey ? -1 : -5, y: 0 });
-				} else {
-					this.moveNode(node, { x: ev.altKey ? -1 : -5, y: 0 });
+				for (const n of this.selection) {
+					if (movableNodes.includes(n.name) && this.applyTransform) {
+						this.moveNodeApplied(n, { x: ev.altKey ? -1 : -5, y: 0 });
+					} else {
+						this.moveNode(n, { x: ev.altKey ? -1 : -5, y: 0 });
+					}
 				}
 				break;
 			case "ArrowRight":
 				ev.preventDefault();
-				if (movableNodes.includes(node.name) && this.applyTransform) {
-					this.moveNodeApplied(node, { x: ev.altKey ? 1 : 5, y: 0 });
-				} else {
-					this.moveNode(node, { x: ev.altKey ? 1 : 5, y: 0 });
+				for (const n of this.selection) {
+					if (movableNodes.includes(n.name) && this.applyTransform) {
+						this.moveNodeApplied(n, { x: ev.altKey ? 1 : 5, y: 0 });
+					} else {
+						this.moveNode(n, { x: ev.altKey ? 1 : 5, y: 0 });
+					}
 				}
 				break;
 			case "ArrowUp":
 				ev.preventDefault();
-				if (movableNodes.includes(node.name) && this.applyTransform) {
-					this.moveNodeApplied(node, { x: 0, y: ev.altKey ? -1 : -5 });
-				} else {
-					this.moveNode(node, { x: 0, y: ev.altKey ? -1 : -5 });
+				for (const n of this.selection) {
+					if (movableNodes.includes(n.name) && this.applyTransform) {
+						this.moveNodeApplied(n, { x: 0, y: ev.altKey ? -1 : -5 });
+					} else {
+						this.moveNode(n, { x: 0, y: ev.altKey ? -1 : -5 });
+					}
 				}
 				break;
 			case "ArrowDown":
 				ev.preventDefault();
-				if (movableNodes.includes(node.name) && this.applyTransform) {
-					this.moveNodeApplied(node, { x: 0, y: ev.altKey ? 1 : 5 });
-				} else {
-					this.moveNode(node, { x: 0, y: ev.altKey ? 1 : 5 });
+				for (const n of this.selection) {
+					if (movableNodes.includes(n.name) && this.applyTransform) {
+						this.moveNodeApplied(n, { x: 0, y: ev.altKey ? 1 : 5 });
+					} else {
+						this.moveNode(n, { x: 0, y: ev.altKey ? 1 : 5 });
+					}
 				}
 				break;
 			case "Delete":
 				ev.preventDefault();
-				parent = findParent(this.document, node.nid);
-				index = parent.children.findIndex((n) => n.nid === node.nid);
-				parent.children.splice(index, 1);
-				recursiveUnobserve(node);
+				for (const n of this.selection) {
+					parent = findParent(this.document, n.nid);
+					index = parent.children.findIndex((nd) => nd.nid === n.nid);
+					parent.children.splice(index, 1);
+					recursiveUnobserve(n);
+				}
 				break;
 			case "PageUp":
 				ev.preventDefault();
@@ -176,11 +254,13 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				if (ev.ctrlKey && !ev.shiftKey && !ev.altKey) {
 					ev.preventDefault();
 					ev.stopPropagation();
-					parent = findParent(this.document, node.nid);
-					index = parent.children.findIndex((n) => n.nid === node.nid);
-					const copy = klona(node);
-					copy.nid = nanoid(13);
-					parent.children.splice(index + 1, 0, copy);
+					for (const n of this.selection) {
+						parent = findParent(this.document, n.nid);
+						index = parent.children.findIndex((nd) => nd.nid === n.nid);
+						const copy = klona(n);
+						copy.nid = nanoid(13);
+						parent.children.splice(index + 1, 0, copy);
+					}
 				}
 				break;
 			case "g":
@@ -202,7 +282,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 						children: <any> children,
 					};
 					const nIds = children.map((n) => n.nid);
-					this.canvas.selection = this.canvas.selection.filter((n) => !nIds.includes(n.nid));
+					this.canvas.selection = this.selection.filter((n) => !nIds.includes(n.nid));
 					this.document.children.push(<any> group);
 					setTimeout(() => {
 						this.canvas.selection.push(this.document.children[this.document.children.length - 1]);
@@ -225,11 +305,47 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 						for (const child of node.children) {
 							parent.children.push(child);
 						}
-						this.canvas.selection = this.canvas.selection.filter((n) => n.nid !== node.nid);
-						this.canvas.selection = [...this.canvas.selection, ...node.children];
+						this.canvas.selection = this.selection.filter((n) => n.nid !== node.nid);
+						this.canvas.selection = [...this.selection, ...node.children];
 						setTimeout(() => {
 							this.canvas.registry[node.children[node.children.length - 1]?.nid]?.focus();
 						}, 150);
+					}
+				}
+				break;
+			case "a":
+				if (ev.ctrlKey && !ev.shiftKey && !ev.altKey) {
+					ev.preventDefault();
+					ev.stopPropagation();
+					this.canvas.selection = [];
+					for (const nid of Object.keys(this.canvas.registry)) {
+						const n = find(this.document, nid);
+						if (selectableNodes.includes(n.name)) {
+							this.canvas.selection.push(n);
+						}
+					}
+				}
+				break;
+			case "A":
+				if (ev.ctrlKey && ev.shiftKey && !ev.altKey) {
+					ev.preventDefault();
+					ev.stopPropagation();
+					this.canvas.selection = [];
+				}
+				break;
+			case "i":
+				if (ev.ctrlKey && !ev.altKey) {
+					ev.preventDefault();
+					ev.stopPropagation();
+					const old = this.selection.map((n) => n.nid);
+					this.canvas.selection = [];
+					for (const nid of Object.keys(this.canvas.registry)) {
+						if (!old.includes(nid)) {
+							const n = find(this.document, nid);
+							if (selectableNodes.includes(n.name)) {
+								this.canvas.selection.push(n);
+							}
+						}
 					}
 				}
 				break;

@@ -18,6 +18,19 @@ export interface SavageRecentSVG {
 }
 
 
+export function find(root: Observable<SavageSVG>, nid: string): Observable<SavageSVG> {
+	let node: Observable<SavageSVG>;
+
+	root.children?.some((n) => {
+		if (n.nid === nid) {
+			return node = n;
+		}
+		return node = find(n, nid);
+	});
+	return node || null;
+}
+
+
 export function findParent(root: Observable<SavageSVG>, nid: string): Observable<SavageSVG> | null {
 	let node: Observable<SavageSVG>;
 
