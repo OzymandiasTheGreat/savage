@@ -24,6 +24,7 @@ export interface IDefinitions {
 	masks: IDef[];
 	filters: IDef[];
 	symbols: IDef[];
+	paths: IDef[];
 }
 
 
@@ -49,6 +50,7 @@ export class SvgFileService {
 				// console.log(change);
 				const definitions = this.parseDefs(<SavageSVG> this._currentFile);
 				this.findSymbols(<SavageSVG> this._currentFile, definitions);
+				this.findPaths(<SavageSVG> this._currentFile, definitions);
 				this._definitions.next(definitions);
 			});
 		});
@@ -95,17 +97,18 @@ export class SvgFileService {
 		return parseSVG(data, { transformNode: this.transformNode }).then((ast) => {
 			const width = ast.attributes.width;
 			const height = ast.attributes.height;
-			this.paper.setup(new this.paper.Size(parseFloat(width), parseFloat(height)))
+			this.paper.setup(new this.paper.Size(parseFloat(width), parseFloat(height)));
 			this.ensureDefs(ast);
 			const definitions = this.parseDefs(<SavageSVG> ast);
 			this.findSymbols(<SavageSVG> ast, definitions);
+			this.findPaths(<SavageSVG> ast, definitions);
 			this._definitions.next(definitions);
 			return <SavageSVG> ast;
 		});
 	}
 
 	private parseDefs(node: SavageSVG): IDefinitions {
-		const definitions: IDefinitions = { gradients: [], patterns: [], masks: [], filters: [], symbols: [] };
+		const definitions: IDefinitions = { gradients: [], patterns: [], masks: [], filters: [], symbols: [], paths: [] };
 		const defs = node.children.find((n) => n.name === "defs");
 		const recurse = (children: SavageSVG[]) => {
 			children.forEach((n) => {
@@ -137,6 +140,16 @@ export class SvgFileService {
 		const recurse = (n: SavageSVG) => {
 			if (n.name === "symbol") {
 				defs.symbols.push({ nid: n.nid, id: n.attributes.id });
+			}
+			n.children.forEach((c) => recurse(<SavageSVG> c));
+		};
+		recurse(node);
+	}
+
+	private findPaths(node: SavageSVG, defs: IDefinitions): void {
+		const recurse = (n: SavageSVG) => {
+			if (n.name === "path" && n.attributes.id) {
+				defs.paths.push({ nid: n.nid, id: n.attributes.id });
 			}
 			n.children.forEach((c) => recurse(<SavageSVG> c));
 		};

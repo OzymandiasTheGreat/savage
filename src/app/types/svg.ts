@@ -44,6 +44,19 @@ export function findParent(root: Observable<SavageSVG>, nid: string): Observable
 }
 
 
+export function findText(root: Observable<SavageSVG>): Observable<SavageSVG> {
+	let text: Observable<SavageSVG>;
+
+	root.children?.some((n) => {
+		if (n.type === "text") {
+			return text = n;
+		}
+		return text = findText(n);
+	});
+	return text || null;
+}
+
+
 export interface Point {
 	x: number;
 	y: number;
@@ -56,6 +69,16 @@ export function screen2svg(svg: SVGSVGElement, screen: Point): Point {
 	point.x = screen.x;
 	point.y = screen.y;
 	const target = point.matrixTransform(ctm.inverse());
+	return { x: target.x, y: target.y };
+}
+
+
+export function svg2screen(svg: SVGSVGElement, point: Point): Point {
+	const ctm = svg.getScreenCTM();
+	const svgPoint = svg.createSVGPoint();
+	svgPoint.x = point.x;
+	svgPoint.y = point.y;
+	const target = svgPoint.matrixTransform(ctm);
 	return { x: target.x, y: target.y };
 }
 

@@ -1,1 +1,48 @@
-<p>text-tool works!</p>
+<div #overlay
+	class="savage-app-canvas-text-tool"
+	[style.overflow]="'visible'"
+	[style.pointer-events]="'none'"
+	[ngStyle]="{ 'width.px': document.attributes.width, 'height.px': document.attributes.height, position: 'relative' }"
+>
+	<ng-container *ngIf="canvas.activeTool === name && !!node" >
+		<div class="savage-app-canvas-text-tool-outline"
+			[ngStyle]="{ position: 'fixed', 'top.px': bbox.y, 'left.px': bbox.x, 'width.px': bbox.width, 'height.px': bbox.height }"
+		></div>
+		<mat-form-field
+			appearance="fill"
+			[ngStyle]="{ position: 'fixed', 'top.px': bbox.bottom, 'left.px': bbox.x, 'width.px': bbox.width, 'min-width.px': 75 }"
+		>
+			<mat-label>Path</mat-label>
+			<input
+				matInput
+				type="text"
+				[value]="textParent.attributes.href || ''"
+				class="savage-app-canvas-text-tool-editable-path"
+				[style.pointer-events]="'all'"
+				(input)="onPathInput($event)"
+				(mousedown)="onMouseDown($event)"
+				(keydown)="onKeyDown($event)"
+				[matAutocomplete]="pathComplete"
+			>
+		</mat-form-field>
+		<mat-autocomplete #pathComplete (optionActivated)="onPathComplete($event.option.value)" >
+			<mat-option *ngFor="let id of pathIds" [value]="'#' + id.id">#{{ id.id }}</mat-option>
+		</mat-autocomplete>
+		<mat-form-field
+			appearance="fill"
+			[ngStyle]="{ position: 'fixed', 'top.px': bbox.bottom + 60, 'left.px': bbox.x, 'width.px': bbox.width, 'min-width.px': 75 }"
+		>
+			<textarea #editable matInput cdkTextareaAutosize
+				class="savage-app-canvas-text-tool-editable"
+				[style.pointer-events]="'all'"
+				(input)="onInput($event)"
+				(mousedown)="onMouseDown($event)"
+				(keydown)="onKeyDown($event)"
+			>{{ text.value.trim() }}</textarea>
+		</mat-form-field>
+	</ng-container>
+</div>
+<svg #ref
+	[style.display]="'none'"
+	[appAttrs]="document"
+></svg>

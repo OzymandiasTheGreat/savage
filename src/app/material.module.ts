@@ -20,7 +20,9 @@ import { MatMenuModule } from "@angular/material/menu";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatTreeModule } from "@angular/material/tree";
 import { MatTabsModule } from "@angular/material/tabs";
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
 
+import { TextFieldModule } from "@angular/cdk/text-field";
 import { DragDropModule } from "@angular/cdk/drag-drop";
 
 import { NgxMatFileInputModule } from "@angular-material-components/file-input";
@@ -51,6 +53,8 @@ import { EditableModule, EDITABLE_CONFIG, EditableConfig } from "@ngneat/edit-in
 		MatSlideToggleModule,
 		MatTreeModule,
 		MatTabsModule,
+		MatAutocompleteModule,
+		TextFieldModule,
 		DragDropModule,
 		NgxMatFileInputModule,
 		TreeModule,
@@ -76,6 +80,8 @@ import { EditableModule, EDITABLE_CONFIG, EditableConfig } from "@ngneat/edit-in
 		MatSlideToggleModule,
 		MatTreeModule,
 		MatTabsModule,
+		MatAutocompleteModule,
+		TextFieldModule,
 		DragDropModule,
 		NgxMatFileInputModule,
 		TreeModule,

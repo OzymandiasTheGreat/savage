@@ -1,0 +1,14 @@
+:host {
+	pointer-events: none;
+}
+
+.savage-app-canvas-text-tool {
+	&-outline {
+		background-color: transparent;
+		border: 2px dotted #212121;
+	}
+
+	.mat-form-field {
+		background-color: #e0e0e0dd;
+	}
+}

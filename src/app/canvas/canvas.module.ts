@@ -1,6 +1,8 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 
+import { MaterialModule } from "../material.module";
+
 import { AttrsDirective } from "./directives/attrs.directive";
 import { RegistryDirective } from "./directives/registry.directive";
 import { DraggableDirective } from "./directives/draggable.directive";
@@ -9,6 +11,7 @@ import { DocumentComponent } from "./document/document.component";
 import { ObjectToolComponent } from "./object-tool/object-tool.component";
 import { PathToolComponent } from "./path-tool/path-tool.component";
 import { TextToolComponent } from "./text-tool/text-tool.component";
+import { ResizeDirective } from "./directives/resize.directive";
 
 
 @NgModule({
@@ -21,9 +24,11 @@ import { TextToolComponent } from "./text-tool/text-tool.component";
 		ObjectToolComponent,
 		PathToolComponent,
 		TextToolComponent,
+		ResizeDirective,
 	],
 	imports: [
 		CommonModule,
+		MaterialModule,
 	],
 	exports: [
 		AttrsDirective,
