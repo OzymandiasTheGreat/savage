@@ -1,3 +1,8 @@
+.savage-app-sidebar-tabs {
+	width: 375px;
+	box-sizing: border-box;
+}
+
 .savage-app-sidebar-toolbar {
 	height: 40px;
 	display: flex;
@@ -6,9 +11,19 @@
 	align-items: center;
 }
 
+.savage-app-sidebar-context-menu {
+	&-trigger {
+		position: fixed;
+		width: 1px;
+		height: 1px;
+		visibility: hidden;
+		background-color: transparent;
+	}
+}
+
 .savage-app-sidebar-el-tree {
-	height: 325px;
-	overflow: auto;
+	height: 275px;
+	padding: 15px 5px;
 
 	.node-wrapper {
 		.node-content-wrapper {
@@ -34,13 +49,99 @@
 				flex-flow: row nowrap;
 				justify-content: space-between;
 				align-items: center;
+				position: relative;
 
 				&-left {
-					flex: 1 0 auto;
+					flex: 0 1 auto;
 					display: flex;
 					flex-flow: row nowrap;
 					justify-content: flex-start;
 					align-items: center;
+				}
+
+				&-vertical {
+					flex: 1 1 auto;
+					display: flex;
+					flex-flow: column nowrap;
+					justify-content: center;
+					align-items: stretch;
+					max-width: 85px;
+
+					.node-editable {
+						.node-editable-label.node-editable-label.node-editable-label {
+							max-width: 85px;
+						}
+
+						&:first-child {
+							.node-editable-input-wrapper {
+								height: 20px;
+
+								.mat-form-field {
+									top: 2px;
+								}
+							}
+						}
+
+						&:last-child {
+							.node-editable-input-wrapper {
+								height: 20px;
+
+								.mat-form-field {
+									top: -22px;
+								}
+							}
+						}
+
+						&:only-child {
+							.node-editable-input-wrapper {
+								height: 40px;
+
+								.mat-form-field {
+									top: -8px;
+								}
+							}
+						}
+					}
+				}
+
+				&-center {
+					flex: 1 0 auto;
+					display: flex;
+					flex-flow: row nowrap;
+					justify-content: stretch;
+					align-items: center;
+
+					.node-editable {
+						flex: 1 1 auto;
+						font-size: 14px;
+						color: var(--subtext);
+						max-width: 85px;
+
+						&-label {
+							display: inline-block;
+							max-width: 125px;
+							overflow: hidden;
+							white-space: nowrap;
+							text-overflow: ellipsis;
+						}
+
+						&-input-wrapper {
+							height: 40px;
+							position: relative;
+							overflow: visible;
+
+							.mat-form-field {
+								background-color: #bdbdbd;
+								min-width: 85px;
+								max-width: 125px;
+								position: absolute;
+								top: -8px;
+								left: -25px;
+								z-index: 10000;
+							}
+						}
+					}
+
 				}
 
 				&-right {
@@ -50,37 +151,36 @@
 				.node-preview {
 					width: 40px;
 					height: 40px;
+
+					&-expandable {
+						background-color: #bdbdbd;
+						background-image:
+							linear-gradient(45deg, #21212133 25%, transparent 25%,
+								transparent 75%, #21212133 75%, #21212133),
+							linear-gradient(45deg, #21212133 25%, transparent 25%,
+								transparent 75%, #21212133 75%, #21212133);
+						background-size: 10px 10px;
+						background-position: 0 0, 5px 5px;
+						position: absolute;
+						width: 40px;
+						height: 40px;
+
+						&:hover {
+							top: -40px;
+							width: 120px;
+							height: 120px;
+							z-index: 9000;
+						}
+					}
 				}
 
 				.node-name {
 					font-size: 15px;
 					width: 60px;
-					margin-left: 5px;
+					margin: 0 10px;
 					overflow: hidden;
 					white-space: nowrap;
 					text-overflow: ellipsis;
-				}
-
-				.node-editable {
-					display: inline-block;
-					font-size: 14px;
-					color: var(--subtext);
-					width: 90px;
-					margin-left: 10px;
-					overflow: hidden;
-					white-space: nowrap;
-					text-overflow: ellipsis;
-
-					&-input-wrapper {
-						height: 40px;
-						position: relative;
-
-						.mat-form-field {
-							width: 90px;
-							position: absolute;
-							top: -8px;
-						}
-					}
 				}
 			}
 		}

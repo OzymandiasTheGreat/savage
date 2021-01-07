@@ -1,12 +1,24 @@
 <mat-toolbar color="primary">
-	<mat-button-toggle-group [vertical]="true" >
-		<mat-button-toggle matTooltip="Select and move" [checked]="true" >
+	<mat-button-toggle-group [vertical]="true" (click)="options.close()" (contextmenu)="$event.preventDefault(); options.toggle()" >
+		<mat-button-toggle matTooltip="Select and transform objects"
+			[checked]="canvas.activeTool === 'OBJECT'"
+			(click)="setTool('OBJECT')"
+		>
 			<mat-icon svgIcon="cursor-default" ></mat-icon>
 		</mat-button-toggle>
-		<mat-button-toggle matTooltip="Paths and curves" >
+		<mat-button-toggle matTooltip="Edit paths and curves"
+			[checked]="canvas.activeTool === 'PATH'"
+			(click)="setTool('PATH')"
+		>
 			<mat-icon svgIcon="vector-curve" ></mat-icon>
 		</mat-button-toggle>
-		<mat-button-toggle matTooltip="Lines" [matMenuTriggerFor]="lineMenu" >
+		<mat-button-toggle matTooltip="Add or edit text"
+			[checked]="canvas.activeTool === 'TEXT'"
+			(click)="setTool('TEXT')"
+		>
+			<mat-icon svgIcon="signature-text" ></mat-icon>
+		</mat-button-toggle>
+		<!-- <mat-button-toggle matTooltip="Lines" [matMenuTriggerFor]="lineMenu" >
 			<mat-icon svgIcon="vector-line" ></mat-icon>
 			<mat-menu #lineMenu class="savage-app-toolbar-menu" [overlapTrigger]="true" >
 				<button mat-menu-item matTooltip="Line" ><mat-icon svgIcon="vector-line" ></mat-icon></button>
@@ -32,6 +44,31 @@
 		</mat-button-toggle>
 		<mat-button-toggle matTooltip="Gradients" >
 			<mat-icon svgIcon="gradient" ></mat-icon>
-		</mat-button-toggle>
+		</mat-button-toggle> -->
 	</mat-button-toggle-group>
 </mat-toolbar>
+<mat-drawer-container [hasBackdrop]="false" >
+	<mat-drawer #options [style.opacity]="0.75" >
+		<ng-container [ngSwitch]="canvas.activeTool" >
+			<div *ngSwitchCase="'OBJECT'"
+				class="savage-app-toolbar-options"
+			>
+				<div class="savage-app-toolbar-options-top">
+					<div class="savage-app-toolbar-options-close" >
+						<button mat-icon-button
+							class="savage-app-toolbar-options-close-button"
+							(click)="options.close()"
+						><mat-icon svgIcon="close" ></mat-icon></button>
+					</div>
+					<mat-list>
+						<mat-list-item>
+							<mat-slide-toggle [(ngModel)]="applyMatrix" >Apply matrix</mat-slide-toggle>
+						</mat-list-item>
+					</mat-list>
+				</div>
+				<div class="savage-app-toolbar-options-bottom" ></div>
+			</div>
+		</ng-container>
+	</mat-drawer>
+	<mat-drawer-content><ng-content></ng-content></mat-drawer-content>
+</mat-drawer-container>

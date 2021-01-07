@@ -18,6 +18,7 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
 	document: Observable<SavageSVG>;
 	pointerMoved = false;
 	panning = false;
+	scale = 1;
 
 	protected globalListeners: Record<string, Array<(event: Event) => void>> = {};
 	protected canvasListeners: Record<string, Array<(event: Event) => void>> = {};
@@ -86,6 +87,14 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
 			return this.document.attributes.height;
 		}
 		return this.document?.attributes.viewbox.split(" ")[3];
+	}
+
+	zoom(event: WheelEvent): void {
+		if (event.ctrlKey) {
+			event.preventDefault();
+			event.stopPropagation();
+			this.scale += 0.01 * event.deltaY;
+		}
 	}
 
 	onMouseDown(event: MouseEvent): void {

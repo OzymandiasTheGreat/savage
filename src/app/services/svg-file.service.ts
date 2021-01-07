@@ -6,7 +6,7 @@ import { nanoid } from "nanoid/non-secure";
 import { PaperScope } from "paper";
 
 import { Observable as ObserverType, recursiveUnobserve } from "../types/observer";
-import { SavageSVG, SavageRecentSVG } from "../types/svg";
+import { SavageSVG, SavageRecentSVG, GRAPHICS } from "../types/svg";
 
 
 const SAVAGE_RECENT_SVG = "SAVAGE_RECENT_SVG_";
@@ -25,6 +25,9 @@ export interface IDefinitions {
 	filters: IDef[];
 	symbols: IDef[];
 	paths: IDef[];
+	markers: IDef[];
+	graphics: IDef[];
+	clipPaths: IDef[];
 }
 
 
@@ -36,9 +39,12 @@ export class SvgFileService {
 	private _currentFile: ObserverType<SavageSVG>;
 	private _openFile: ReplaySubject<ObserverType<SavageSVG>>;
 	openFile: Observable<ObserverType<SavageSVG>>;
-	private _definitions: ReplaySubject<IDefinitions>;
+	private _definitions: IDefinitions;
+	private _definitions$: ReplaySubject<IDefinitions>;
 	definitions: Observable<IDefinitions>;
 	recent: SavageRecentSVG[] = [];
+	textNodes: string[];
+	graphics: IDef[] = [];
 
 	constructor() {
 		this.paper = new PaperScope();
@@ -47,15 +53,11 @@ export class SvgFileService {
 		this.openFile.subscribe((file) => {
 			(<any> window).svg = file;
 			file.observe((change) => {
-				// console.log(change);
-				const definitions = this.parseDefs(<SavageSVG> this._currentFile);
-				this.findSymbols(<SavageSVG> this._currentFile, definitions);
-				this.findPaths(<SavageSVG> this._currentFile, definitions);
-				this._definitions.next(definitions);
+				this._definitions$.next(this._definitions);
 			});
 		});
-		this._definitions = new ReplaySubject<IDefinitions>();
-		this.definitions = this._definitions.asObservable();
+		this._definitions$ = new ReplaySubject<IDefinitions>();
+		this.definitions = this._definitions$.asObservable();
 
 		for (let i = 0; i < 5; i++) {
 			const recent: SavageRecentSVG = JSON.parse(window.localStorage.getItem(SAVAGE_RECENT_SVG + i) || "null");
@@ -66,11 +68,43 @@ export class SvgFileService {
 	}
 
 	private transformNode(node: INode): INode {
-		(<SavageSVG> node).nid = nanoid(13);
-		if (node.name === "script") {
-			node.attributes.src = "";
-			node.value = "";
+		const nid = nanoid(13);
+		(<SavageSVG> node).nid = nid;
+		if (node.type === "text") {
+			this.textNodes.push(nid);
 		}
+		if (node.name === "a") {
+			node.attributes.target = "_blank";
+		}
+		if (node.name === "script") {
+			node.attributes.href = "";
+			node.attributes["xlink:href"] = "";
+		}
+
+		// DEFINITIONS
+		if (node.attributes.id) {
+			if (["linearGradient", "radialGradient"].includes(node.name)) {
+				this._definitions.gradients.push({ nid, id: node.attributes.id });
+			} else if (node.name === "pattern") {
+				this._definitions.patterns.push({ nid, id: node.attributes.id });
+			} else if (node.name === "mask") {
+				this._definitions.masks.push({ nid, id: node.attributes.id });
+			} else if (node.name === "filter") {
+				this._definitions.filters.push({ nid, id: node.attributes.id });
+			} else if (node.name === "symbol") {
+				this._definitions.symbols.push({ nid, id: node.attributes.id });
+			} else if (node.name === "marker") {
+				this._definitions.markers.push({ nid, id: node.attributes.id });
+			} else if (node.name === "clipPath") {
+				this._definitions.clipPaths.push({ nid, id: node.attributes.id });
+			} else if (node.name === "path") {
+				this._definitions.paths.push({ nid, id: node.attributes.id });
+			}
+			if (node.name !== "use" && GRAPHICS.includes(node.name)) {
+				this.graphics.push({ nid, id: node.attributes.id });
+			}
+		}
+
 		return node;
 	}
 
@@ -94,72 +128,24 @@ export class SvgFileService {
 	}
 
 	private async parseSVG(data: string): Promise<SavageSVG> {
-		return parseSVG(data, { transformNode: this.transformNode }).then((ast) => {
+		this._definitions =  {
+			gradients: [], patterns: [], masks: [], filters: [], symbols: [], paths: [], markers: [], graphics: [], clipPaths: [],
+		};
+		return parseSVG(data, { transformNode: this.transformNode.bind(this) }).then((ast) => {
 			const width = ast.attributes.width;
 			const height = ast.attributes.height;
 			this.paper.setup(new this.paper.Size(parseFloat(width), parseFloat(height)));
 			this.ensureDefs(ast);
-			const definitions = this.parseDefs(<SavageSVG> ast);
-			this.findSymbols(<SavageSVG> ast, definitions);
-			this.findPaths(<SavageSVG> ast, definitions);
-			this._definitions.next(definitions);
+			this._definitions$.next(this._definitions);
 			return <SavageSVG> ast;
 		});
-	}
-
-	private parseDefs(node: SavageSVG): IDefinitions {
-		const definitions: IDefinitions = { gradients: [], patterns: [], masks: [], filters: [], symbols: [], paths: [] };
-		const defs = node.children.find((n) => n.name === "defs");
-		const recurse = (children: SavageSVG[]) => {
-			children.forEach((n) => {
-				switch (n.name) {
-					case "linearGradient":
-					case "radialGradient":
-						definitions.gradients.push({ nid: n.nid, id: n.attributes.id });
-						break;
-					case "pattern":
-						definitions.patterns.push({ nid: n.nid, id: n.attributes.id });
-						break;
-					case "mask":
-						definitions.masks.push({ nid: n.nid, id: n.attributes.id });
-						break;
-					case "filter":
-						definitions.filters.push({ nid: n.nid, id: n.attributes.id });
-						break;
-					case "symbol":
-						definitions.symbols.push({ nid: n.nid, id: n.attributes.id });
-				}
-				recurse(<SavageSVG[]> n.children);
-			});
-		};
-		recurse(<SavageSVG[]> defs.children);
-		return definitions;
-	}
-
-	private findSymbols(node: SavageSVG, defs: IDefinitions): void {
-		const recurse = (n: SavageSVG) => {
-			if (n.name === "symbol") {
-				defs.symbols.push({ nid: n.nid, id: n.attributes.id });
-			}
-			n.children.forEach((c) => recurse(<SavageSVG> c));
-		};
-		recurse(node);
-	}
-
-	private findPaths(node: SavageSVG, defs: IDefinitions): void {
-		const recurse = (n: SavageSVG) => {
-			if (n.name === "path" && n.attributes.id) {
-				defs.paths.push({ nid: n.nid, id: n.attributes.id });
-			}
-			n.children.forEach((c) => recurse(<SavageSVG> c));
-		};
-		recurse(node);
 	}
 
 	openUploadSVG(file: File): void {
 		const reader = new FileReader();
 
 		reader.addEventListener("load", (e) => {
+			this.textNodes = [];
 			this.parseSVG(<string> e.target.result).then((svg) => {
 				// console.log(svg);
 				let index: number;
@@ -182,6 +168,7 @@ export class SvgFileService {
 	}
 
 	openRecentSVG(file: SavageRecentSVG): void {
+		this.textNodes = [];
 		this.parseSVG(file.data).then((svg) => {
 			console.log(svg);
 			file.modified = Date.now();

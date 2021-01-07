@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, Input, ViewChild, ElementRef } from "@angular/core";
-import { Path, Segment, Point, Matrix, Rectangle, Size } from "paper";
+import { PathItem, Segment, Point, Matrix, Rectangle, Size } from "paper";
 import { compose, fromDefinition, fromTransformAttribute } from "transformation-matrix";
 import { nanoid } from "nanoid/non-secure";
 
@@ -17,11 +17,11 @@ import { DragEvent } from "../directives/draggable.directive";
 })
 export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	private _node: Observable<SavageSVG>;
-	private _path: paper.Path;
+	private _path: paper.Path | paper.CompoundPath;
 	private _matrix: paper.Matrix;
 	private _transformObserver = (changes: Change[]) => {
 		for (const change of changes) {
-			if (change.path[change.path.length - 1] === "transform") {
+			if (change.path[change.path.length - 1] === "transform" && change.type !== "delete") {
 				const m = compose(fromDefinition(fromTransformAttribute(change.value)));
 				this.path?.transform(this._matrix.inverted());
 				this._matrix = new Matrix(m.a, m.b, m.c, m.d, m.e, m.f);
@@ -38,9 +38,11 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 	name: "PATH" = "PATH";
 	external = true;
+	@Input() scale: number;
 	@Input() document: Observable<SavageSVG>;
 	@Input() scrollable: HTMLElement;
 	@Input() set node(value) {
+		console.log(value)
 		const node = (<Observable<SavageSVG>[]> <unknown> value).filter((n) => n.name === "path")[0];
 		this._node?.attributes.unobserve(this._transformObserver);
 		this._node?.attributes.unobserve(this._dObserver);
@@ -48,7 +50,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		if (this._path) {
 			this._path.remove();
 		}
-		this._path = !!node ? new Path(node.attributes.d) : null;
+		this._path = !!node ? PathItem.create(node.attributes.d) : null;
 		if (this._path) {
 			if (node?.attributes.transform) {
 				const m = compose(fromDefinition(fromTransformAttribute(node.attributes.transform)));
@@ -62,8 +64,12 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		}
 	}
 	get node(): Observable<SavageSVG> { return this._node; }
-	get path(): paper.Path { return this._path; }
-	get segments(): paper.Segment[] { return this._path ? this._path.segments : []; }
+	get path(): paper.Path | paper.CompoundPath { return this._path; }
+	get segments(): paper.Segment[] {
+		const segments = this._path?.curves.map((curve) => curve.segment1);
+		segments?.push(this._path?.lastCurve?.segment2);
+		return segments;
+	}
 	get d(): string {
 		if (this.path && this._matrix) {
 			const clone = this.path.clone();
@@ -109,26 +115,31 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				const point = new Point(position.x, position.y);
 				const location = this.path.getNearestLocation(point);
 				const previous = location.segment;
+				const path = previous.path;
 				const segment = new Segment(point);
-				this.path.insertSegments(previous.index + 1, [segment]);
-				const clone = this.path.clone({ insert: false, deep: false });
+				path.insertSegments(previous.index + 1, [segment]);
+				const clone = this.path.clone({ insert: false });
 				clone.transform(this._matrix.inverted());
 				this.external = false;
 				this.node.attributes.d = clone.pathData;
 				this.external = true;
 			} else {
 				const point = new Point(position.x, position.y);
+				const location = this.path.getNearestLocation(point);
+				const curve = location.curve;
+				const path = curve.path;
 				const segment = new Segment(point);
-				this.path.addSegments([segment]);
-				const clone = this.path.clone({ insert: false, deep: false });
+				path.addSegments([segment]);
+				const clone = this.path.clone({ insert: false });
 				clone.transform(this._matrix.inverted());
 				this.external = false;
 				this.node.attributes.d = clone.pathData;
 				this.external = true;
+				console.log(clone.pathData, this.path.pathData);
 			}
 		} else {
 			const nid = nanoid(13);
-			const path: SavageSVG = {
+			const pathNode: SavageSVG = {
 				nid,
 				name: "path",
 				type: "element",
@@ -136,7 +147,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				children: <any> [],
 				attributes: <any> { d: `M ${position.x},${position.y}` },
 			};
-			this.document.children.push(<any> path);
+			this.document.children.push(<any> pathNode);
 			this.canvas.selection = [find(this.document, nid)];
 		}
 	}
@@ -174,9 +185,11 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	handleMouseUp(event: MouseEvent): void {
 		if (this.selectbox) {
 			this.selection = [];
-			for (const segment of this.segments) {
-				if (segment.point.isInside(this.selectbox)) {
-					this.selection.push(segment);
+			if (this.segments) {
+				for (const segment of this.segments) {
+					if (segment.point.isInside(this.selectbox)) {
+						this.selection.push(segment);
+					}
 				}
 			}
 		}
@@ -208,7 +221,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		const alt = event.altKey;
 		const ctrl = event.ctrlKey;
 		const shift = event.shiftKey;
-		let clone: paper.Path;
+		let clone: paper.Path | paper.CompoundPath;
 		switch (event.key) {
 			case "ArrowLeft":
 				event.preventDefault();
@@ -217,7 +230,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				for (const seg of this.selection) {
 					seg.point.set(seg.point.x - (alt ? this.wx : this.wx * 5), seg.point.y);
 				}
-				clone = this.path.clone({ insert: false, deep: false });
+				clone = this.path.clone({ insert: false });
 				clone.transform(this._matrix.inverted());
 				this.external = false;
 				this.node.attributes.d = clone.pathData;
@@ -230,7 +243,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				for (const seg of this.selection) {
 					seg.point.set(seg.point.x + (alt ? this.wx : this.wx * 5), seg.point.y);
 				}
-				clone = this.path.clone({ insert: false, deep: false });
+				clone = this.path.clone({ insert: false });
 				clone.transform(this._matrix.inverted());
 				this.external = false;
 				this.node.attributes.d = clone.pathData;
@@ -243,7 +256,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				for (const seg of this.selection) {
 					seg.point.set(seg.point.x, seg.point.y - (alt ? this.wx : this.wx * 5));
 				}
-				clone = this.path.clone({ insert: false, deep: false });
+				clone = this.path.clone({ insert: false });
 				clone.transform(this._matrix.inverted());
 				this.external = false;
 				this.node.attributes.d = clone.pathData;
@@ -256,7 +269,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				for (const seg of this.selection) {
 					seg.point.set(seg.point.x, seg.point.y + (alt ? this.wx : this.wx * 5));
 				}
-				clone = this.path.clone({ insert: false, deep: false });
+				clone = this.path.clone({ insert: false });
 				clone.transform(this._matrix.inverted());
 				this.external = false;
 				this.node.attributes.d = clone.pathData;
@@ -266,10 +279,11 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				event.preventDefault();
 				event.stopPropagation();
 				for (const seg of this.selection) {
-					this.path.removeSegment(seg.index);
+					const path = seg.path;
+					path.removeSegment(seg.index);
 				}
 				this.selection = [];
-				clone = this.path.clone({ insert: false, deep: false });
+				clone = this.path.clone({ insert: false });
 				clone.transform(this._matrix.inverted());
 				this.external = false;
 				this.node.attributes.d = clone.pathData;
@@ -308,7 +322,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 			segment.point.set(segment.point.x + d.x, segment.point.y + d.y);
 		}
 		// this.segments[index].point.set(position.x, position.y);
-		const clone = this.path.clone({ insert: false, deep: false });
+		const clone = this.path.clone({ insert: false });
 		clone.transform(this._matrix.inverted());
 		this.external = false;
 		this.node.attributes.d = clone.pathData;
@@ -321,7 +335,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		const d = { x: position.x - previous.x, y: position.y - previous.y };
 		const point = segment[handle === "in" ? "handleIn" : "handleOut"];
 		point.set(point.x + d.x, point.y + d.y);
-		const clone = this.path.clone({ insert: false, deep: false });
+		const clone = this.path.clone({ insert: false });
 		clone.transform(this._matrix.inverted());
 		this.external = false;
 		this.node.attributes.d = clone.pathData;

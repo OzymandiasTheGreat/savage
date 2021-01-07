@@ -29,7 +29,7 @@
 	</text>
 	<use x="110" y="350" href="#path" transform="translate(0, -350)" ></use>
 	<use x="-140" y="350" href="#c" transform="translate(-100) skewX(14)"></use>
-	<text transform="rotate(25, 350, 400)">
+	<text transform="rotate(25, 350, 400)" font-size="70" >
 		<tspan x="300" y="400" textLength="150" >Blah blah blah...</tspan>
 	</text>
 </svg>

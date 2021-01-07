@@ -16,6 +16,7 @@ import { IDocumentEvent } from "../document/document.component";
 export class TextToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	private _node: Observable<SavageSVG>;
 	name: "TEXT" = "TEXT";
+	@Input() scale: number;
 	@Input() document: Observable<SavageSVG>;
 	@Input() scrollable: HTMLElement;
 	@Input() set node(value) {
@@ -115,7 +116,7 @@ export class TextToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	handleKeyDown(event: IDocumentEvent): void { }
 
 	get bbox(): DOMRect {
-		if (this.text.value.trim()) {
+		if (this.text.value.trim() || !(this.node.attributes.x && this.node.attributes.y)) {
 			return this.canvas.registry[this.node.nid]?.getBoundingClientRect();
 		}
 		const point = svg2screen(this.ref.nativeElement, { x: parseFloat(this.node.attributes.x), y: parseFloat(this.node.attributes.y) });

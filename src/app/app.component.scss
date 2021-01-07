@@ -5,23 +5,23 @@
 		min-width: 300px;
 	}
 
-	.savage-app-content {
-		display: grid;
-		grid-template-rows: [top] 100%;
-		grid-template-columns: [left] 48px [center] calc(100% - 48px);
+	// .savage-app-content {
+	// 	display: grid;
+	// 	grid-template-rows: [top] 100%;
+	// 	grid-template-columns: [left] 48px [center] calc(100% - 48px);
 
-		app-toolbar {
-			grid-row: top;
-			grid-column: left;
-		}
+	// 	app-toolbar {
+	// 		grid-row: top;
+	// 		grid-column: left;
+	// 	}
 
-		app-canvas {
-			grid-row: top;
-			grid-column: center;
-		}
-	}
+	// 	app-canvas {
+	// 		grid-row: top;
+	// 		grid-column: center;
+	// 	}
+	// }
 
 	.savage-app-sidebar {
-		min-width: 450px;
+		min-width: 375px;
 	}
 }

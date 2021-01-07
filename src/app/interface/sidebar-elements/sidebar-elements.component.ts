@@ -1,23 +1,28 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, OnChanges, Input, SimpleChanges, ViewChild, ElementRef } from "@angular/core";
 import { FormControl } from "@angular/forms";
-import { TreeNode, TREE_ACTIONS, ITreeOptions, IActionMapping, ITreeState, TreeModel } from "@circlon/angular-tree-component";
+import { MatMenuTrigger } from "@angular/material/menu";
+import { MatDialog } from "@angular/material/dialog";
+import {
+	TreeNode, TREE_ACTIONS, ITreeOptions, IActionMapping, ITreeState, TreeComponent, TreeModel,
+} from "@circlon/angular-tree-component";
 import { stringify, INode } from "svgson";
 import { nanoid } from "nanoid/non-secure";
+import { klona } from "klona";
+import Text2Svg from "text-to-svg";
+import googleFonts from "google-fonts-complete/google-fonts.json";
+import element2path from "element-to-path";
+import { PathItem, Matrix } from "paper";
+import { compose, fromDefinition, fromTransformAttribute } from "transformation-matrix";
 
-import { SVGElements, KNOWN_ELEMENTS, CONTAINMENT_MAP } from "../../types/svg";
-import { Observable, recursiveUnobserve } from "../../types/observer";
+import {
+	findParent, CONTAINMENT_MAP, RENDER, RENDER_REF, ANIMATION, OBSOLETE, GRAPHICS, TEXT, PRIMITIVES, DESCRIPTION, find, findText,
+} from "../../types/svg";
+import { Observable, Change, recursiveUnobserve } from "../../types/observer";
 import { SavageSVG } from "../../types/svg";
 import { SvgFileService, IDefinitions } from "../../services/svg-file.service";
-
-
-const recursiveIgnore = (node: Observable<SavageSVG>, map: object) => {
-	node.children.forEach((n) => {
-		if (!KNOWN_ELEMENTS.some((name) => n.name.startsWith(name))) {
-			map[n.nid] = true;
-		}
-		recursiveIgnore(n, map);
-	});
-};
+import { CanvasService } from "../../services/canvas.service";
+import { HrefDialogComponent, HrefData } from "../href-dialog/href-dialog.component";
+import { HistoryService } from "../../services/history.service";
 
 
 @Component({
@@ -25,8 +30,21 @@ const recursiveIgnore = (node: Observable<SavageSVG>, map: object) => {
 	templateUrl: "./sidebar-elements.component.html",
 	styleUrls: ["./sidebar-elements.component.scss"]
 })
-export class SidebarElementsComponent implements OnInit {
+export class SidebarElementsComponent implements OnInit, OnChanges {
+	private _treeObserver = (changes: Change[]) => {
+		for (const change of changes) {
+			if (!change.path.includes("attributes") && ["insert", "delete"].includes(change.type)) {
+				this.tree.treeModel.update();
+			}
+		}
+	}
+	@ViewChild("tree", { static: true }) tree: TreeComponent;
+	@ViewChild("contextMenu", { static: true }) contextMenu: ElementRef<HTMLDivElement>;
+	@ViewChild("contextMenu", { static: true, read: MatMenuTrigger }) contextMenuTrigger: MatMenuTrigger;
+	@Input() selection: Observable<SavageSVG>[];
+	@Input() scrollable: HTMLDivElement;
 	root: Observable<SavageSVG>;
+	defs: Observable<SavageSVG>;
 	data: Observable<Observable<SavageSVG>[]>;
 	definitions: IDefinitions;
 	actionMap: IActionMapping = {
@@ -34,15 +52,27 @@ export class SidebarElementsComponent implements OnInit {
 			click: (tree, node, event: MouseEvent) => {
 				if (event.ctrlKey) {
 					TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, event);
+					this.canvas.selection.push(node.data);
 				} else {
 					TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, event);
+					this.canvas.selection = [node.data];
 				}
 			},
-			dblClick: () => {},
 			contextMenu: (tree, node, event: MouseEvent) => {
 				event.preventDefault();
+				node.setIsActive(true, event.ctrlKey);
+				this.contextMenu.nativeElement.style.top = `${event.clientY}px`;
+				this.contextMenu.nativeElement.style.left = `${event.clientX}px`;
+				this.contextMenuData = { nodes: tree.activeNodes };
+				// nodes is undefined without timeout, not sure why
+				setTimeout(() => {
+					this.contextMenuTrigger.openMenu();
+				}, 100);
 			},
-			drop: (tree, node, event, { from, to }) => tree.moveNode(from, to),
+			drop: (tree, node, event, { from, to }) => {
+				tree.moveNode(from, to);
+				this.history.snapshot("Reorder element");
+			},
 		},
 		keys: {
 			// PageDown
@@ -51,6 +81,7 @@ export class SidebarElementsComponent implements OnInit {
 				if (index < node.parent.children.length) {
 					const target = { dropOnNode: false, index, parent: node.parent };
 					tree.moveNode(node, target);
+					this.history.snapshot("Reorder element");
 				}
 			},
 			// PageUp
@@ -59,6 +90,7 @@ export class SidebarElementsComponent implements OnInit {
 				if (index >= 0) {
 					const target = { dropOnNode: false, index, parent: node.parent };
 					tree.moveNode(node, target);
+					this.history.snapshot("Reorder element");
 				}
 			},
 			// Delete
@@ -66,344 +98,769 @@ export class SidebarElementsComponent implements OnInit {
 				const data = node.parent.data;
 				recursiveUnobserve(data.children[node.index]);
 				data.children.splice(node.index, 1);
+				delete this.editableNode[node.data.nid];
+				if (node.data.attributes.id) {
+					for (const arr of Object.values(this.definitions)) {
+						const index = arr.findIndex((d) => d.nid === node.data.nid);
+						if (index) {
+							arr.splice(index, 1);
+						}
+					}
+				}
 				tree.update();
+				this.history.snapshot("Remove element");
 			},
-		}
-	};
-	options: ITreeOptions = {
-		idField: "nid",
-		allowDrag: true,
-		levelPadding: 5,
-		nodeHeight: 40,
-		useVirtualScroll: true,
-		actionMapping: this.actionMap,
-		allowDrop: (element: TreeNode, { parent, index }: { parent: TreeNode, index: number }) => {
-			if (Object.values(CONTAINMENT_MAP).flat().includes(parent.data.name)) {
-				switch (parent.data?.name) {
-					case "a":
-						return CONTAINMENT_MAP.a.includes(element?.data.name);
-					case "g":
-						return CONTAINMENT_MAP.g.includes(element?.data.name);
-					case "svg":
-						return CONTAINMENT_MAP.svg.includes(element?.data.name);
-					case "defs":
-						return CONTAINMENT_MAP.defs.includes(element?.data.name);
-					case "clipPath":
-						return CONTAINMENT_MAP.clipPath.includes(element?.data.name);
-					case "marker":
-						return CONTAINMENT_MAP.marker.includes(element?.data.name);
-					case "linearGradient":
-						return CONTAINMENT_MAP.linearGradient.includes(element?.data.name);
-					case "radialGradient":
-						return CONTAINMENT_MAP.radialGradient.includes(element?.data.name);
-					case "pattern":
-						return CONTAINMENT_MAP.pattern.includes(element?.data.name);
-					case "symbol":
-						return CONTAINMENT_MAP.symbol.includes(element?.data.name);
-					case "mask":
-						return CONTAINMENT_MAP.mask.includes(element?.data.name);
-					case "filter":
-						return CONTAINMENT_MAP.filter.includes(element?.data.name);
-					case "text":
-						return CONTAINMENT_MAP.text.includes(element?.data.name);
-					default:
-						return false;
+			// Y
+			89: (tree, node, event: KeyboardEvent) => {
+				if (event.ctrlKey && !event.shiftKey && !event.altKey) {
+					event.preventDefault();
+					event.stopPropagation();
+					this.history.redo(1);
+				}
+			},
+			// Z
+			90: (tree, node, event: KeyboardEvent) => {
+				if (event.ctrlKey && !event.shiftKey && !event.altKey) {
+					event.preventDefault();
+					event.stopPropagation();
+					this.history.undo(1);
+				}
+			},
+			// D
+			68: (tree, node, event: KeyboardEvent) => {
+				if (event.ctrlKey && !event.shiftKey && !event.altKey) {
+					event.preventDefault();
+					this.dupeNode(tree.activeNodes);
+				}
+			},
+			// G
+			71: (tree, node, event: KeyboardEvent) => {
+				if (event.ctrlKey && !event.shiftKey && !event.altKey) {
+					event.preventDefault();
+					this.groupNodes(tree.activeNodes);
+				} else if (event.ctrlKey && event.shiftKey && !event.altKey) {
+					event.preventDefault();
+					this.ungroupNodes(tree.activeNodes);
+				}
+			},
+			// K
+			75: (tree, node, event: KeyboardEvent) => {
+				if (event.ctrlKey && !event.shiftKey && !event.altKey) {
+					event.preventDefault();
+					this.linkNodes(tree.activeNodes);
 				}
 			}
-			return false;
 		}
 	};
+	options: ITreeOptions;
 	state: ITreeState;
 	activeView: "shapes" | "defs" = "shapes";
-	controls: Record<string, { id: FormControl, class: FormControl }> = {};
-
-	primitives = SVGElements.primitives;
+	editableNode: Record<string, FormControl> = {};
+	editablePrimitive: Record<string, { in: FormControl, in2: FormControl, result: FormControl }> = {};
+	contextMenuData: { nodes: TreeNode[] };
+	animation = ANIMATION;
+	graphics = (nodes: TreeNode[]) => nodes.every((n) => GRAPHICS.includes(n.data.name) && !["foreignObject", "use"].includes(n.data.name));
+	render = RENDER;
+	primitives = PRIMITIVES;
+	primitivesFiltered = PRIMITIVES.filter((p) => !p.startsWith("feFunc") && !p.endsWith("Node"));
+	containmentMap = CONTAINMENT_MAP;
 
 	constructor(
+		protected dialog: MatDialog,
+		protected history: HistoryService,
 		public file: SvgFileService,
+		public canvas: CanvasService,
 	) { }
 
 	ngOnInit(): void {
-		const initControls = (node: Observable<SavageSVG>) => {
-			this.controls[node.nid] = {
-				id: new FormControl(node.attributes.id),
-				class: new FormControl(node.attributes.class),
-			};
-			// tslint:disable-next-line
-			node.children && node.children.forEach((n) => initControls(n));
+		this.options = {
+			idField: "nid",
+			allowDrag: true,
+			scrollOnActivate: true,
+			actionMapping: this.actionMap,
+			allowDrop: (element: TreeNode, { parent, index }: { parent: TreeNode, index: number }) => {
+				if (Object.keys(CONTAINMENT_MAP).includes(parent.data.name)) {
+					return CONTAINMENT_MAP[parent.data.name].includes(element.data.name);
+				}
+				return false;
+			}
+		};
+
+		const editableIds = (node: Observable<SavageSVG>) => {
+			if (PRIMITIVES.includes(node.name)) {
+				this.editablePrimitive[node.nid] = {
+					in: new FormControl(node.attributes.in || "SourceGraphic"),
+					in2: new FormControl(node.attributes.in2 || ""),
+					result: new FormControl(node.attributes.result || ""),
+				};
+			} else {
+				this.editableNode[node.nid] = new FormControl(node.attributes.id || "");
+			}
+			node.children.forEach((n) => editableIds(n));
 		};
 		this.file.openFile.subscribe((file) => {
 			const hiddenNodeIds = {};
+			this.root?.unobserve(this._treeObserver);
 			this.root = file;
+			this.defs = file.children.find((n) => n.name === "defs");
 			this.data = file.children;
 			this.data.forEach((node) => {
-				initControls(node);
+				editableIds(node);
 				if (this.activeView === "defs") {
-					hiddenNodeIds[node.nid] = node.name !== "defs";
+					hiddenNodeIds[node.nid] = !["defs", "symbol"].includes(node.name);
 				} else {
-					hiddenNodeIds[node.nid] = node.name === "defs";
+					hiddenNodeIds[node.nid] = ["defs", "symbol"].includes(node.name);
 				}
-				if (!KNOWN_ELEMENTS.some((name) => node.name.startsWith(name))) {
-					hiddenNodeIds[node.nid] = true;
+				for (const nid of this.file.textNodes) {
+					hiddenNodeIds[nid] = true;
 				}
-				recursiveIgnore(node, hiddenNodeIds);
 			});
 			this.state = { ...this.state, hiddenNodeIds };
+			this.root.observe(this._treeObserver);
 		});
 		this.file.definitions.subscribe((defs) => this.definitions = defs);
 	}
 
-	// UPDATE
+	ngOnChanges(changes: SimpleChanges): void {
+		if (changes.selection) {
+			const activeNodeIds = {};
+			this.selection.forEach((n) => activeNodeIds[n.nid] = true);
+			this.state = { ...this.state, activeNodeIds };
+		}
+	}
+
 	switchView(view: "shapes" | "defs"): void {
 		const hiddenNodeIds = {};
 		this.activeView = view;
 		this.data?.forEach((node) => {
 			if (view === "defs") {
-				hiddenNodeIds[node.nid] = node.name !== "defs";
+				hiddenNodeIds[node.nid] = !["defs", "symbol"].includes(node.name);
 			} else {
-				hiddenNodeIds[node.nid] = node.name === "defs";
+				hiddenNodeIds[node.nid] = ["defs", "symbol"].includes(node.name);
 			}
-			if (!KNOWN_ELEMENTS.some((name) => node.name.startsWith(name))) {
-				hiddenNodeIds[node.nid] = true;
+			for (const nid of this.file.textNodes) {
+				hiddenNodeIds[nid] = true;
 			}
-			recursiveIgnore(node, hiddenNodeIds);
 		});
 		this.state = { ...this.state, hiddenNodeIds };
+		this.tree.treeModel.setFocus(true);
+		setTimeout(() => {
+			const node = this.tree.treeModel.getFirstRoot(true);
+			if (node) {
+				this.tree.treeModel.setActiveNode(node, true, false);
+			}
+		}, 100);
 	}
 
-	updateIdentifier(node: Observable<SavageSVG>, attr: "id" | "class", control: FormControl): void {
-		node.attributes[attr] = control.value;
+	updateId(node: Observable<SavageSVG>): void {
+		const id = this.editableNode[node.nid].value;
+		if (id) {
+			node.attributes.id = id;
+			if (node.name === "path") {
+				const def = this.definitions.paths.find((d) => d.nid === node.nid);
+				if (def) {
+					def.id = id;
+				} else {
+					this.definitions.paths.push({ nid: node.nid, id });
+				}
+			} else if (node.name === "clipPath") {
+				const def = this.definitions.clipPaths.find((d) => d.nid === node.nid);
+				if (def) {
+					def.id = id;
+				} else {
+					this.definitions.clipPaths.push({ nid: node.nid, id });
+				}
+			} else if (node.name === "filter") {
+				const def = this.definitions.filters.find((d) => d.nid === node.nid);
+				if (def) {
+					def.id = id;
+				} else {
+					this.definitions.filters.push({ nid: node.nid, id });
+				}
+			} else if (["linearGradient", "radialGradient"].includes(node.name)) {
+				const def = this.definitions.gradients.find((d) => d.nid === node.nid);
+				if (def) {
+					def.id = id;
+				} else {
+					this.definitions.gradients.push({ nid: node.nid, id });
+				}
+			} else if (node.name === "marker") {
+				const def = this.definitions.markers.find((d) => d.nid === node.nid);
+				if (def) {
+					def.id = id;
+				} else {
+					this.definitions.markers.push({ nid: node.nid, id });
+				}
+			} else if (node.name === "mask") {
+				const def = this.definitions.masks.find((d) => d.nid === node.nid);
+				if (def) {
+					def.id = id;
+				} else {
+					this.definitions.masks.push({ nid: node.nid, id });
+				}
+			} else if (node.name === "pattern") {
+				const def = this.definitions.patterns.find((d) => d.nid === node.nid);
+				if (def) {
+					def.id = id;
+				} else {
+					this.definitions.patterns.push({ nid: node.nid, id });
+				}
+			} else if (node.name === "symbol") {
+				const def = this.definitions.symbols.find((d) => d.nid === node.nid);
+				if (def) {
+					def.id = id;
+				} else {
+					this.definitions.symbols.push({ nid: node.nid, id });
+				}
+			}
+			if (node.name !== "use" && GRAPHICS.includes(node.name)) {
+				this.definitions.graphics.push({ nid: node.nid, id });
+			}
+		}
+		this.history.snapshot("Edit ID");
 	}
 
-	formatIdentifier(attr: "id" | "class", value: string): string {
-		const prefix = attr === "id" ? "#" : ".";
-		return `${prefix}${value ? value.split(" ").map((v) => v.trim()).join(prefix) : ""}`;
+	contextMenuIdentifier(event: MouseEvent): void {
+		event.stopPropagation();
 	}
 
 	toggleVisibility(node: TreeNode): void {
 		if (node.data.attributes.display === "none") {
-			node.data.attributes.display = node.data.attributes.dataSavageDisplay || "inline";
+			node.data.attributes.display = node.data.attributes["data-savage-display"] || "inline";
 		} else {
-			node.data.attributes.dataSavageDisplay = node.data.attributes.display;
+			node.data.attributes["data-savage-display"] = node.data.attributes.display || "inline";
 			node.data.attributes.display = "none";
 		}
+		this.history.snapshot("Toggle visibility");
 	}
 
-	getPreviewKey(data: Observable<SavageSVG>): string {
-		if (SVGElements.render.includes(data.name)) {
-			return "render";
-		}
-		if (SVGElements.renderRef.includes(data.name)) {
-			return "ref";
-		}
-		return "icon";
+	shouldPreview(data: Observable<SavageSVG>): boolean {
+		return [...RENDER, ...RENDER_REF].includes(data.name);
 	}
 
-	pickPreviewIcon(data: Observable<SavageSVG>): string {
+	getIcon(data: Observable<SavageSVG>): string {
 		switch (data.name) {
-			case "svg":
-				return "svg";
 			case "defs":
 				return "signature-freehand";
 			case "marker":
 				return "map-marker-path";
-			case "clipPath":
-				return "content-cut";
 			case "style":
 				return "language-css3";
-			case "script":
-				return "cancel";
 			case "mpath":
 				return "vector-link";
 			case "stop":
 				return "octagon";
 			default:
-				if (SVGElements.text.includes(data.name)) {
+				if (ANIMATION.includes(data.name)) {
+					return "animation-play-outline";
+				}
+				if (OBSOLETE.includes(data.name)) {
+					return "cancel";
+				}
+				if (TEXT.includes(data.name)) {
 					return "format-text";
 				}
-				if (SVGElements.unsupported.includes(data.name)) {
-					return "lifebuoy";
-				}
-				if (SVGElements.deprecated.includes(data.name)) {
-					return "exclamation-thick";
-				}
-				if (SVGElements.primitives.includes(data.name)) {
+				if (PRIMITIVES.includes(data.name)) {
 					return "function-variant";
+				}
+				if (DESCRIPTION.includes(data.name)) {
+					return "image-text";
 				}
 		}
 	}
 
-	generatePreview(key: string, data: Observable<SavageSVG>): string {
-		const width = (this.root.attributes.width && parseFloat(this.root.attributes.width));
-		const height = (this.root.attributes.height && parseFloat(this.root.attributes.height));
-		const origViewbox = this.root.attributes.viewBox?.split(" ").map((u) => parseFloat(u));
-		const viewboxWidth = (origViewbox && origViewbox[2]) || width || 40;
-		const viewboxHeight = (origViewbox && origViewbox[3]) || height || 40;
-		const viewbox = [0, 0, viewboxWidth, viewboxHeight].join(" ");
+	getPreview(data: Observable<SavageSVG>): string {
+		const originalViewBox = this.root.attributes.viewBox?.split(" ").map((l) => parseFloat(l));
+		const originalWidth = (originalViewBox && originalViewBox[2]) || parseFloat(this.root.attributes.width || "40");
+		const originalHeight = (originalViewBox && originalViewBox[3]) || parseFloat(this.root.attributes.height || "40");
+		const viewBox = [0, 0, originalWidth, originalHeight].join(" ");
+
 		const defs = this.data.find((node) => node.name === "defs");
-		const symbol = this.data.filter((node) => node.name === "symbol");
-		const parent = {
+		const symbols = this.data.filter((node) => node.name === "symbol");
+		const parent: INode = {
 			name: "svg",
 			type: "element",
 			value: "",
-			attributes: { width: "40", height: "40", viewbox },
-			children: <INode[]> [...symbol],
+			attributes: { style: "width: 100%; height: 100%;", viewBox },
+			children: <INode[]> [defs, ...symbols],
 		};
-		let target: INode;
-		// tslint:disable-next-line
-		defs && parent.children.unshift(<INode> defs);
-		if (key === "render") {
-			target = <INode> { ...data };
-			target.attributes = <INode["attributes"]> <unknown> { ...data.attributes, display: "inline" };
-			parent.children.push(<INode> target);
-		} else if (key === "ref") {
+
+		if (RENDER.includes(data.name)) {
+			const target = <INode> klona(data);
+			target.attributes.display = "inline";
+			parent.children.push(target);
+		} else if (RENDER_REF.includes(data.name)) {
+			let name: string;
+			const attributes: Record<string, string> = {
+				x: `0`,
+				y: `0`,
+				width: `${originalWidth}`,
+				height: `${originalHeight}`,
+				display: "inline",
+			};
 			switch (data.name) {
+				case "clipPath":
+					name = "rect";
+					attributes["clip-path"] = `url(#${data.attributes.id})`;
+					break;
 				case "linearGradient":
 				case "radialGradient":
 				case "pattern":
-					target = {
-							name: "rect",
-							type: "element",
-							value: "",
-							attributes: {
-								x: "0",
-								y: "0",
-								width: viewboxWidth.toString(),
-								height: viewboxHeight.toString(),
-								fill: `url(#${data.attributes.id})`,
-								display: "inline",
-							},
-							children: [],
-						};
-					parent.children.push(target);
-					break;
-				case "symbol":
-					target = {
-						name: "use",
-						type: "element",
-						value: "",
-						attributes: {
-							x: "0",
-							y: "0",
-							width: viewboxWidth.toString(),
-							height: viewboxHeight.toString(),
-							href: `#${data.attributes.id}`,
-							display: "inline",
-						},
-						children: [],
-					};
-					parent.children.push(target);
+					name = "rect";
+					attributes.fill = `url(#${data.attributes.id})`;
 					break;
 				case "filter":
-					target = {
-						name: "rect",
-						type: "element",
-						value: "",
-						attributes: {
-							x: "0",
-							y: "0",
-							width: viewboxWidth.toString(),
-							height: viewboxHeight.toString(),
-							filter: `url(#${data.attributes.id})`,
-							display: "inline",
-						},
-						children: [],
-					};
-					parent.children.push(target);
+					name = "rect";
+					attributes.filter = `url(#${data.attributes.id})`;
 					break;
 				case "mask":
-					target = {
-						name: "rect",
-						type: "element",
-						value: "",
-						attributes: {
-							x: "0",
-							y: "0",
-							width: viewboxWidth.toString(),
-							height: viewboxHeight.toString(),
-							mask: `url(#${data.attributes.id})`,
-							display: "inline",
-						},
-						children: [],
-					};
-					parent.children.push(target);
+					name = "rect";
+					attributes.mask = `url(#${data.attributes.id})`;
+					break;
+				case "symbol":
+					name = "use";
+					attributes.href = `#${data.attributes.id}`;
 					break;
 			}
+			const target: INode = {
+				name,
+				type: "element",
+				value: "",
+				attributes,
+				children: [],
+			};
+			parent.children.push(target);
 		}
 		return stringify(parent);
 	}
 
-	removeNodes(tree: TreeModel): void {
-		const remove = (node: TreeNode) => {
-			const parent = node.parent.data;
-			if (!node.isRoot) {
-				recursiveUnobserve(node.data);
+	checkParent(name: string, node: TreeNode): boolean {
+		if (node?.parent) {
+			if (node.parent.data.name === name) {
+				return true;
 			}
-			parent.children.splice(node.index, 1);
-			delete this.controls[node.id];
-		};
-		[...tree.activeNodes].reverse().forEach(remove);
-		tree.update();
+			return this.checkParent(name, node.parent);
+		}
+		return false;
 	}
 
-	addNode(name: string, tree: TreeModel): void {
-		const activeNode: TreeNode = tree.activeNodes[tree.activeNodes.length - 1];
+	findParent(name: string, node: TreeNode): TreeNode {
+		if (node?.parent) {
+			if (CONTAINMENT_MAP[node.parent.data.name]?.includes(name)) {
+				return node.parent;
+			}
+			return this.findParent(name, node.parent);
+		}
+		return null;
+	}
+
+	canGroup(nodes: TreeNode[]): boolean {
+		return nodes.length && !nodes.some((n) => ["defs", "symbol"].includes(n.data.name));
+	}
+
+	canUngroup(nodes: TreeNode[]): boolean {
+		return nodes.length && nodes.every((n) => ["g", "a", "svg"].includes(n.data.name));
+	}
+
+	canLink(nodes: TreeNode[]): boolean {
+		return nodes.length && nodes.every((n) => GRAPHICS.includes(n.data.name));
+	}
+
+	canMove(nodes: TreeNode[]): boolean {
+		return nodes.length && nodes.length && !nodes.some((n) => ["defs", "symbol"].includes(n.data.name));
+	}
+
+	canRemove(nodes: TreeNode[]): boolean {
+		return nodes.length && nodes.length && !nodes.some((n) => n.data.name === "defs");
+	}
+
+	canText2Path(nodes: TreeNode[]): boolean {
+		return nodes.length && nodes.every((n) => ["text", "tspan"].includes(n.data.name) && !n.data.children.some((c) => c.name === "textPath"));
+	}
+
+	canBoolean(nodes: TreeNode[]): boolean {
+		return nodes.length && nodes.length === 2 && nodes.every((n) => n.data.name === "path");
+	}
+
+	groupNodes(nodes: TreeNode[]): void {
+		const children: Observable<SavageSVG>[] = [];
+		const group: SavageSVG = {
+			nid: nanoid(13),
+			name: "g",
+			type: "element",
+			value: "",
+			attributes: <any> {},
+			children: <any> children,
+		};
+		const firstParent: Observable<SavageSVG> = findParent(this.root, nodes[0]?.data.nid);
+		nodes.forEach((node) => {
+			const parent = findParent(this.root, node.data.nid);
+			children.push(parent.children.splice(parent.children.indexOf(node.data), 1)[0]);
+		});
+		firstParent?.children.splice(nodes[0].index, 0, <any> group);
+		this.history.snapshot("Group elements");
+	}
+
+	ungroupNodes(nodes: TreeNode[]): void {
+		if (nodes.some((n) => !["g", "a", "svg"].includes(n.data.name))) {
+			return;
+		}
+		nodes.forEach((node) => {
+			const children = node.data.children;
+			node.data.children = [];
+			(<SavageSVG[]> node.parent.data.children).splice(node.index, 1, ...children);
+			recursiveUnobserve(node.data);
+		});
+		this.tree.treeModel.update();
+		this.history.snapshot("Ungroup elements");
+	}
+
+	linkNodes(nodes: TreeNode[]): void {
+		const dialogRef = this.dialog.open(HrefDialogComponent, {
+			data: { href: "" } as HrefData,
+		});
+
+		dialogRef.afterClosed().subscribe(result => {
+			if (result !== null && result !== undefined) {
+				const children: Observable<SavageSVG>[] = [];
+				const group: SavageSVG = {
+					nid: nanoid(13),
+					name: "a",
+					type: "element",
+					value: "",
+					attributes: <any> { href: result, target: "_blank" },
+					children: <any> children,
+				};
+				const firstParent: Observable<SavageSVG> = findParent(this.root, nodes[0]?.data.nid);
+				nodes.forEach((node) => {
+					const parent = findParent(this.root, node.data.nid);
+					children.push(parent.children.splice(parent.children.indexOf(node.data), 1)[0]);
+				});
+				firstParent?.children.splice(nodes[0].index, 0, <any> group);
+			}
+			this.tree.treeModel.setFocus(true);
+		});
+		this.history.snapshot("Link elements");
+	}
+
+	moveNodes(nid: string, nodes: TreeNode[]): void {
+		const container = find(this.root, nid) || this.root;
+		nodes.forEach((node) => {
+			if (CONTAINMENT_MAP[container.name].includes(node.data.name)) {
+				const parent = findParent(this.root, node.data.nid);
+				container.children.push(parent.children.splice(parent.children.indexOf(node.data), 1)[0]);
+			}
+		});
+		this.history.snapshot("Move elements");
+	}
+
+	addContainer(name: string, nodes: TreeNode[]): void {
+		const nid = nanoid(13);
 		const id = `${name}-${nanoid(7)}`;
-		const node = {
+		const container: SavageSVG = {
+			nid,
 			name,
 			type: "element",
 			value: "",
-			nid: id,
 			attributes: <any> { id },
-			children: [],
+			children: <any> [],
 		};
-		this.controls[id] = { id: new FormControl(id), class: new FormControl("") };
-		if (activeNode && CONTAINMENT_MAP[activeNode.data.name]?.includes(name)) {
-			activeNode.data.children.push(node);
-		} else if (activeNode && CONTAINMENT_MAP[activeNode.parent.data.name]?.includes(name)) {
-			activeNode.parent.data.children.push(node);
-		} else if (CONTAINMENT_MAP.svg.includes(name)) {
-			this.root.children.push(<any> node);
-		} else {
-			const validParent: string[] = [];
-			for (const [parent, elems] of Object.entries(CONTAINMENT_MAP)) {
-				if (elems.includes(name)) {
-					validParent.push(parent);
+		const parent = name === "symbol" ? this.root : this.defs;
+		nodes.forEach((node) => {
+			if (CONTAINMENT_MAP[name].includes(node.data.name)) {
+				const nodeParent = findParent(this.root, node.data.nid);
+				container.children.push(nodeParent.children.splice(nodeParent.children.indexOf(node.data), 1)[0]);
+			}
+		});
+		parent.children.push(<any> container);
+		if (name === "pattern") {
+			this.definitions.patterns.push({ nid, id });
+		} else if (name === "mask") {
+			this.definitions.masks.push({ nid, id });
+		} else if (name === "symbol") {
+			this.definitions.symbols.push({ nid, id });
+		} else if (name === "marker") {
+			this.definitions.markers.push({ nid, id });
+		} else if (name === "clipPath") {
+			this.definitions.clipPaths.push({ nid, id });
+		}
+		this.history.snapshot("Add element");
+	}
+
+	removeNodes(nodes: TreeNode[]): void {
+		nodes.forEach((node) => {
+			const parent = findParent(this.root, node.data.nid);
+			const child = parent.children.splice(parent.children.indexOf(node.data), 1)[0];
+			recursiveUnobserve(child);
+			if (node.data.attributes.id) {
+				for (const arr of Object.values(this.definitions)) {
+					const index = arr.findIndex((d) => d.nid === node.data.nid);
+					if (index) {
+						arr.splice(index, 1);
+					}
 				}
 			}
-			console.warn(`Element ${name} can only be created in ${validParent.join(", ")}`);
-		}
-		tree.update();
-		(<TreeNode> tree.getNodeById(node.nid))?.setActiveAndVisible();
+		});
+		this.history.snapshot("Remove element");
 	}
 
-	dupeNode(tree: TreeModel): void {
-		const dupe = (node: SavageSVG) => {
-			const attributes = { ...node.attributes, id: `copy-${node.attributes.id}` };
-			const children = node.children.map((n) => dupe(<SavageSVG> n));
-			const copy = { ...node, nid: nanoid(13), attributes, children };
-			return copy;
+	addNode(name: string, selection: TreeNode): void {
+		const nid = nanoid(13);
+		const id = `${name}-${nanoid(7)}`;
+		const children: SavageSVG[] = [];
+		const node: SavageSVG = {
+			name,
+			type: "element",
+			value: "",
+			nid,
+			attributes: <any> { id },
+			children: <any> children,
 		};
-		tree.activeNodes.forEach((node: TreeNode) => {
-			if (node.data.name !== "defs") {
-				const copy = dupe(node.data);
-				node.parent.data.children.splice(node.index + 1, 0, copy);
+		this.editableNode[nid] = new FormControl(id);
+		if (["textPath", "tspan"].includes(name)) {
+			children.push({
+				nid: nanoid(13),
+				name: "",
+				type: "text",
+				value: "",
+				attributes: <any> {},
+				children: <any> [],
+			});
+		}
+		if (selection.isRoot && selection.data.name !== "defs" && CONTAINMENT_MAP.svg.includes(name)) {
+			this.data.push(<any> node);
+		} else if (CONTAINMENT_MAP[selection?.data.name].includes(name)) {
+			selection.data.children.push(<any> node);
+		} else {
+			const parent = this.findParent(name, selection);
+			parent?.data.children.push(<any> node);
+		}
+		if (name !== "use" && GRAPHICS.includes(name)) {
+			this.definitions.graphics.push({ nid, id });
+		}
+		this.history.snapshot("Add element");
+	}
+
+	addNodeHref(name: string, selection: TreeNode): void {
+		const data: HrefData = { href: "" };
+		if (name === "use") {
+			data.autocomplete = this.definitions.graphics.map((d) => d.id).concat(this.definitions.symbols.map((d) => d.id));
+		} else if (name === "textPath") {
+			data.autocomplete = this.definitions.paths.map((d) => d.id);
+		}
+		const ref = this.dialog.open(HrefDialogComponent, { data });
+
+		ref.afterClosed().subscribe((result) => {
+			if (result !== null && result !== undefined) {
+				const nid = nanoid(13);
+				const id = `${name}-${nanoid(7)}`;
+				const children: SavageSVG[] = [];
+				const node: SavageSVG = {
+					name,
+					type: "element",
+					value: "",
+					nid,
+					attributes: <any> { id, href: result },
+					children: <any> children,
+				};
+				this.editableNode[nid] = new FormControl(id);
+				if (["textPath", "tspan"].includes(name)) {
+					children.push({
+						nid: nanoid(13),
+						name: "",
+						type: "text",
+						value: "",
+						attributes: <any> {},
+						children: <any> [],
+					});
+				}
+				if (selection.isRoot && CONTAINMENT_MAP.svg.includes(name)) {
+					this.data.push(<any> node);
+				} else if (CONTAINMENT_MAP[selection?.data.name].includes(name)) {
+					selection.data.children.push(<any> node);
+				} else {
+					const parent = this.findParent(name, selection);
+					parent?.data.children.push(<any> node);
+				}
+				if (name !== "use" && GRAPHICS.includes(name)) {
+					this.definitions.graphics.push({ nid, id });
+				}
+			}
+			this.tree.treeModel.setFocus(true);
+		});
+		this.history.snapshot("Add element");
+	}
+
+	addPrimitiveNode(name: string, target: TreeNode): void {
+		const nid = nanoid(13);
+		const primitive: SavageSVG = {
+			name,
+			type: "element",
+			value: "",
+			nid,
+			attributes: <any> { in: "SourceGraphic", in2: "", result: "" },
+			children: <any> [],
+		};
+		this.editablePrimitive[nid] = {
+			in: new FormControl("SourceGraphic"),
+			in2: new FormControl(""),
+			result: new FormControl(""),
+		};
+		if (target?.data.name === "filter") {
+			target.data.children.push(primitive);
+		} else if (CONTAINMENT_MAP[target?.data.name].includes(name)) {
+			target.data.children.push(primitive);
+		} else {
+			const parent = this.findParent("filter", target);
+			parent?.data.children.push(primitive);
+		}
+		this.history.snapshot("Add element");
+	}
+
+	text2path(treeNode: TreeNode): void {
+		const node: SavageSVG = treeNode.data;
+		const x = parseFloat(node.attributes.x || node.children[0].attributes.x || "0");
+		const y = parseFloat(node.attributes.y || node.children[0].attributes.y || "0");
+		const text = node.children.map((c) => findText(c)?.value).join("");
+		const family = node.attributes["font-family"] || "Roboto";
+		const style = node.attributes["font-style"] || "normal";
+		let weight = node.attributes["font-weight"] || "400";
+		const size = parseFloat(node.attributes["font-size"] || "20");
+
+
+		const font = googleFonts[family] || (<any> googleFonts).Roboto;
+		if (weight === "normal") {
+			weight = "400";
+		} else if (weight === "bold") {
+			weight = "700";
+		}
+		let variant = font.variants[style];
+		if (!variant) {
+			if (style === "italic") {
+				variant = font.variants.oblique;
+			} else {
+				variant = font.variants.italic;
+			}
+		}
+		if (!variant) {
+			variant = font.variants.normal;
+		}
+		variant = variant[weight];
+		if (!variant) {
+			variant = variant["400"];
+		}
+		Text2Svg.load(variant.url.ttf || variant.url.woff, (err, text2svg) => {
+			if (err) {
+				console.warn(err);
+			} else {
+				const d = text2svg.getD(text, { x, y, fontSize: size });
+				const path: SavageSVG = {
+					nid: node.nid,
+					name: "path",
+					type: "element",
+					value: "",
+					attributes: <any> { d, ...node.attributes },
+					children: <any> [],
+				};
+				delete path.attributes.x;
+				delete path.attributes.y;
+				delete path.attributes["font-family"];
+				delete path.attributes["font-size"];
+				delete path.attributes["font-style"];
+				delete path.attributes["font-weight"];
+				const index = treeNode.index;
+				treeNode.parent.data.children.splice(index, 1, path);
+				recursiveUnobserve(<any> node);
+				this.tree.treeModel.update();
 			}
 		});
-		tree.update();
 	}
 
-	move2ref(tree: TreeModel, ref: string): void {
-		let parent;
-		if (ref === "defs") {
-			parent = this.root.children.find((n) => n.name === "defs");
-		} else {
-			parent = tree.getNodeById(ref)?.data;
-		}
-		tree.activeNodes.forEach((n: TreeNode) => {
-			const node = n.parent.data.children.splice(n.index, 1)[0];
-			parent?.children.push(node);
+	shape2path(treeNodes: TreeNode[]): void {
+		treeNodes.forEach((treeNode) => {
+			if (treeNode.data.name === "text") {
+				if (this.canText2Path([treeNode])) {
+					this.text2path(treeNode);
+				} else {
+					console.log("Cannot convert textPath to path");
+				}
+			} else {
+				const node: SavageSVG = {
+					nid: treeNode.data.nid,
+					name: "path",
+					type: "element",
+					value: "",
+					attributes: <any> { ...treeNode.data.attributes, d: element2path(treeNode.data) },
+					children: <any> [],
+				};
+				delete node.attributes.points;
+				delete node.attributes.x;
+				delete node.attributes.x1;
+				delete node.attributes.x2;
+				delete node.attributes.y;
+				delete node.attributes.y1;
+				delete node.attributes.y2;
+				delete node.attributes.width;
+				delete node.attributes.height;
+				delete node.attributes.r;
+				delete node.attributes.rx;
+				delete node.attributes.ry;
+				delete node.attributes.cx;
+				delete node.attributes.cy;
+				treeNode.parent.data.children.splice(treeNode.index, 1, node);
+				recursiveUnobserve(treeNode.data);
+				this.tree.treeModel.update();
+			}
 		});
-		tree.update();
+		this.history.snapshot("Convert to path");
+	}
+
+	booleanOp(op: string, treeNodes: TreeNode[]): void {
+		if (treeNodes.length === 2 && treeNodes.every((n) => n.data.name === "path")){
+			const pathOne = PathItem.create(treeNodes[0].data.attributes.d);
+			const pathTwo = PathItem.create(treeNodes[1].data.attributes.d);
+			if (treeNodes[0].data.attributes.transform) {
+				const matrix = compose(fromDefinition(fromTransformAttribute(treeNodes[0].data.attributes.transform)));
+				pathOne.transform(new Matrix(matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f));
+			}
+			if (treeNodes[1].data.attributes.transform) {
+				const matrix = compose(fromDefinition(fromTransformAttribute(treeNodes[1].data.attributes.transform)));
+				pathTwo.transform(new Matrix(matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f));
+			}
+			const path: paper.PathItem = pathOne[op](pathTwo, { insert: false });
+			const node = treeNodes[1].parent.data.children.splice(treeNodes[1].index, 1)[0];
+			recursiveUnobserve(node);
+			pathOne.remove();
+			pathTwo.remove();
+			treeNodes[0].data.attributes.d = path.pathData;
+			delete treeNodes[0].data.attributes.transform;
+		} else {
+			console.warn("Boolean operations apply to 2 paths only");
+		}
+		this.history.snapshot("Boolean operation");
+	}
+
+	dupeNode(treeNodes: TreeNode[]): void {
+		const changeIds = (node: SavageSVG) => {
+			node.nid = nanoid(13);
+			node.attributes.id = "";
+			node.children.forEach((c) => changeIds(<any> c));
+		};
+		const makeEditable = (node: SavageSVG) => {
+			if (PRIMITIVES.includes(node.name)) {
+				node.attributes.in = "SourceGraphic";
+				this.editablePrimitive[node.nid] = { in: new FormControl("SourceGraphic"), in2: new FormControl(""), result: new FormControl("") };
+			} else {
+				this.editableNode[node.nid] = new FormControl(node.attributes.id);
+			}
+			node.children.forEach((c) => makeEditable(<any> c));
+		}
+		treeNodes.forEach((treeNode) => {
+			const clone = klona(treeNode.data);
+			changeIds(clone);
+			makeEditable(clone);
+			treeNode.parent.data.children.splice(treeNode.index + 1, 0, clone);
+		});
+		this.history.snapshot("Duplicate element");
 	}
 }

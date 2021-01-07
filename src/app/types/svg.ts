@@ -95,52 +95,81 @@ export function applyTransformedPoly(points: ArrayPoint[], d: Point, matrix: Mat
 }
 
 
-export const SVGElements = {
-	render: ["a", "circle", "ellipse", "g", "image", "line", "path", "polygon",
-		"polyline", "rect", "svg", "use"],
-	renderRef: ["linearGradient", "pattern", "radialGradient", "symbol", "filter", "mask"],
-	text: ["text", "textPath", "tspan"],
-	unsupported: ["switch", "meshgradient", "mesh", "hatch", "title", "unknown", "foreignObject",
-		"hatchpath", "meshpatch", "meshrow", "view", "desc", "metadata", "animate",
-		"animateMotion", "animateTransform", "discard", "set", "mpath"],
-	deprecated: ["animateColor", "missing-glyph", "font", "font-face", "font-face-format",
-		"font-face-name", "font-face-src", "font-face-uri", "hkern", "vkern", "solidcolor",
-		"altGlyph", "altGlyphDef", "altGlyphItem", "glyph", "glyphRef", "tref",
-		"color-profile", "cursor"],
-	primitives: ["feBlend", "feColorMatrix", "feComponentTransfer", "feComposite",
-		"feConvolveMatrix", "feDiffuseLighting", "feDisplacementMap", "feDropShadow",
-		"feFlood", "feFuncA", "feFuncB", "feFuncG", "feFuncR", "feGaussianBlur", "feImage",
-		"feMerge", "feMergeNode", "feMorphology", "feOffset", "feSpecularLighting", "feTile",
-		"feTurbulence", "feDistantLight", "fePointLight", "feSpotLight"],
-	other: ["defs", "clipPath", "marker", "script", "style", "stop"],
-};
+export const ANIMATION = ["animate", "animateMotion", "animateTransform", "discard", "mpath", "set"];
+export const CONTAINER_RENDER = ["a", "g", "svg", "switch"];
+export const CONTAINER_NORENDER = ["defs", "marker", "mask", "pattern", "symbol"];
+export const CONTAINER = [...CONTAINER_RENDER, ...CONTAINER_NORENDER];
+export const DESCRIPTION = ["desc", "metadata", "title"];
+export const GRAPHICS = ["circle", "ellipse", "foreignObject", "image", "line",
+	"path", "polygon", "polyline", "rect", "text", "use"];
+export const PRIMITIVES = ["feBlend", "feColorMatrix", "feComponentTransfer", "feComposite",
+	"feConvolveMatrix", "feDiffuseLighting", "feDisplacementMap", "feDropShadow", "feFlood",
+	"feFuncA", "feFuncB", "feFuncG", "feFuncR", "feGaussianBlur", "feImage", "feMerge",
+	"feMergeNode", "feMorphology", "feOffset", "feSpecularLighting", "feTile", "feTurbulence"];
+export const STRUCTURAL = ["defs", "g", "svg", "symbol", "use"];
+export const TEXT = ["textPath", "tspan"];
+export const RENDER = [...CONTAINER_RENDER, ...GRAPHICS];
+export const RENDER_REF = ["linearGradient", "pattern", "radialGradient", "symbol", "filter", "mask", "clipPath"];
+export const OBSOLETE = ["altGlyph", "altGlyphDef", "altGlyphItem", "animateColor", "cursor",
+	"font", "font-face", "font-face-format", "font-face-name", "font-face-src", "font-face-uri",
+	"glyph", "glyphRef", "hkern", "missing-glyph", "tref", "vkern", "script"];
 
 
+export const NO_CONTAINMENT = ["animate", "animateTransform", "desc", "discard",
+	"foreignObject", "metadata", "set", "style", "title"];
 export const CONTAINMENT_MAP = {
-	a: [...SVGElements.render.slice(1), "text"],
-	g: [...SVGElements.render, "text"],
-	svg: [...SVGElements.render, "text", "defs", "symbol", "style", "script"],
-	defs: [...SVGElements.render, ...SVGElements.renderRef, "clipPath", "marker"],
-	clipPath: [...SVGElements.render.slice(1), "text"],
-	marker: [...SVGElements.render, "text"],
-	linearGradient: ["stop"],
-	radialGradient: ["stop"],
-	pattern: [...SVGElements.render, "text"],
-	symbol: [...SVGElements.render, "text"],
-	mask: [...SVGElements.render, "text", "linearGradient", "radialGradient", "pattern", "filter"],
-	filter: [...SVGElements.primitives],
-	text: [...SVGElements.text.slice(1)],
+	a: [...ANIMATION, ...DESCRIPTION, ...GRAPHICS, ...CONTAINER],
+	animateMotion: ["mpath"],
+	circle: [...ANIMATION, ...DESCRIPTION],
+	clipPath: [...ANIMATION, ...DESCRIPTION, ...GRAPHICS],
+	defs: [...ANIMATION, ...CONTAINER, ...DESCRIPTION, ...GRAPHICS, ...RENDER_REF],
+	ellipse: [...ANIMATION, ...DESCRIPTION],
+	feBlend: ANIMATION,
+	feColorMatrix: ANIMATION,
+	feComponentTransfer: ["feFuncA", "feFuncR", "feFuncB", "feFuncG"],
+	feComposite: ANIMATION,
+	feConvolveMatrix: ANIMATION,
+	feDiffuseLighting: ["feDistantLight", "fePointLight", "feSpotLight"],
+	feDisplacementMap: ANIMATION,
+	feDistantLight: ANIMATION,
+	feDropShadow: ANIMATION,
+	feFlood: ANIMATION,
+	feFuncA: ANIMATION,
+	feFuncB: ANIMATION,
+	feFuncG: ANIMATION,
+	feFuncR: ANIMATION,
+	feGaussianBlur: ANIMATION,
+	feImage: ANIMATION,
+	feMerge: ["feMergeNode"],
+	feMergeNode: ANIMATION,
+	feMorphology: ANIMATION,
+	feOffset: ANIMATION,
+	fePointLight: ANIMATION,
+	feSpecularLighting: ["feDistantLight", "fePointLight", "feSpotLight"],
+	feSpotLight: ANIMATION,
+	feTile: ANIMATION,
+	feTurbulence: ANIMATION,
+	filter: [...ANIMATION, ...DESCRIPTION, ...PRIMITIVES],
+	g: [...ANIMATION, ...CONTAINER, ...GRAPHICS, ...DESCRIPTION, ...RENDER_REF],
+	image: [...ANIMATION, ...DESCRIPTION],
+	line: [...ANIMATION, ...DESCRIPTION],
+	linearGradient: [...ANIMATION, ...DESCRIPTION, "stop"],
+	marker: [...ANIMATION, ...CONTAINER, ...GRAPHICS, ...DESCRIPTION, ...RENDER_REF],
+	mask: [...ANIMATION, ...CONTAINER, ...GRAPHICS, ...DESCRIPTION, ...RENDER_REF],
+	mpath: [...DESCRIPTION],
+	path: [...ANIMATION, ...DESCRIPTION],
+	pattern: [...ANIMATION, ...CONTAINER, ...GRAPHICS, ...DESCRIPTION, ...RENDER_REF],
+	polygon: [...ANIMATION, ...DESCRIPTION],
+	polyline: [...ANIMATION, ...DESCRIPTION],
+	radialGradient: [...ANIMATION, ...DESCRIPTION, "stop"],
+	rect: [...ANIMATION, ...DESCRIPTION],
+	stop: ANIMATION,
+	svg: [...ANIMATION, ...CONTAINER, ...GRAPHICS, ...DESCRIPTION, ...RENDER_REF],
+	switch: [...ANIMATION, ...DESCRIPTION, ...CONTAINER_RENDER, ...GRAPHICS],
+	symbol: [...ANIMATION, ...CONTAINER, ...GRAPHICS, ...DESCRIPTION, ...RENDER_REF],
+	text: [...ANIMATION, ...DESCRIPTION, ...TEXT],
+	textPath: [...ANIMATION, ...DESCRIPTION, "tspan"],
+	tspan: [...ANIMATION, ...DESCRIPTION, "tspan"],
+	use: [...ANIMATION, ...DESCRIPTION],
+	root: [...ANIMATION, ...CONTAINER_RENDER, ...GRAPHICS, ...DESCRIPTION],
 };
-
-
-export const KNOWN_ELEMENTS = SVGElements.render.concat(
-	SVGElements.renderRef,
-	SVGElements.text,
-	SVGElements.primitives,
-	SVGElements.other,
-	SVGElements.deprecated,
-	SVGElements.unsupported,
-);
-
-
-export const ELEMENTS_SKIP = SVGElements.unsupported.concat(SVGElements.deprecated);

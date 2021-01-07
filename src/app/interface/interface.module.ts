@@ -8,6 +8,7 @@ import { ToolbarComponent } from "./toolbar/toolbar.component";
 import { DrawerComponent } from "./drawer/drawer.component";
 import { SidebarComponent } from "./sidebar/sidebar.component";
 import { SidebarElementsComponent } from "./sidebar-elements/sidebar-elements.component";
+import { HrefDialogComponent } from "./href-dialog/href-dialog.component";
 
 
 @NgModule({
@@ -18,6 +19,10 @@ import { SidebarElementsComponent } from "./sidebar-elements/sidebar-elements.co
 		DrawerComponent,
 		SidebarComponent,
 		SidebarElementsComponent,
+		HrefDialogComponent,
+	],
+	entryComponents: [
+		HrefDialogComponent,
 	],
 	imports: [
 		CommonModule,

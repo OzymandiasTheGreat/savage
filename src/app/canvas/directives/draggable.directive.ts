@@ -165,12 +165,11 @@ export class DraggableDirective implements OnInit, OnChanges, OnDestroy {
 			handle: this.handle,
 			zIndex: this.zIndex,
 			onDrag: (args) => this.handleEvent(args),
-			// This one's slightly off, rather than calculate, use onMoveStart
-			// onDragStart: (args) => { this.prevPosition = { left: args.clientX, top: args.clientY }; },
 			onMoveStart: (args) => { this.prevPosition = { left: args.left, top: args.top }; },
 			onDragEnd: () => this.handleEvent({ left: this.prevPosition?.left, top: this.prevPosition?.top }, true),
 		} as IDraggableOptions);
 		this.draggable.disabled = this.disabled;
+		(<HTMLElement> this.host.nativeElement).setAttribute("transform", this.transform || "");
 	}
 
 	ngOnChanges(changes: SimpleChanges): void {

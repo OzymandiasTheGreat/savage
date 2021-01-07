@@ -1,0 +1,16 @@
+<form>
+	<h1 mat-dialog-title>Enter URI</h1>
+	<div mat-dialog-content>
+		<mat-form-field>
+			<mat-label>href</mat-label>
+			<input matInput type="text" [(ngModel)]="data.href" [matAutocomplete]="autocomplete" name="href" >
+		</mat-form-field>
+		<mat-autocomplete #autocomplete >
+			<mat-option *ngFor="let uri of data.autocomplete" [value]="'#' + uri" >#{{ uri }}</mat-option>
+		</mat-autocomplete>
+	</div>
+	<div mat-dialog-actions>
+		<button mat-button (click)="cancel()" type="reset" >Cancel</button>
+		<button mat-button [mat-dialog-close]="data.href" type="submit" >Set</button>
+	</div>
+</form>

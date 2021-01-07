@@ -4,7 +4,18 @@
 		<mat-divider [vertical]="true" ></mat-divider>
 		<button mat-icon-button matTooltip="Save" ><mat-icon svgIcon="content-save" ></mat-icon></button>
 	</span>
-	<span class="savage-app-menubar-center" ></span>
+	<span class="savage-app-menubar-center" >
+		<button mat-icon-button (click)="history.undo(1)" [disabled]="!history._undo.length" ><mat-icon svgIcon="undo" ></mat-icon></button>
+		<button mat-icon-button [matMenuTriggerFor]="undoMenu" [disabled]="!history._undo.length" ><mat-icon svgIcon="menu-down" ></mat-icon></button>
+		<mat-menu #undoMenu >
+			<button mat-menu-item *ngFor="let snapshot of history._undo.slice().reverse(); let i = index" (click)="history.undo(i + 1)" >{{ snapshot.name }}</button>
+		</mat-menu>
+		<button mat-icon-button (click)="history.redo(1)" [disabled]="!history._redo.length" ><mat-icon svgIcon="redo" ></mat-icon></button>
+		<button mat-icon-button [matMenuTriggerFor]="redoMenu" [disabled]="!history._redo.length" ><mat-icon svgIcon="menu-down" ></mat-icon></button>
+		<mat-menu #redoMenu >
+			<button mat-menu-item *ngFor="let snapshot of history._redo.slice().reverse(); let i = index" (click)="history.redo(i + 1)" >{{ snapshot.name }}</button>
+		</mat-menu>
+	</span>
 	<span class="savage-app-menubar-right" >
 		<iframe src="https://ghbtns.com/github-btn.html?user=OzymandiasTheGreat&repo=savage-app&type=star&count=true&size=large"
 			frameborder="0"

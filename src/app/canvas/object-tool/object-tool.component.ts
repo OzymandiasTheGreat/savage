@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy, Input, ViewChild, ElementRef } from "@angular/core";
-import * as equal from "fast-deep-equal/es6";
+import equal from "fast-deep-equal/es6";
 import { klona } from "klona";
 import { nanoid } from "nanoid/non-secure";
-import { Path, Point as PathPoint, Matrix as PathMatrix, Rectangle } from "paper";
+import { CompoundPath, Point as PathPoint, Matrix as PathMatrix, Rectangle } from "paper";
 import {
 	compose, fromDefinition, fromTransformAttribute, Matrix, applyToPoint, applyToPoints,
 	translate, scale, toSVG, inverse, smoothMatrix, rotateDEG, skew } from "transformation-matrix";
@@ -32,6 +32,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	name: "OBJECT" = "OBJECT";
 	applyTransform = true;
 	mode: "scale" | "rotate" | "skew" = "scale";
+	@Input() scale: number;
 	@Input() document: Observable<SavageSVG>;
 	@Input() scrollable: HTMLElement;
 	@Input() set selection(value) {
@@ -422,7 +423,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				node.attributes.y2 = `${point2.y}`;
 				break;
 			case "path":
-				const path = new Path(node.attributes.d);
+				const path = new CompoundPath(node.attributes.d);
 				const inverseMatrix = inverse(matrix);
 				path.transform(new PathMatrix([matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f]));
 				path.translate(new PathPoint(d.x, d.y));
@@ -561,7 +562,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 						);
 						break;
 					case "path":
-						const path = new Path(node.attributes.d);
+						const path = new CompoundPath(node.attributes.d);
 						const pathMatrix = new PathMatrix([matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f]);
 						path.transform(pathMatrix);
 						sx = bbox.width / (bbox.width + d.x);
@@ -632,7 +633,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 						);
 						break;
 					case "path":
-						const path = new Path(node.attributes.d);
+						const path = new CompoundPath(node.attributes.d);
 						const pathMatrix = new PathMatrix([matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f]);
 						path.transform(pathMatrix);
 						sx = bbox.width / (bbox.width - d.x);
@@ -703,7 +704,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 						);
 						break;
 					case "path":
-						const path = new Path(node.attributes.d);
+						const path = new CompoundPath(node.attributes.d);
 						const pathMatrix = new PathMatrix([matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f]);
 						path.transform(pathMatrix);
 						sx = bbox.width / (bbox.width + d.x);
@@ -774,7 +775,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 						);
 						break;
 					case "path":
-						const path = new Path(node.attributes.d);
+						const path = new CompoundPath(node.attributes.d);
 						const pathMatrix = new PathMatrix([matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f]);
 						path.transform(pathMatrix);
 						sx = bbox.width / (bbox.width - d.x);
@@ -843,7 +844,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 					applyToPoints(matrix, points)).flat());
 				break;
 			case "path":
-				const path = new Path(node.attributes.d);
+				const path = new CompoundPath(node.attributes.d);
 				const pathMatrix = new PathMatrix(matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f);
 				path.transform(pathMatrix);
 				path.rotate(angle, new PathPoint(c.x, c.y));
@@ -907,7 +908,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 					applyToPoints(matrix, points)).flat());
 				break;
 			case "path":
-				const path = new Path(node.attributes.d);
+				const path = new CompoundPath(node.attributes.d);
 				const pathMatrix = new PathMatrix(matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f);
 				path.transform(pathMatrix);
 				path.skew(axis === "x" ? angle * 100 : 0, axis === "y" ? angle * 100 : 0);

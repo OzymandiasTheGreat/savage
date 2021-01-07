@@ -4,6 +4,7 @@
 	pointer-events="none"
 	[appAttrs]="document"
 	[skipAttrs]="['overflow', 'pointer-events']"
+	[style.transform]="'scale(' + scale + ')'"
 >
 	<ng-container *ngIf="canvas.activeTool === name">
 		<ng-container *ngFor="let node of selection" >

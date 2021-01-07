@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
+import { INode, stringify } from "svgson";
 
 import { Observable } from "../../types/observer";
 import { SavageSVG, findParent } from "../../types/svg";
@@ -18,6 +19,7 @@ export interface IDocumentEvent {
 	styleUrls: ["./document.component.scss"]
 })
 export class DocumentComponent implements OnInit {
+	@Input() scale: number;
 	@Input() document: Observable<SavageSVG>;
 	@Input() scrollable: HTMLElement;
 	@Output() dragging: EventEmitter<IDocumentEvent>;
@@ -83,5 +85,9 @@ export class DocumentComponent implements OnInit {
 			event.stopPropagation();
 			this.handleKeyDown.emit({ event, node });
 		}
+	}
+
+	stringify(node: INode): string {
+		return node.children.map((n) => stringify(n)).join("\n");
 	}
 }

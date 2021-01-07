@@ -5,23 +5,27 @@
 		(mousedown)="onMouseDown($event)"
 		(dblclick)="onDblClick($event)"
 		(keydown)="onKeyDown($event)"
+		(wheel)="zoom($event)"
 		tabindex="-1"
 	>
 		<div #doc *ngIf="!!document"
 			class="savage-app-canvas-document"
 			[style.width.px]="width"
-			[style.height.px]="height" >
+			[style.height.px]="height"
+			[style.transform]="'scale(' + scale + ')'"
+		>
 			<app-document
 				[document]="document"
 				[scrollable]="scrollable"
+				[scale]="scale"
 				(dragging)="handleDrag($event)"
 				(handleClick)="handleClick($event)"
 				(handleDblClick)="handleDblClick($event)"
 				(handleMouseDown)="handleMouseDown($event)"
 				(handleKeyDown)="handleKeyDown($event)" ></app-document>
-			<app-object-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" ></app-object-tool>
-			<app-path-tool [document]="document" [scrollable]="scrollable" [node]="canvas.selection" ></app-path-tool>
-			<app-text-tool [document]="document" [scrollable]="scrollable" [node]="canvas.selection" ></app-text-tool>
+			<app-object-tool [scale]="scale" [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" ></app-object-tool>
+			<app-path-tool [scale]="scale" [document]="document" [scrollable]="scrollable" [node]="canvas.selection" ></app-path-tool>
+			<app-text-tool [scale]="scale" [document]="document" [scrollable]="scrollable" [node]="canvas.selection" ></app-text-tool>
 		</div>
 	</div>
 </div>

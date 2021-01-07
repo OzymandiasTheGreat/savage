@@ -3,6 +3,7 @@ import { Component, OnInit } from "@angular/core";
 import { Observable } from "../../types/observer";
 import { SavageSVG } from "../../types/svg";
 import { SvgFileService } from "../../services/svg-file.service";
+import { CanvasService } from "../../services/canvas.service";
 
 
 
@@ -15,6 +16,7 @@ import { SvgFileService } from "../../services/svg-file.service";
 export class SidebarComponent implements OnInit {
 	constructor(
 		public file: SvgFileService,
+		public canvas: CanvasService,
 	) { }
 
 	ngOnInit(): void { }
