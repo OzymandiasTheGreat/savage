@@ -17,15 +17,29 @@
 			<app-document
 				[document]="document"
 				[scrollable]="scrollable"
-				[scale]="scale"
 				(dragging)="handleDrag($event)"
 				(handleClick)="handleClick($event)"
 				(handleDblClick)="handleDblClick($event)"
 				(handleMouseDown)="handleMouseDown($event)"
 				(handleKeyDown)="handleKeyDown($event)" ></app-document>
-			<app-object-tool [scale]="scale" [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" ></app-object-tool>
-			<app-path-tool [scale]="scale" [document]="document" [scrollable]="scrollable" [node]="canvas.selection" ></app-path-tool>
-			<app-text-tool [scale]="scale" [document]="document" [scrollable]="scrollable" [node]="canvas.selection" ></app-text-tool>
+			<app-object-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" ></app-object-tool>
+			<app-path-tool [document]="document" [scrollable]="scrollable" [node]="canvas.selection" ></app-path-tool>
+			<app-text-tool [document]="document" [scrollable]="scrollable" [node]="canvas.selection" ></app-text-tool>
 		</div>
+		<ng-container *ngIf="!!document && canvas.grid.enabled" >
+			<div class="savage-app-canvas-gridline" *ngFor="let line of gridY" [style.transform]="'scale(' + scale + ')'" [style.top.px]="line" [style.width.%]="100" ></div>
+			<div class="savage-app-canvas-gridline" *ngFor="let line of gridX" [style.transform]="'scale(' + scale + ')'" [style.left.px]="line" [style.height.%]="100" ></div>
+		</ng-container>
+		<ng-container *ngIf="!!document" >
+			<div class="savage-app-canvas-guide" *ngFor="let guide of guides"
+				[style.transform]="'scale(' + scale + ')'"
+				[style.width.%]="guide.width"
+				[style.height.%]="guide.height"
+				[style.top.px]="guide.top"
+				[style.left.px]="guide.left"
+				[style.border-right]="guide.borderRight + 'px solid #212121'"
+				[style.border-bottom]="guide.borderBottom + 'px solid #212121'"
+			></div>
+		</ng-container>
 	</div>
 </div>

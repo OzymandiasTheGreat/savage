@@ -27,7 +27,7 @@ export class CanvasService {
 	tools: Record<string, ICanvasTool> = {};
 	activeTool = "OBJECT";
 
-	grid: number;
+	grid: { enabled: boolean, step: number } = { enabled: false, step: 50 };
 	guides: ISnapTarget[] = [];
 	boundaries: { x: number, y: number, w: number, h: number };
 	get snap(): ISnapTarget[] { return [

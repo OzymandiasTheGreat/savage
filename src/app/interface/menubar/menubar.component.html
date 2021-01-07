@@ -15,6 +15,17 @@
 		<mat-menu #redoMenu >
 			<button mat-menu-item *ngFor="let snapshot of history._redo.slice().reverse(); let i = index" (click)="history.redo(i + 1)" >{{ snapshot.name }}</button>
 		</mat-menu>
+		<button mat-flat-button [matMenuTriggerFor]="gridMenu" >Grid <mat-icon svgIcon="menu-down" ></mat-icon></button>
+		<mat-menu #gridMenu >
+			<button mat-menu-item (click)="toggleGrid()" >Toggle grid</button>
+			<button mat-menu-item (click)="setGrid()" >Set grid size</button>
+		</mat-menu>
+		<button mat-flat-button [matMenuTriggerFor]="guideMenu" >Guides <mat-icon svgIcon="menu-down" ></mat-icon></button>
+		<mat-menu #guideMenu >
+			<button mat-menu-item (click)="addGuide('horizontal')">Add horizontal guide</button>
+			<button mat-menu-item (click)="addGuide('vertical')">Add vertical guide</button>
+			<button mat-menu-item *ngFor="let guide of canvas.guides" (click)="removeGuide(guide)" >Remove {{ !!guide.x ? "vertical" : "horizontal" }} guide at {{ guide.x || guide.y }}</button>
+		</mat-menu>
 	</span>
 	<span class="savage-app-menubar-right" >
 		<iframe src="https://ghbtns.com/github-btn.html?user=OzymandiasTheGreat&repo=savage-app&type=star&count=true&size=large"

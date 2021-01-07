@@ -16,8 +16,9 @@
 				transparent 75%, #21212133 75%, #21212133);
 		background-size: 10px 10px;
 		background-position: 0 0, 5px 5px;
-		width: calc(100% * 3);
-		height: calc(100% * 3);
+		width: calc(100vw * 3);
+		height: calc(100vw * 3);
+		position: relative;
 	}
 
 	&-document {
@@ -29,5 +30,15 @@
 		& > * {
 			position: absolute;
 		}
+	}
+
+	&-gridline {
+		position: absolute;
+		border-right: 1px solid #212121;
+		border-bottom: 1px solid #212121;
+	}
+
+	&-guide {
+		position: absolute;
 	}
 }

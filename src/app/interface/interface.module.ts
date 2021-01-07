@@ -9,6 +9,7 @@ import { DrawerComponent } from "./drawer/drawer.component";
 import { SidebarComponent } from "./sidebar/sidebar.component";
 import { SidebarElementsComponent } from "./sidebar-elements/sidebar-elements.component";
 import { HrefDialogComponent } from "./href-dialog/href-dialog.component";
+import { GuideDialogComponent } from "./guide-dialog/guide-dialog.component";
 
 
 @NgModule({
@@ -20,9 +21,11 @@ import { HrefDialogComponent } from "./href-dialog/href-dialog.component";
 		SidebarComponent,
 		SidebarElementsComponent,
 		HrefDialogComponent,
+		GuideDialogComponent,
 	],
 	entryComponents: [
 		HrefDialogComponent,
+		GuideDialogComponent,
 	],
 	imports: [
 		CommonModule,

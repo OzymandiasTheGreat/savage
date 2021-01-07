@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef, ChangeDetectorRef } from "@angular/core";
 
 import { Observable } from "../../types/observer";
-import { findParent, SavageSVG } from "../../types/svg";
+import { SavageSVG } from "../../types/svg";
 import { SvgFileService } from "../../services/svg-file.service";
 import { CanvasService } from "../../services/canvas.service";
 import { IDocumentEvent } from "../document/document.component";
@@ -14,11 +14,57 @@ import { IDocumentEvent } from "../document/document.component";
 })
 export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
 	@ViewChild("element", { static: true }) element: ElementRef<HTMLDivElement>;
-	@ViewChild("doc", { static: false }) container: ElementRef<SVGSVGElement>;
+	@ViewChild("scrollable", { static: true }) scrollable: ElementRef<HTMLDivElement>;
+	@ViewChild("doc", { static: false }) container: ElementRef<HTMLDivElement>;
 	document: Observable<SavageSVG>;
 	pointerMoved = false;
 	panning = false;
 	scale = 1;
+	get guides(): { width: number, height: number, top: number, left: number, borderRight: number, borderBottom: number }[] {
+		const guides: { width: number, height: number, top: number, left: number, borderRight: number, borderBottom: number }[] = [];
+		for (const target of this.canvas.guides) {
+			if (target.x) {
+				guides.push({
+					width: 0,
+					height: 100,
+					top: 0,
+					left: <number> target.x + this.container.nativeElement.offsetLeft,
+					borderRight: 1,
+					borderBottom: 0,
+				});
+			} else {
+				guides.push({
+					width: 100,
+					height: 0,
+					top: <number> target.y + this.container.nativeElement.offsetTop,
+					left: 0,
+					borderRight: 0,
+					borderBottom: 1,
+				});
+			}
+		}
+		return guides;
+	}
+	get gridX(): number[] {
+		const grid: number[] = [];
+		if (this.container) {
+			const offset = (this.scrollable.nativeElement.clientWidth % this.container.nativeElement.clientWidth) / 2;
+			for (let i = 0; i < this.scrollable.nativeElement.clientWidth; i += this.canvas.grid.step) {
+				grid.push(offset + i);
+			}
+		}
+		return grid;
+	}
+	get gridY(): number[] {
+		const grid: number[] = [];
+		if (this.container) {
+			const offset = (this.scrollable.nativeElement.clientHeight % this.container.nativeElement.clientHeight) / 2;
+			for (let i = 0; i < this.scrollable.nativeElement.clientHeight; i += this.canvas.grid.step) {
+				grid.push(offset + i);
+			}
+		}
+		return grid;
+	}
 
 	protected globalListeners: Record<string, Array<(event: Event) => void>> = {};
 	protected canvasListeners: Record<string, Array<(event: Event) => void>> = {};
@@ -93,7 +139,7 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
 		if (event.ctrlKey) {
 			event.preventDefault();
 			event.stopPropagation();
-			this.scale += 0.01 * event.deltaY;
+			this.scale += 0.01 * -event.deltaY;
 		}
 	}
 
