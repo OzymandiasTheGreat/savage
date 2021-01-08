@@ -29,26 +29,19 @@ export class CanvasService {
 
 	grid: { enabled: boolean, step: number } = { enabled: false, step: 50 };
 	guides: ISnapTarget[] = [];
-	boundaries: { x: number, y: number, w: number, h: number };
-	get snap(): ISnapTarget[] { return [
-		{
-			...this.boundaries,
-			corner: "all",
-			edge: "both",
-			side: "both",
-		}, {
-			step: this.grid,
-			corner: "all",
-			edge: "both",
-			side: "both",
-		},
-		...this.guides?.map((g) => ({
-			...g,
-			corner: "all",
-			edge: "both",
-			side: "both",
-		} as ISnapTarget)),
-	]; }
+	boundaries: { x: number, y: number, width: number, height: number };
+	snapping: boolean;
+	get snap(): ISnapTarget[] {
+		const targets: ISnapTarget[] = [];
+		if (this.snapping) {
+			targets.push({ ...this.boundaries, corner: "all" });
+			if (this.grid.enabled) {
+				targets.push({ step: this.grid.step, gravity: this.grid.step / 4, corner: "all" });
+			}
+			targets.concat(this.guides.map((g) => ({ ...g, corner: "all" })));
+		}
+		return targets;
+	}
 
 	constructor() { }
 }

@@ -24,6 +24,10 @@ export class MenubarComponent implements OnInit {
 
 	ngOnInit(): void { }
 
+	toggleSnapping(): void {
+		this.canvas.snapping = !this.canvas.snapping;
+	}
+
 	toggleGrid(): void {
 		this.canvas.grid.enabled = !this.canvas.grid.enabled;
 	}

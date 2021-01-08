@@ -44,9 +44,6 @@ export class DocumentComponent implements OnInit {
 		if (this.canvas.activeTool === "OBJECT") {
 			return true;
 		}
-		if (this.canvas.activeTool === "PATH" && node.name === "path") {
-			return true;
-		}
 		return false;
 	}
 

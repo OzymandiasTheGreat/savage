@@ -6,6 +6,7 @@ import { SavageSVG, findText, screen2svg, svg2screen, findParent, find } from ".
 import { ICanvasTool, CanvasService } from "../../services/canvas.service";
 import { SvgFileService, IDefinitions } from "../../services/svg-file.service";
 import { IDocumentEvent } from "../document/document.component";
+import { HistoryService } from "../../services/history.service";
 
 
 @Component({
@@ -38,6 +39,7 @@ export class TextToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	constructor(
 		public canvas: CanvasService,
 		public svg: SvgFileService,
+		public history: HistoryService,
 	) {
 		this.canvas.tools[this.name] = this;
 	}
@@ -125,6 +127,7 @@ export class TextToolComponent implements ICanvasTool, OnInit, OnDestroy {
 
 	onInput(event: InputEvent): void {
 		this.text.value = (<HTMLTextAreaElement> event.target).value.trim();
+		this.history.snapshot("Edit text");
 	}
 
 	onPathInput(event: InputEvent): void {
@@ -144,6 +147,7 @@ export class TextToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				delete this.textParent.attributes.href;
 			}
 		}
+		this.history.snapshot("Edit textPath");
 	}
 
 	onPathComplete(value: string): void {
@@ -155,6 +159,7 @@ export class TextToolComponent implements ICanvasTool, OnInit, OnDestroy {
 			delete this.textParent.attributes.dy;
 			this.textParent.attributes.href = value;
 		}
+		this.history.snapshot("Edit textPath");
 	}
 
 	onMouseDown(event: MouseEvent): void {

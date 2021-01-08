@@ -116,7 +116,7 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
 			setTimeout(() => {
 				const rect = this.container.nativeElement.getBoundingClientRect();
 				this.container.nativeElement.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
-				this.canvas.boundaries = { x: rect.x, y: rect.y, w: rect.width, h: rect.height };
+				this.canvas.boundaries = { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
 			}, 100);
 		});
 	}

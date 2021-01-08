@@ -8,6 +8,7 @@ import { SavageSVG, screen2svg, find } from "../../types/svg";
 import { ICanvasTool, CanvasService } from "../../services/canvas.service";
 import { IDocumentEvent } from "../document/document.component";
 import { DragEvent } from "../directives/draggable.directive";
+import { HistoryService } from "../../services/history.service";
 
 
 @Component({
@@ -92,6 +93,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 
 	constructor(
 		public canvas: CanvasService,
+		public history: HistoryService,
 	) {
 		this.canvas.tools[this.name] = this;
 	}
@@ -123,6 +125,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				this.external = false;
 				this.node.attributes.d = clone.pathData;
 				this.external = true;
+				this.history.snapshot("Insert path segment");
 			} else {
 				const point = new Point(position.x, position.y);
 				const location = this.path.getNearestLocation(point);
@@ -135,7 +138,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				this.external = false;
 				this.node.attributes.d = clone.pathData;
 				this.external = true;
-				console.log(clone.pathData, this.path.pathData);
+				this.history.snapshot("Add path segment");
 			}
 		} else {
 			const nid = nanoid(13);
@@ -149,6 +152,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 			};
 			this.document.children.push(<any> pathNode);
 			this.canvas.selection = [find(this.document, nid)];
+			this.history.snapshot("Add path element");
 		}
 	}
 
@@ -235,6 +239,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				this.external = false;
 				this.node.attributes.d = clone.pathData;
 				this.external = true;
+				this.history.snapshot("Move path segment");
 				break;
 			case "ArrowRight":
 				event.preventDefault();
@@ -248,6 +253,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				this.external = false;
 				this.node.attributes.d = clone.pathData;
 				this.external = true;
+				this.history.snapshot("Move path segment");
 				break;
 			case "ArrowUp":
 				event.preventDefault();
@@ -261,6 +267,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				this.external = false;
 				this.node.attributes.d = clone.pathData;
 				this.external = true;
+				this.history.snapshot("Move path segment");
 				break;
 			case "ArrowDown":
 				event.preventDefault();
@@ -274,6 +281,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				this.external = false;
 				this.node.attributes.d = clone.pathData;
 				this.external = true;
+				this.history.snapshot("Move path segment");
 				break;
 			case "Delete":
 				event.preventDefault();
@@ -288,6 +296,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				this.external = false;
 				this.node.attributes.d = clone.pathData;
 				this.external = true;
+				this.history.snapshot("Remove path segment");
 				break;
 			case "a":
 				event.preventDefault();
@@ -327,6 +336,9 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		this.external = false;
 		this.node.attributes.d = clone.pathData;
 		this.external = true;
+		if (event.end) {
+			this.history.snapshot("Move path segment");
+		}
 	}
 
 	handleHandleDrag(segment: paper.Segment, handle: "in" | "out", event: DragEvent): void {
@@ -340,5 +352,8 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		this.external = false;
 		this.node.attributes.d = clone.pathData;
 		this.external = true;
+		if (event.end) {
+			this.history.snapshot("Edit path curve");
+		}
 	}
 }

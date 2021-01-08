@@ -13,6 +13,7 @@ import { find, findParent, SavageSVG, screen2svg, applyTransformed, applyTransfo
 import { ICanvasTool, CanvasService } from "../../services/canvas.service";
 import { IDocumentEvent } from "../document/document.component";
 import { DragEvent } from "../directives/draggable.directive";
+import { HistoryService } from "../../services/history.service";
 
 
 const selectableNodes: string[] = ["a", "circle", "ellipse", "foreignObject", "g", "image", "line", "path", "polygon", "polyline", "rect", "svg", "switch", "text", "use"];
@@ -53,6 +54,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 
 	constructor(
 		public canvas: CanvasService,
+		public history: HistoryService,
 	) {
 		this.canvas.tools[this.name] = this;
 	}
@@ -93,6 +95,9 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 			} else {
 				this.moveNode(node, d);
 			}
+		}
+		if ((<DragEvent> event.event).end) {
+			this.history.snapshot("Move (translate) element");
 		}
 	}
 
@@ -191,6 +196,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 						this.moveNode(n, { x: ev.altKey ? -1 : -5, y: 0 });
 					}
 				}
+				this.history.snapshot("Move (translate) element");
 				break;
 			case "ArrowRight":
 				ev.preventDefault();
@@ -201,6 +207,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 						this.moveNode(n, { x: ev.altKey ? 1 : 5, y: 0 });
 					}
 				}
+				this.history.snapshot("Move (translate) element");
 				break;
 			case "ArrowUp":
 				ev.preventDefault();
@@ -211,6 +218,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 						this.moveNode(n, { x: 0, y: ev.altKey ? -1 : -5 });
 					}
 				}
+				this.history.snapshot("Move (translate) element");
 				break;
 			case "ArrowDown":
 				ev.preventDefault();
@@ -221,6 +229,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 						this.moveNode(n, { x: 0, y: ev.altKey ? 1 : 5 });
 					}
 				}
+				this.history.snapshot("Move (translate) element");
 				break;
 			case "Delete":
 				ev.preventDefault();
@@ -230,6 +239,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 					parent.children.splice(index, 1);
 					recursiveUnobserve(n);
 				}
+				this.history.snapshot("Remove element");
 				break;
 			case "PageUp":
 				ev.preventDefault();
@@ -240,6 +250,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				setTimeout(() => {
 					this.canvas.registry[node.nid]?.focus();
 				}, 150);
+				this.history.snapshot("Reorder element");
 				break;
 			case "PageDown":
 				ev.preventDefault();
@@ -250,6 +261,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				setTimeout(() => {
 					this.canvas.registry[node.nid]?.focus();
 				}, 150);
+				this.history.snapshot("Reorder element");
 				break;
 			case "d":
 				if (ev.ctrlKey && !ev.shiftKey && !ev.altKey) {
@@ -262,6 +274,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 						copy.nid = nanoid(13);
 						parent.children.splice(index + 1, 0, copy);
 					}
+					this.history.snapshot("Duplicate element");
 				}
 				break;
 			case "g":
@@ -289,6 +302,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 						this.canvas.selection.push(this.document.children[this.document.children.length - 1]);
 						this.canvas.registry[children[children.length - 1]?.nid]?.focus();
 					}, 150);
+					this.history.snapshot("Group elements");
 				}
 				break;
 			case "G":
@@ -312,6 +326,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 							this.canvas.registry[node.children[node.children.length - 1]?.nid]?.focus();
 						}, 150);
 					}
+					this.history.snapshot("Ungroup elements");
 				}
 				break;
 			case "a":
@@ -486,6 +501,9 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 			}
 			node.attributes.transform = toSVG(smoothMatrix(matrix, 10 ** 7));
 		}
+		if (event.end) {
+			this.history.snapshot("Scale element");
+		}
 	}
 
 	scaleNodeApplied(
@@ -578,18 +596,18 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				switch (node.name) {
 					case "circle":
 						const r = parseFloat(node.attributes.r || "1");
-						const rd = Math.abs(d.x) > Math.abs(d.y) ? -d.x : d.y;
-						point = applyToPoint(matrix, { x: cx, y: cy });
-						node.attributes.cx = `${point.x - rd}`;
-						node.attributes.cy = `${point.y + rd}`;
+						const rd = Math.abs(d.x) > Math.abs(d.y) ? d.x : d.y;
+						point = applyTransformed({ x: cx, y: cy }, d, matrix);
+						node.attributes.cx = `${point.x}`;
+						node.attributes.cy = `${point.y}`;
 						node.attributes.r = `${Math.max(r - rd, 1)}`;
 						break;
 					case "ellipse":
 						const rx = parseFloat(node.attributes.rx || "1");
 						const ry = parseFloat(node.attributes.ry || "1");
-						point = applyToPoint(matrix, { x: cx, y: cy });
-						node.attributes.cx = `${point.x + d.x}`;
-						node.attributes.cy = `${point.y + d.y}`;
+						point = applyTransformed({ x: cx, y: cy }, d, matrix);
+						node.attributes.cx = `${point.x}`;
+						node.attributes.cy = `${point.y}`;
 						node.attributes.rx = `${Math.max(rx + d.x, 1)}`;
 						node.attributes.ry = `${Math.max(ry - d.y, 1)}`;
 						break;
@@ -649,20 +667,20 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				switch (node.name) {
 					case "circle":
 						const r = parseFloat(node.attributes.r || "1");
-						const rd = Math.abs(d.x) > Math.abs(d.y) ? d.x : -d.y;
-						point = applyToPoint(matrix, { x: cx, y: cy });
-						node.attributes.cx = `${point.x + rd}`;
-						node.attributes.cy = `${point.y - rd}`;
-						node.attributes.r = `${Math.max(Math.abs(r - rd), 1)}`;
+						const rd = Math.abs(d.x) > Math.abs(d.y) ? d.x : d.y;
+						point = applyTransformed({ x: cx, y: cy }, d, matrix);
+						node.attributes.cx = `${point.x}`;
+						node.attributes.cy = `${point.y}`;
+						node.attributes.r = `${Math.max(r - rd, 1)}`;
 						break;
 					case "ellipse":
 						const rx = parseFloat(node.attributes.rx || "1");
 						const ry = parseFloat(node.attributes.ry || "1");
-						point = applyToPoint(matrix, { x: cx, y: cy });
-						node.attributes.cx = `${point.x + d.x}`;
-						node.attributes.cy = `${point.y + d.y}`;
+						point = applyTransformed({ x: cx, y: cy }, d, matrix);
+						node.attributes.cx = `${point.x}`;
+						node.attributes.cy = `${point.y}`;
 						node.attributes.rx = `${Math.max(rx - d.x, 1)}`;
-						node.attributes.ry = `${Math.max(ry - d.y, 1)}`;
+						node.attributes.ry = `${Math.max(ry + d.y, 1)}`;
 						break;
 					case "image":
 					case "rect":
@@ -720,18 +738,18 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				switch (node.name) {
 					case "circle":
 						const r = parseFloat(node.attributes.r || "1");
-						const rd = Math.abs(d.x) > Math.abs(d.y) ? -d.x : -d.y;
-						point = applyToPoint(matrix, { x: cx, y: cy });
-						node.attributes.cx = `${point.x - rd}`;
-						node.attributes.cy = `${point.y - rd}`;
-						node.attributes.r = `${Math.max(Math.abs(r - rd), 1)}`;
+						const rd = Math.abs(d.x) > Math.abs(d.y) ? d.x : d.y;
+						point = applyTransformed({ x: cx, y: cy }, d, matrix);
+						node.attributes.cx = `${point.x}`;
+						node.attributes.cy = `${point.y}`;
+						node.attributes.r = `${Math.max(r - rd, 1)}`;
 						break;
 					case "ellipse":
 						const rx = parseFloat(node.attributes.rx || "1");
 						const ry = parseFloat(node.attributes.ry || "1");
-						point = applyToPoint(matrix, { x: cx, y: cy });
-						node.attributes.cx = `${point.x + d.x}`;
-						node.attributes.cy = `${point.y + d.y}`;
+						point = applyTransformed({ x: cx, y: cy }, d, matrix);
+						node.attributes.cx = `${point.x}`;
+						node.attributes.cy = `${point.y}`;
 						node.attributes.rx = `${Math.max(rx + d.x, 1)}`;
 						node.attributes.ry = `${Math.max(ry + d.y, 1)}`;
 						break;
@@ -807,6 +825,9 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 			}
 			node.attributes.transform = toSVG(smoothMatrix(compose(rotateDEG(angle, cx, cy), matrix), 10 ** 7));
 		}
+		if (event.end) {
+			this.history.snapshot("Rotate element");
+		}
 	}
 
 	rotateNodeApplied(node: Observable<SavageSVG>, angle: number, c: Point): void {
@@ -870,6 +891,9 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 			}
 			node.attributes.transform = toSVG(smoothMatrix(
 				compose(skew(axis === "x" ? angle : 0, axis === "y" ? angle : 0), matrix), 10 ** 7));
+		}
+		if (event.end) {
+			this.history.snapshot("Skew element");
 		}
 	}
 

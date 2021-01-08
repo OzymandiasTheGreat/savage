@@ -26,6 +26,7 @@
 			<button mat-menu-item (click)="addGuide('vertical')">Add vertical guide</button>
 			<button mat-menu-item *ngFor="let guide of canvas.guides" (click)="removeGuide(guide)" >Remove {{ !!guide.x ? "vertical" : "horizontal" }} guide at {{ guide.x || guide.y }}</button>
 		</mat-menu>
+		<mat-slide-toggle [checked]="canvas.snapping" (toggleChange)="toggleSnapping()" >Snap</mat-slide-toggle>
 	</span>
 	<span class="savage-app-menubar-right" >
 		<iframe src="https://ghbtns.com/github-btn.html?user=OzymandiasTheGreat&repo=savage-app&type=star&count=true&size=large"
