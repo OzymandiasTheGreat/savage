@@ -1,0 +1,210 @@
+<svg #overlay xmlns="http://www.w3.org/2000/svg"
+	class="savage-app-canvas-circle-tool"
+	overflow="visible"
+	pointer-events="none"
+	[appAttrs]="document"
+	[skipAttrs]="['overflow', 'pointer-events']"
+>
+	<ng-container *ngIf="canvas.activeTool === name" >
+		<ng-container *ngIf="!!drawing" >
+			<ng-container [ngSwitch]="drawing.name" >
+				<svg:path *ngSwitchCase="'path'"
+					[attr.d]="drawing.attributes.d"
+					fill="#42424233"
+					stroke="#212121"
+					[attr.stroke-width]="1 * wx"
+					[attr.stroke-dasharray]="[1 * wx, 2 * wx].join(' ')"
+					vector-effect="non-scaling-size"
+				></svg:path>
+				<svg:line *ngSwitchCase="'path'"
+					[attr.x1]="arc.cx"
+					[attr.y1]="arc.cy"
+					[attr.x2]="arc.startX"
+					[attr.y2]="arc.startY"
+					stroke="#212121"
+					[attr.stroke-width]="1 * wx"
+					[attr.stroke-dasharray]="[1 * wx, 2 * wx].join(' ')"
+					vector-effect="non-scaling-size"
+				></svg:line>
+				<svg:line *ngSwitchCase="'path'"
+					[attr.x1]="arc.cx"
+					[attr.y1]="arc.cy"
+					[attr.x2]="arc.endX"
+					[attr.y2]="arc.endY"
+					stroke="#212121"
+					[attr.stroke-width]="1 * wx"
+					[attr.stroke-dasharray]="[1 * wx, 2 * wx].join(' ')"
+					vector-effect="non-scaling-size"
+				></svg:line>
+				<svg:circle *ngSwitchCase="'circle'"
+					[attr.cx]="drawing.attributes.cx"
+					[attr.cy]="drawing.attributes.cy"
+					[attr.r]="drawing.attributes.r"
+					fill="#42424233"
+					stroke="#212121"
+					[attr.stroke-width]="1 * wx"
+					[attr.stroke-dasharray]="[1 * wx, 2 * wx].join(' ')"
+					vector-effect="non-scaling-size"
+				></svg:circle>
+				<svg:ellipse *ngSwitchCase="'ellipse'"
+					[attr.cx]="drawing.attributes.cx"
+					[attr.cy]="drawing.attributes.cy"
+					[attr.rx]="drawing.attributes.rx"
+					[attr.ry]="drawing.attributes.ry"
+					fill="#42424233"
+					stroke="#212121"
+					[attr.stroke-width]="1 * wx"
+					[attr.stroke-dasharray]="[1 * wx, 2 * wx].join(' ')"
+					vector-effect="non-scaling-size"
+				></svg:ellipse>
+			</ng-container>
+		</ng-container>
+		<ng-container *ngIf="selection?.name === 'path' && !!arc" >
+			<svg:rect
+				pointer-events="all"
+				appDraggable
+				[containment]="scrollable"
+				[autoScroll]="scrollable"
+				[snap]="canvas.snap"
+				(dragging)="move($event)"
+				[attr.x]="bbox.right - (bbox.width / 2) - (3.5 * wx)"
+				[attr.y]="bbox.bottom - (bbox.height / 2) - (3.5 * hx)"
+				[attr.width]="7 * wx"
+				[attr.height]="7 * hx"
+				fill="#424242"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				vector-effect="non-scaling-size"
+				[attr.transform]="'rotate(' + 45 + ', ' + (bbox.right - (bbox.width / 2)) + ', ' + (bbox.bottom - (bbox.height / 2)) + ')'"
+			></svg:rect>
+			<svg:circle
+				pointer-events="all"
+				appDraggable
+				[containment]="scrollable"
+				[autoScroll]="scrollable"
+				[snap]="canvas.snap"
+				(dragging)="radius('r', $event)"
+				[attr.cx]="bbox.right"
+				[attr.cy]="bbox.y + (bbox.height / 2)"
+				[attr.r]="3.5 * wx"
+				fill="#424242"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				vector-effect="non-scaling-size"
+			></svg:circle>
+			<svg:circle
+				pointer-events="all"
+				appDraggable
+				[containment]="scrollable"
+				[autoScroll]="scrollable"
+				[snap]="canvas.snap"
+				(dragging)="changeArc('start', $event)"
+				[attr.cx]="transformed(arc.startX, arc.startY).x"
+				[attr.cy]="transformed(arc.startX, arc.startY).y"
+				[attr.r]="3.5 * wx"
+				fill="#424242"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				vector-effect="non-scaling-size"
+			></svg:circle>
+			<svg:circle
+				pointer-events="all"
+				appDraggable
+				[containment]="scrollable"
+				[autoScroll]="scrollable"
+				[snap]="canvas.snap"
+				(dragging)="changeArc('end', $event)"
+				[attr.cx]="transformed(arc.endX, arc.endY).x"
+				[attr.cy]="transformed(arc.endX, arc.endY).y"
+				[attr.r]="3.5 * wx"
+				fill="#424242"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				vector-effect="non-scaling-size"
+			></svg:circle>
+		</ng-container>
+		<ng-container *ngIf="selection?.name === 'circle'" >
+			<svg:rect
+				pointer-events="all"
+				appDraggable
+				[containment]="scrollable"
+				[autoScroll]="scrollable"
+				[snap]="canvas.snap"
+				(dragging)="move($event)"
+				[attr.x]="bbox.right - (bbox.width / 2) - (3.5 * wx)"
+				[attr.y]="bbox.bottom - (bbox.height / 2) - (3.5 * hx)"
+				[attr.width]="7 * wx"
+				[attr.height]="7 * hx"
+				fill="#424242"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				vector-effect="non-scaling-size"
+				[attr.transform]="'rotate(' + 45 + ', ' + (bbox.right - (bbox.width / 2)) + ', ' + (bbox.bottom - (bbox.height / 2)) + ')'"
+			></svg:rect>
+			<svg:circle
+				pointer-events="all"
+				appDraggable
+				[containment]="scrollable"
+				[autoScroll]="scrollable"
+				[snap]="canvas.snap"
+				(dragging)="radius('r', $event)"
+				[attr.cx]="bbox.right"
+				[attr.cy]="bbox.y + (bbox.height / 2)"
+				[attr.r]="3.5 * wx"
+				fill="#424242"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				vector-effect="non-scaling-size"
+			></svg:circle>
+		</ng-container>
+		<ng-container *ngIf="selection?.name === 'ellipse'" >
+			<svg:rect
+				pointer-events="all"
+				appDraggable
+				[containment]="scrollable"
+				[autoScroll]="scrollable"
+				[snap]="canvas.snap"
+				(dragging)="move($event)"
+				[attr.x]="bbox.right - (bbox.width / 2) - (3.5 * wx)"
+				[attr.y]="bbox.bottom - (bbox.height / 2) - (3.5 * hx)"
+				[attr.width]="7 * wx"
+				[attr.height]="7 * hx"
+				fill="#424242"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				vector-effect="non-scaling-size"
+				[attr.transform]="'rotate(' + 45 + ', ' + (bbox.right - (bbox.width / 2)) + ', ' + (bbox.bottom - (bbox.height / 2)) + ')'"
+			></svg:rect>
+			<svg:circle
+				pointer-events="all"
+				appDraggable
+				[containment]="scrollable"
+				[autoScroll]="scrollable"
+				[snap]="canvas.snap"
+				(dragging)="radius('rx', $event)"
+				[attr.cx]="bbox.right"
+				[attr.cy]="bbox.y + (bbox.height / 2)"
+				[attr.r]="3.5 * wx"
+				fill="#424242"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				vector-effect="non-scaling-size"
+			></svg:circle>
+			<svg:circle
+				pointer-events="all"
+				appDraggable
+				[containment]="scrollable"
+				[autoScroll]="scrollable"
+				[snap]="canvas.snap"
+				(dragging)="radius('ry', $event)"
+				[attr.cx]="bbox.x + (bbox.width / 2)"
+				[attr.cy]="bbox.bottom"
+				[attr.r]="3.5 * wx"
+				fill="#424242"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				vector-effect="non-scaling-size"
+			></svg:circle>
+		</ng-container>
+	</ng-container>
+</svg>

@@ -130,7 +130,7 @@ export class DraggableDirective implements OnInit, OnChanges, OnDestroy {
 					: { x: rect.x, y: rect.y, width: 0, height: rect.height } as IRect;
 				this.restrict = true;
 			} else if (!event.ctrlKey && this.restrict) {
-				this.draggable.containment = el;
+				this.draggable.containment = this.containment;
 				this.restrict = false;
 			}
 		}

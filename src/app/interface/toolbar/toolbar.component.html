@@ -12,6 +12,18 @@
 		>
 			<mat-icon svgIcon="vector-curve" ></mat-icon>
 		</mat-button-toggle>
+		<mat-button-toggle matTooltip="Create rectangles or squares"
+			[checked]="canvas.activeTool === 'RECT'"
+			(click)="setTool('RECT')"
+		>
+			<mat-icon svgIcon="vector-square" ></mat-icon>
+		</mat-button-toggle>
+		<mat-button-toggle matTooltip="Create arcs, circles or ellipses"
+			[checked]="canvas.activeTool === 'CIRCLE'"
+			(click)="setTool('CIRCLE')"
+		>
+			<mat-icon svgIcon="vector-circle-variant" ></mat-icon>
+		</mat-button-toggle>
 		<mat-button-toggle matTooltip="Add or edit text"
 			[checked]="canvas.activeTool === 'TEXT'"
 			(click)="setTool('TEXT')"

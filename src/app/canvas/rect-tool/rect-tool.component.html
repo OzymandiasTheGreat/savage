@@ -1,0 +1,86 @@
+<svg #overlay xmlns="http://www.w3.org/2000/svg"
+	class="savage-app-canvas-rect-tool"
+	overflow="visible"
+	pointer-events="none"
+	[appAttrs]="document"
+	[skipAttrs]="['overflow', 'pointer-events']"
+>
+	<ng-container *ngIf="canvas.activeTool === name" >
+		<svg:rect *ngIf="!!drawing"
+			[attr.x]="drawing.attributes.x"
+			[attr.y]="drawing.attributes.y"
+			[attr.width]="drawing.attributes.width"
+			[attr.height]="drawing.attributes.height"
+			fill="#42424233"
+			stroke="#212121"
+			[attr.stroke-width]="1 * wx"
+			[attr.stroke-dasharray]="[1 * wx, 2 * wx].join(' ')"
+			vector-effect="non-scaling-size"
+		></svg:rect>
+		<ng-container *ngIf="!!selection" >
+			<svg:rect *ngFor="let corner of ['topLeft', 'bottomRight']"
+				pointer-events="all"
+				appDraggable
+				[containment]="scrollable"
+				[autoScroll]="scrollable"
+				[snap]="canvas.snap"
+				(dragging)="scaleSelection(corner, $event)"
+				[attr.x]="corner.endsWith('Left') ? bbox.x - 3.5 * wx : bbox.right - 3.5 * wx"
+				[attr.y]="corner.startsWith('top') ? bbox.y - 3.5 * hx : bbox.bottom - 3.5 * hx"
+				[attr.width]="7 * wx"
+				[attr.height]="7 * hx"
+				fill="#424242"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				vector-effect="non-scaling-size"
+			></svg:rect>
+			<svg:circle
+				pointer-events="all"
+				appDraggable
+				[containment]="{ x: bbox.x + (bbox.width / 2) + (3.5 * wx), y: bbox.y, width: (bbox.width / 2) + (7 * wx) , height: 0 }"
+				[autoScroll]="scrollable"
+				[snap]="canvas.snap"
+				(dragging)="radius('rx', $event)"
+				[attr.cx]="bbox.right - rx"
+				[attr.cy]="bbox.y"
+				[attr.r]="3.5 * wx"
+				fill="#424242"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				vector-effect="non-scaling-size"
+			></svg:circle>
+			<svg:circle
+				pointer-events="all"
+				appDraggable
+				[containment]="{ x: bbox.right, y: bbox.bottom - (3.5 * hx), width: 0, height: (bbox.height / 2) + (7 * hx) }"
+				[autoScroll]="scrollable"
+				[snap]="canvas.snap"
+				(dragging)="radius('ry', $event)"
+				[attr.cx]="bbox.right"
+				[attr.cy]="bbox.y + ry"
+				[attr.r]="3.5 * hx"
+				fill="#424242"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				vector-effect="non-scaling-size"
+			></svg:circle>
+			<svg:rect
+				pointer-events="all"
+				appDraggable
+				[containment]="scrollable"
+				[autoScroll]="scrollable"
+				[snap]="canvas.snap"
+				(dragging)="move($event)"
+				[attr.x]="bbox.x + (bbox.width / 2) - (3.5 * wx)"
+				[attr.y]="bbox.y + (bbox.height / 2) - (3.5 * hx)"
+				[attr.width]="7 * wx"
+				[attr.height]="7 * hx"
+				fill="#424242"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				vector-effect="non-scaling-size"
+				[transform]="'rotate(' + 45 + ', ' + (bbox.x + (bbox.width / 2)) + ', ' + (bbox.y + (bbox.height / 2)) + ')'"
+			></svg:rect>
+		</ng-container>
+	</ng-container>
+</svg>
