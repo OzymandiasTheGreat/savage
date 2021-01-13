@@ -64,6 +64,8 @@ export class RectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		this.draw = true;
 		if (event.node?.name === "rect") {
 			this.canvas.selection = [event.node];
+		} else {
+			this.canvas.selection = [];
 		}
 	}
 

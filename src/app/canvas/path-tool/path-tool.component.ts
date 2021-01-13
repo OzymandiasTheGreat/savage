@@ -9,6 +9,7 @@ import { ICanvasTool, CanvasService } from "../../services/canvas.service";
 import { IDocumentEvent } from "../document/document.component";
 import { DragEvent } from "../directives/draggable.directive";
 import { HistoryService } from "../../services/history.service";
+import { ObjectToolComponent } from "../object-tool/object-tool.component";
 
 
 @Component({
@@ -43,7 +44,6 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	@Input() document: Observable<SavageSVG>;
 	@Input() scrollable: HTMLElement;
 	@Input() set node(value) {
-		console.log(value)
 		const node = (<Observable<SavageSVG>[]> <unknown> value).filter((n) => n.name === "path")[0];
 		this._node?.attributes.unobserve(this._transformObserver);
 		this._node?.attributes.unobserve(this._dObserver);
@@ -202,7 +202,9 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 
 	handleDrag(event: IDocumentEvent): void { }
 
-	handleKeyDown(event: IDocumentEvent): void { }
+	handleKeyDown(event: IDocumentEvent): void {
+		(<ObjectToolComponent> this.canvas.tools.OBJECT).handleKeyDown(event);
+	}
 
 	onSegmentDown(segment: paper.Segment, event: MouseEvent): void {
 		event.preventDefault();

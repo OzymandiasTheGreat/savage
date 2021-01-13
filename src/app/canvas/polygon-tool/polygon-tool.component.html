@@ -1,0 +1,107 @@
+<svg #overlay xmlns="http://www.w3.org/2000/svg"
+	class="savage-app-canvas-polygon-tool"
+	overflow="visible"
+	pointer-events="none"
+	[appAttrs]="document"
+	[skipAttrs]="['overflow', 'pointer-events']"
+>
+	<ng-container *ngIf="canvas.activeTool === name" >
+		<ng-container *ngIf="!!drawing" >
+			<svg:polygon
+				[attr.points]="drawing.attributes.points"
+				fill="#42424233"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				[attr.stroke-dasharray]="[1 * wx, 2 * wx].join(' ')"
+				vector-effect="non-scaling-size"
+			></svg:polygon>
+		</ng-container>
+		<ng-container *ngIf="regular && !!poly" >
+			<svg:circle
+				pointer-events="all"
+				appDraggable
+				[containment]="scrollable"
+				[autoScroll]="scrollable"
+				[snap]="canvas.snap"
+				(dragging)="radius('r1', $event)"
+				[attr.cx]="bbox.right"
+				[attr.cy]="bbox.y + (bbox.height / 2)"
+				[attr.r]="3.5 * wx"
+				fill="#424242"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				vector-effect="non-scaling-size"
+			></svg:circle>
+			<svg:circle *ngIf="!!poly.r2"
+				pointer-events="all"
+				appDraggable
+				[containment]="scrollable"
+				[autoScroll]="scrollable"
+				[snap]="canvas.snap"
+				(dragging)="radius('r2', $event)"
+				[attr.cx]="bbox.right - (bbox.width / 2) + poly.r2"
+				[attr.cy]="bbox.y + (bbox.height / 2)"
+				[attr.r]="3.5 * wx"
+				fill="#424242"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				vector-effect="non-scaling-size"
+			></svg:circle>
+		</ng-container>
+		<ng-container *ngIf="regular && !!selection" >
+			<svg:rect
+				pointer-events="all"
+				appDraggable
+				[containment]="scrollable"
+				[autoScroll]="scrollable"
+				[snap]="canvas.snap"
+				(dragging)="move($event)"
+				[attr.x]="bbox.right - (bbox.width / 2) - (3.5 * wx)"
+				[attr.y]="bbox.bottom - (bbox.height / 2) - (3.5 * hx)"
+				[attr.width]="7 * wx"
+				[attr.height]="7 * hx"
+				fill="#424242"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				vector-effect="non-scaling-size"
+				[attr.transform]="'rotate(' + 45 + ', ' + (bbox.right - (bbox.width / 2)) + ', ' + (bbox.bottom - (bbox.height / 2)) + ')'"
+			></svg:rect>
+		</ng-container>
+		<ng-container *ngIf="!regular && !!points" >
+			<svg:rect *ngFor="let point of points; let i = index"
+				pointer-events="all"
+				tabindex="-1"
+				appDraggable
+				[containment]="scrollable"
+				[autoScroll]="scrollable"
+				[snap]="canvas.snap"
+				[transform]="'rotate(' + 45 + ', ' + transformed(point).x + ', ' + transformed(point).y + ')'"
+				(dragging)="handlePointDrag(i, $event)"
+				(mousedown)="onPointDown(i, $event)"
+				(keydown)="onKeyDown(i, $event)"
+				[attr.x]="transformed(point).x - (3.5 * wx)"
+				[attr.y]="transformed(point).y - (3.5 * hx)"
+				[attr.width]="7 * wx"
+				[attr.height]="7 * hx"
+				fill="#424242"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				vector-effect="non-scaling-size"
+				[ngClass]="{ selected: selectedPoints.includes(i) }"
+			></svg:rect>
+		</ng-container>
+		<ng-container *ngIf="!!selectbox" >
+			<svg:rect
+				[attr.x]="selectbox.x"
+				[attr.y]="selectbox.y"
+				[attr.width]="selectbox.size.width"
+				[attr.height]="selectbox.size.height"
+				fill="#42424233"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				[attr.stroke-dasharray]="[1 * wx, 2 * wx].join(' ')"
+				vector-effect="non-scaling-size"
+			></svg:rect>
+		</ng-container>
+	</ng-container>
+</svg>

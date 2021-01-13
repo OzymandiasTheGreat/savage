@@ -157,6 +157,10 @@ export class DraggableDirective implements OnInit, OnChanges, OnDestroy {
 		}
 	}
 
+	private resetTransform(): void {
+		(<HTMLElement> this.host.nativeElement).setAttribute("transform", this.transform || "");
+	}
+
 	ngOnInit(): void {
 		this.draggable = new Draggable(this.host.nativeElement, {
 			containment: this.containment,
@@ -165,6 +169,7 @@ export class DraggableDirective implements OnInit, OnChanges, OnDestroy {
 			handle: this.handle,
 			zIndex: this.zIndex,
 			onDrag: (args) => this.handleEvent(args),
+			onMove: (args) => this.resetTransform(),
 			onMoveStart: (args) => { this.prevPosition = { left: args.left, top: args.top }; },
 			onDragEnd: () => this.handleEvent({ left: this.prevPosition?.left, top: this.prevPosition?.top }, true),
 		} as IDraggableOptions);

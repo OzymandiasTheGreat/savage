@@ -15,6 +15,18 @@ export class ToolbarComponent implements OnInit {
 			(<any> this.canvas.tools.OBJECT).applyTransform = val;
 		}
 	}
+	get regularPolygon(): boolean { return (<any> this.canvas.tools.POLYGON)?.regular || true; }
+	set regularPolygon(val: boolean) {
+		if (this.canvas.tools.POLYGON) {
+			(<any> this.canvas.tools.POLYGON).regular = val;
+		}
+	}
+	get polygonSides(): number { return (<any> this.canvas.tools.POLYGON).sides || 5; }
+	set polygonSides(val: number) {
+		if (this.canvas.tools.POLYGON) {
+			(<any> this.canvas.tools.POLYGON).sides = val;
+		}
+	}
 
 	constructor(
 		public canvas: CanvasService,

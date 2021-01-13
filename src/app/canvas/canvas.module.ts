@@ -14,6 +14,7 @@ import { TextToolComponent } from "./text-tool/text-tool.component";
 import { ResizeDirective } from "./directives/resize.directive";
 import { RectToolComponent } from "./rect-tool/rect-tool.component";
 import { CircleToolComponent } from "./circle-tool/circle-tool.component";
+import { PolygonToolComponent } from "./polygon-tool/polygon-tool.component";
 
 
 @NgModule({
@@ -29,6 +30,7 @@ import { CircleToolComponent } from "./circle-tool/circle-tool.component";
 		ResizeDirective,
 		RectToolComponent,
 		CircleToolComponent,
+		PolygonToolComponent,
 	],
 	imports: [
 		CommonModule,

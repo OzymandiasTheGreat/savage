@@ -99,6 +99,8 @@ export class CircleToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		this.draw = true;
 		if (["circle", "ellipse"].includes(event.node?.name) || (event.node?.name === "path" && !!event.node?.attributes["data-savage-arc"])) {
 			this.canvas.selection = [event.node];
+		} else {
+			this.canvas.selection = [];
 		}
 	}
 

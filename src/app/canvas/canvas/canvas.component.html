@@ -26,6 +26,7 @@
 			<app-path-tool [document]="document" [scrollable]="scrollable" [node]="canvas.selection" ></app-path-tool>
 			<app-rect-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" ></app-rect-tool>
 			<app-circle-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" ></app-circle-tool>
+			<app-polygon-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" ></app-polygon-tool>
 			<app-text-tool [document]="document" [scrollable]="scrollable" [node]="canvas.selection" ></app-text-tool>
 		</div>
 		<ng-container *ngIf="!!document && canvas.grid.enabled" >

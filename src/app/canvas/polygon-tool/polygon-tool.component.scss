@@ -1,0 +1,9 @@
+:host {
+	pointer-events: none;
+}
+
+svg.savage-app-canvas-polygon-tool {
+	.selected {
+		fill: var(--accent);
+	}
+}
