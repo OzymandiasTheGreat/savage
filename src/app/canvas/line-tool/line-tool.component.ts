@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, Input, ViewChild, ElementRef } from "@ang
 import { nanoid } from "nanoid/non-secure";
 import { compose, fromDefinition, fromTransformAttribute, Matrix, applyToPoint, inverse } from "transformation-matrix";
 import { parse as pointsParse, serialize as pointsSerialize } from "svg-numbers";
+import { Point, Rectangle, Size } from "paper";
 
 import { Observable, Change } from "../../types/observer";
 import { SavageSVG, screen2svg, findParent, find } from "../../types/svg";
@@ -10,7 +11,6 @@ import { HistoryService } from "../../services/history.service";
 import { IDocumentEvent } from "../document/document.component";
 import { DragEvent } from "../directives/draggable.directive";
 import { ObjectToolComponent } from "../object-tool/object-tool.component";
-import { Point, Rectangle, Size } from "paper";
 
 
 @Component({

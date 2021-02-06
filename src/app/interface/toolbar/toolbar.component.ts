@@ -33,6 +33,20 @@ export class ToolbarComponent implements OnInit {
 			(<any> this.canvas.tools.LINE).poly = val;
 		}
 	}
+	get freehandSimplify(): number { return (<any> this.canvas.tools.FREEHAND).simplify; }
+	set freehandSimplify(val: number) {
+		if (this.canvas.tools.FREEHAND) {
+			(<any> this.canvas.tools.FREEHAND).simplify = val;
+		}
+	}
+	get freehandSmooth(): { type: "continuous" | "catmull-rom" | "geometric", factor?: number } {
+		return (<any> this.canvas.tools.FREEHAND).smooth;
+	}
+	set freehandSmooth(val: { type: "continuous" | "catmull-rom" | "geometric", factor?: number }) {
+		if (this.canvas.tools.FREEHAND) {
+			(<any> this.canvas.tools.FREEHAND).smooth = val;
+		}
+	}
 
 	constructor(
 		public canvas: CanvasService,

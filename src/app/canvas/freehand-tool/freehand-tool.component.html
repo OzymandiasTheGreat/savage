@@ -1,1 +1,14 @@
-<p>freehand-tool works!</p>
+<svg #overlay xmlns="http://www.w3.org/2000/svg"
+	class="savage-app-canvas-freehand-tool"
+	overflow="visible"
+	pointer-events="none"
+	[appAttrs]="document"
+	[skipAttrs]="['overflow', 'pointer-events']"
+>
+	<svg:path *ngIf="!!this.drawing"
+		[attr.d]="this.drawing.attributes.d"
+		[attr.fill]="this.drawing.attributes.fill"
+		[attr.stroke]="this.drawing.attributes.stroke"
+		[attr.stroke-width]="this.drawing.attributes['stroke-width']"
+	></svg:path>
+</svg>
