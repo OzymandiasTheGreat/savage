@@ -1,0 +1,95 @@
+<svg #overlay xmlns="http://www.w3.org/2000/svg"
+	class="savage-app-canvas-line-tool"
+	overflow="visible"
+	pointer-events="none"
+	[appAttrs]="document"
+	[skipAttrs]="['overflow', 'pointer-events']"
+>
+	<ng-container *ngIf="canvas.activeTool === name" >
+		<ng-container *ngIf="!!selection" >
+			<ng-container *ngIf="selection.name === 'polyline'" >
+				<svg:polygon *ngFor="let point of points; let i = index"
+					pointer-events="all"
+					tabindex="-1"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[transform]="'translate(' + (-4 * wx) + ', ' + (-4 * hx) + ')'"
+					(dragging)="handlePointDrag(i, $event)"
+					(mousedown)="onPointDown(i, $event)"
+					(keydown)="onKeyDown(i, $event)"
+					[attr.points]="(transformed(point).x + 4 * wx) + ',' + (transformed(point).y) + ' ' + (transformed(point).x + 8 * wx) + ',' + (transformed(point).y + 4 * hx) + ' ' + (transformed(point).x + 4 * wx) + ',' + (transformed(point).y + 8 * hx) + ' ' + (transformed(point).x) + ',' + (transformed(point).y + 4 * hx)"
+					fill="#424242"
+					stroke="#212121"
+					[attr.stroke-width]="1 * wx"
+					vector-effect="non-scaling-size"
+					[ngClass]="{ selected: selectedPoints.includes(i) }"
+				></svg:polygon>
+			</ng-container>
+			<ng-container *ngIf="selection.name === 'line'" >
+				<svg:polygon
+					pointer-events="all"
+					tabindex="-1"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[transform]="'translate(' + (-4 * wx) + ', ' + (-4 * hx) + ')'"
+					(dragging)="handlePointDrag('start', $event)"
+					(mousedown)="onPointDown('start', $event)"
+					(keydown)="onKeyDown('start', $event)"
+					[attr.points]="(transformed([selection.attributes.x1, selection.attributes.y1]).x + 4 * wx) + ',' + (transformed([selection.attributes.x1, selection.attributes.y1]).y) + ' ' + (transformed([selection.attributes.x1, selection.attributes.y1]).x + 8 * wx) + ',' + (transformed([selection.attributes.x1, selection.attributes.y1]).y + 4 * hx) + ' ' + (transformed([selection.attributes.x1, selection.attributes.y1]).x + 4 * wx) + ',' + (transformed([selection.attributes.x1, selection.attributes.y1]).y + 8 * hx) + ' ' + (transformed([selection.attributes.x1, selection.attributes.y1]).x) + ',' + (transformed([selection.attributes.x1, selection.attributes.y1]).y + 4 * hx)"
+					fill="#424242"
+					stroke="#212121"
+					[attr.stroke-width]="1 * wx"
+					vector-effect="non-scaling-size"
+					[ngClass]="{ selected: selectedPoints.includes('start') }"
+				></svg:polygon>
+				<svg:polygon
+					pointer-events="all"
+					tabindex="-1"
+					appDraggable
+					[containment]="scrollable"
+					[autoScroll]="scrollable"
+					[snap]="canvas.snap"
+					[transform]="'translate(' + (-4 * wx) + ', ' + (-4 * hx) + ')'"
+					(dragging)="handlePointDrag('end', $event)"
+					(mousedown)="onPointDown('end', $event)"
+					(keydown)="onKeyDown('end', $event)"
+					[attr.points]="(transformed([selection.attributes.x2, selection.attributes.y2]).x + 4 * wx) + ',' + (transformed([selection.attributes.x2, selection.attributes.y2]).y) + ' ' + (transformed([selection.attributes.x2, selection.attributes.y2]).x + 8 * wx) + ',' + (transformed([selection.attributes.x2, selection.attributes.y2]).y + 4 * hx) + ' ' + (transformed([selection.attributes.x2, selection.attributes.y2]).x + 4 * wx) + ',' + (transformed([selection.attributes.x2, selection.attributes.y2]).y + 8 * hx) + ' ' + (transformed([selection.attributes.x2, selection.attributes.y2]).x) + ',' + (transformed([selection.attributes.x2, selection.attributes.y2]).y + 4 * hx)"
+					fill="#424242"
+					stroke="#212121"
+					[attr.stroke-width]="1 * wx"
+					vector-effect="non-scaling-size"
+					[ngClass]="{ selected: selectedPoints.includes('end') }"
+				></svg:polygon>
+			</ng-container>
+		</ng-container>
+		<ng-container *ngIf="!!selectbox" >
+			<svg:rect
+				[attr.x]="selectbox.x"
+				[attr.y]="selectbox.y"
+				[attr.width]="selectbox.size.width"
+				[attr.height]="selectbox.size.height"
+				fill="#42424233"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				[attr.stroke-dasharray]="[1 * wx, 2 * wx].join(' ')"
+				vector-effect="non-scaling-size"
+			></svg:rect>
+		</ng-container>
+		<ng-container *ngIf="!!drawing" >
+			<svg:line
+				[attr.x1]="drawing.attributes.x1"
+				[attr.y1]="drawing.attributes.y1"
+				[attr.x2]="drawing.attributes.x2"
+				[attr.y2]="drawing.attributes.y2"
+				stroke="#212121"
+				[attr.stroke-width]="1 * wx"
+				[attr.stroke-dasharray]="[1 * wx, 2 * wx].join(' ')"
+				vector-effect="non-scaling-size"
+			></svg:line>
+		</ng-container>
+	</ng-container>
+</svg>

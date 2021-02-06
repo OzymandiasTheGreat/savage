@@ -12,19 +12,25 @@
 		>
 			<mat-icon svgIcon="vector-curve" ></mat-icon>
 		</mat-button-toggle>
-		<mat-button-toggle matTooltip="Create rectangles or squares"
+		<mat-button-toggle matTooltip="Draw lines"
+			[checked]="canvas.activeTool === 'LINE'"
+			(click)="setTool('LINE')"
+		>
+			<mat-icon svgIcon="vector-line" ></mat-icon>
+		</mat-button-toggle>
+		<mat-button-toggle matTooltip="Draw rectangles or squares"
 			[checked]="canvas.activeTool === 'RECT'"
 			(click)="setTool('RECT')"
 		>
 			<mat-icon svgIcon="vector-square" ></mat-icon>
 		</mat-button-toggle>
-		<mat-button-toggle matTooltip="Create arcs, circles or ellipses"
+		<mat-button-toggle matTooltip="Draw arcs, circles or ellipses"
 			[checked]="canvas.activeTool === 'CIRCLE'"
 			(click)="setTool('CIRCLE')"
 		>
 			<mat-icon svgIcon="vector-circle-variant" ></mat-icon>
 		</mat-button-toggle>
-		<mat-button-toggle matTooltip="Create stars and polygons"
+		<mat-button-toggle matTooltip="Draw stars and polygons"
 			[checked]="canvas.activeTool === 'POLYGON'"
 			(click)="setTool('POLYGON')"
 		>
@@ -85,6 +91,23 @@
 					</mat-list>
 				</div>
 				<div class="savage-app-toolbar-options-bottom" ></div>
+			</div>
+			<div *ngSwitchCase="'LINE'"
+				class="savage-app-toolbar-options"
+			>
+				<div class="savage-app-toolbar-options-top" >
+					<div class="savage-app-toolbar-options-close" >
+						<button mat-icon-button
+							class="savage-app-toolbar-options-close-button"
+							(click)="options.close()"
+						><mat-icon svgIcon="close" ></mat-icon></button>
+					</div>
+					<mat-list>
+						<mat-list-item>
+							<mat-slide-toggle [(ngModel)]="polyline" >Polyline</mat-slide-toggle>
+						</mat-list-item>
+					</mat-list>
+				</div>
 			</div>
 			<div *ngSwitchCase="'POLYGON'"
 				class="savage-app-toolbar-options"

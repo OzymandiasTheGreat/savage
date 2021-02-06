@@ -1,37 +1,25 @@
 import { Component, OnInit, OnDestroy, Input, ViewChild, ElementRef } from "@angular/core";
 import { nanoid } from "nanoid/non-secure";
 import { compose, fromDefinition, fromTransformAttribute, Matrix, applyToPoint, inverse } from "transformation-matrix";
-import { Path, Point, Rectangle, Size } from "paper";
 import { parse as pointsParse, serialize as pointsSerialize } from "svg-numbers";
 
-import { Change, Observable } from "../../types/observer";
+import { Observable, Change } from "../../types/observer";
 import { SavageSVG, screen2svg, findParent, find } from "../../types/svg";
 import { ICanvasTool, CanvasService } from "../../services/canvas.service";
 import { HistoryService } from "../../services/history.service";
 import { IDocumentEvent } from "../document/document.component";
 import { DragEvent } from "../directives/draggable.directive";
 import { ObjectToolComponent } from "../object-tool/object-tool.component";
-
-
-export interface SavagePolygon {
-	star: boolean;
-	sides: number;
-	cx: number;
-	cy: number;
-	r1: number;
-	r2: number;
-}
+import { Point, Rectangle, Size } from "paper";
 
 
 @Component({
-	selector: "app-polygon-tool",
-	templateUrl: "./polygon-tool.component.html",
-	styleUrls: ["./polygon-tool.component.scss"]
+	selector: "app-line-tool",
+	templateUrl: "./line-tool.component.html",
+	styleUrls: ["./line-tool.component.scss"]
 })
-export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
+export class LineToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	private node: Observable<SavageSVG>;
-	private draw: boolean;
-	protected drawing: SavageSVG;
 	private mouseDownTimeout: any;
 	private _points: PointArrayNotation[];
 	private _pointsObserver = (changes: Change[]) => {
@@ -46,15 +34,16 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 			}
 		}
 	}
-	name: "POLYGON" = "POLYGON";
+	protected drawing: SavageSVG = null;
+	name: "LINE" = "LINE";
 	external = true;
 	@Input() scale: number;
 	@Input() document: Observable<SavageSVG>;
 	@Input() scrollable: HTMLElement;
 	@Input() set selection(value) {
 		this.node?.attributes.unobserve(this._pointsObserver);
-		this.node = (<Observable<SavageSVG>[]> <unknown> value).filter((n) => n.name === "polygon")[0] || null;
-		if (this.node) {
+		this.node = (<Observable<SavageSVG>[]> <unknown> value).filter((n) => ["line", "polyline"].includes(n.name))[0] || null;
+		if (this.node && this.node.name === "polyline") {
 			this._points = pointsParse(this.node.attributes.points).reduce((result, val, index, array) => {
 				if (index % 2 === 0) {
 					result.push(array.slice(index, index + 2));
@@ -73,12 +62,6 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	get hx(): number {
 		return (parseFloat(this.document.attributes.viewBox?.split(" ")[3]) || parseFloat(this.document.attributes.height)) / 350;
 	}
-	get poly(): SavagePolygon {
-		if (this.selection?.attributes["data-savage-polygon"]) {
-			return JSON.parse(this.selection.attributes["data-savage-polygon"]);
-		}
-		return null;
-	}
 	get points(): PointArrayNotation[] { return this._points; }
 	get matrix(): Matrix {
 		if (this.selection?.attributes.transform) {
@@ -88,9 +71,8 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 	@ViewChild("overlay", { static: true }) overlay: ElementRef<SVGSVGElement>;
 	selectbox: paper.Rectangle = null;
-	selectedPoints: number[] = [];
-	regular = true;
-	sides = 5;
+	selectedPoints: Array<number | "start" | "end"> = [];
+	poly = false;
 
 	constructor(
 		public canvas: CanvasService,
@@ -110,12 +92,11 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	handleDblClick(event: IDocumentEvent): void {
 		clearTimeout(this.mouseDownTimeout);
 		this.mouseDownTimeout = null;
-		if (!this.regular) {
+		if (this.poly) {
 			const mEvent = <PointerEvent> event.event;
 			const position = screen2svg(this.overlay.nativeElement, { x: mEvent.clientX, y: mEvent.clientY });
 			const point = applyToPoint(inverse(this.matrix), position);
 			if (this.points) {
-				delete this.selection?.attributes["data-savage-polygon"];
 				if (mEvent.shiftKey) {
 					const distance = (a: PointArrayNotation, b: PointArrayNotation) => Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
 					const distances = this.points.map((p) => distance(p, [point.x, point.y]));
@@ -136,15 +117,39 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				const nid = nanoid(13);
 				const node: SavageSVG = {
 					nid,
-					name: "polygon",
+					name: "polyline",
 					type: "element",
 					value: "",
 					children: <any> [],
-					attributes: <any> { points: `${position.x},${position.y}` },
+					attributes: <any> { points: `${position.x},${position.y}`, stroke: "currentColor" },
 				};
 				this.document.children.push(<any> node);
 				this.canvas.selection = [find(this.document, nid)];
-				this.history.snapshot("Add polygon element");
+				this.history.snapshot("Add polyline element");
+			}
+		} else {
+			const mEvent = <PointerEvent> event.event;
+			const position = screen2svg(this.overlay.nativeElement, { x: mEvent.clientX, y: mEvent.clientY });
+			if (this.drawing) {
+				const parent = findParent(this.document, this.selection?.nid);
+				this.drawing.attributes.x2 = `${position.x}`;
+				this.drawing.attributes.y2 = `${position.y}`;
+				if (parent) {
+					parent.children.push(<any> this.drawing);
+				} else {
+					this.document.children.push(<any> this.drawing);
+				}
+				this.drawing = null;
+				this.history.snapshot("Add line element");
+			} else {
+				this.drawing = {
+					nid: nanoid(13),
+					name: "line",
+					type: "element",
+					value: "",
+					children: <any> [],
+					attributes: <any> { x1: `${position.x}`, y1: `${position.y}`, stroke: "currentColor" },
+				};
 			}
 		}
 	}
@@ -152,83 +157,30 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	handleDrag(event: IDocumentEvent): void { }
 
 	handleMouseDown(event: IDocumentEvent): void {
-		if (this.regular) {
-			this.draw = true;
-			if (event.node?.name === "polygon") {
-				this.canvas.selection = [event.node];
-			} else {
-				this.canvas.selection = [];
-			}
-		} else {
-			const ev = <PointerEvent> event.event;
-			const point = screen2svg(this.overlay.nativeElement, { x: ev.clientX, y: ev.clientY });
-			this.selectbox = new Rectangle(new Point(point.x, point.y), new Size(0, 0));
-			if (!this.mouseDownTimeout) {
-				this.mouseDownTimeout = setTimeout(() => {
-					clearTimeout(this.mouseDownTimeout);
-					this.mouseDownTimeout = null;
-					if (!this.selectbox) {
-						if (!event.node || event.node.name !== "polygon") {
-							this.canvas.selection = [];
-						} else {
-							this.canvas.selection = [event.node];
-						}
-						if (event.node !== this.node) {
-							this.selectedPoints = [];
-						}
+		const ev = <PointerEvent> event.event;
+		const point = screen2svg(this.overlay.nativeElement, { x: ev.clientX, y: ev.clientY });
+		this.selectbox = new Rectangle(new Point(point.x, point.y), new Size(0, 0));
+		if (!this.mouseDownTimeout) {
+			this.mouseDownTimeout = setTimeout(() => {
+				clearTimeout(this.mouseDownTimeout);
+				this.mouseDownTimeout = null;
+				if (!this.selectbox) {
+					if (!event.node) {
+						this.canvas.selection = [];
+					} else {
+						this.canvas.selection = [event.node];
 					}
-				}, 550);
-			}
+					if (event.node !== this.node) {
+						this.selectedPoints = [];
+					}
+				}
+			}, 550);
 		}
 	}
 
 	handleMouseMove(event: PointerEvent): void {
-		if (this.regular && this.draw) {
-			const xy = screen2svg(this.overlay.nativeElement, { x: event.clientX, y: event.clientY });
-			if (this.drawing) {
-				const poly: SavagePolygon = JSON.parse(this.drawing.attributes["data-savage-polygon"]);
-				const d = { x: xy.x - poly.cx, y: xy.y - poly.cy };
-				const rd = Math.abs(d.x) > Math.abs(d.y) ? d.x : d.y;
-				poly.r1 = rd;
-				if (poly.r2 !== null) {
-					poly.r2 = rd / 2;
-				}
-				let path: paper.Path;
-				if (poly.star) {
-					path = new Path.Star(new Point(poly.cx, poly.cy), poly.sides, poly.r1, poly.r2);
-				} else {
-					path = new Path.RegularPolygon(new Point(poly.cx, poly.cy), poly.sides, poly.r1);
-				}
-				this.drawing.attributes.points = pointsSerialize(path.segments.map((s) => [s.point.x, s.point.y]));
-				this.drawing.attributes["data-savage-polygon"] = JSON.stringify(poly);
-				path.remove();
-			} else {
-				let path: paper.Path;
-				let poly: SavagePolygon;
-				if (event.ctrlKey && !event.shiftKey && !event.altKey) {
-					path = new Path.Star(new Point(xy.x, xy.y), this.sides, 2.5, 5);
-					poly = { star: true, cx: xy.x, cy: xy.y, sides: this.sides, r1: 5, r2: 2.5 };
-				} else if (!event.ctrlKey && !event.shiftKey && !event.altKey) {
-					path = new Path.RegularPolygon(new Point(xy.x, xy.y), this.sides, 5);
-					poly = { star: false, cx: xy.x, cy: xy.y, sides: this.sides, r1: 5, r2: null };
-				}
-				if (path) {
-					this.drawing = {
-						nid: nanoid(13),
-						name: "polygon",
-						type: "element",
-						value: "",
-						attributes: <any> {
-							points: pointsSerialize(path.segments.map((s) => [s.point.x, s.point.y])),
-							"data-savage-polygon": JSON.stringify(poly),
-						},
-						children: <any> [],
-					};
-					path.remove();
-				}
-			}
-		} else if (this.selectbox) {
-			const point = screen2svg(this.overlay.nativeElement, { x: event.clientX, y: event.clientY });
+		const point = screen2svg(this.overlay.nativeElement, { x: event.clientX, y: event.clientY });
+		if (this.selectbox) {
 			if (this.selectbox.x <= point.x) {
 				this.selectbox.size.width = point.x - this.selectbox.x;
 			} else {
@@ -242,18 +194,14 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				this.selectbox.y = point.y;
 			}
 		}
+		if (this.drawing) {
+			this.drawing.attributes.x2 = `${point.x}`;
+			this.drawing.attributes.y2 = `${point.y}`;
+		}
 	}
 
 	handleMouseUp(event: PointerEvent): void {
-		this.draw = false;
-		if (this.regular && this.drawing) {
-			const parent = this.selection ? findParent(this.document, this.selection.nid) : this.document;
-			if (parent) {
-				const index = this.selection ? parent.children.indexOf(this.selection) + 1 : parent.children.length;
-				parent.children.splice(index, 0, <any> this.drawing);
-				this.history.snapshot("Add element");
-			}
-		} else if (this.selectbox) {
+		if (this.selectbox) {
 			this.selectedPoints = [];
 			if (this.points) {
 				this.points.forEach((point: PointArrayNotation, index) => {
@@ -262,9 +210,19 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 						this.selectedPoints.push(index);
 					}
 				});
+			} else if (this.selection) {
+				const start = new Point(
+					...applyToPoint(this.matrix, [parseFloat(this.selection.attributes.x1), parseFloat(this.selection.attributes.y1)]));
+				const end = new Point(
+					...applyToPoint(this.matrix, [parseFloat(this.selection.attributes.x2), parseFloat(this.selection.attributes.y2)]));
+				if (start.isInside(this.selectbox)) {
+					this.selectedPoints.push("start");
+				}
+				if (end.isInside(this.selectbox)) {
+					this.selectedPoints.push("end");
+				}
 			}
 		}
-		this.drawing = null;
 		this.selectbox = null;
 	}
 
@@ -282,44 +240,11 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		return new DOMRect(0, 0, 0, 0);
 	}
 
-	transformed(point: [number, number]): { x: number, y: number } {
+	transformed(point: PointArrayNotation): PointObjectNotation {
 		return applyToPoint(this.matrix, { x: point[0], y: point[1] });
 	}
 
-	move(event: DragEvent): void {
-		const position = screen2svg(this.overlay.nativeElement, { x: event.x, y: event.y });
-		const previous = screen2svg(this.overlay.nativeElement, { x: event.prevX, y: event.prevY });
-		const d = { x: position.x - previous.x, y: position.y - previous.y };
-		(<ObjectToolComponent> this.canvas.tools.OBJECT).moveNodeApplied(this.selection, d);
-		if (this.poly) {
-			const poly = {...this.poly};
-			poly.cx += d.x;
-			poly.cy += d.y;
-			this.selection.attributes["data-savage-polygon"] = JSON.stringify(poly);
-		}
-		if (event.end) {
-			this.history.snapshot("Move (translate) element");
-		}
-	}
-
-	radius(radius: "r1" | "r2", event: DragEvent): void {
-		const position = screen2svg(this.overlay.nativeElement, { x: event.x, y: event.y });
-		const previous = screen2svg(this.overlay.nativeElement, { x: event.prevX, y: event.prevY });
-		const rd = position.x - previous.x;
-		const poly = {...this.poly};
-		poly[radius] += rd;
-		let path: paper.Path;
-		if (poly.star) {
-			path = new Path.Star(new Point(poly.cx, poly.cy), poly.sides, poly.r1, poly.r2);
-		} else {
-			path = new Path.RegularPolygon(new Point(poly.cx, poly.cy), poly.sides, poly.r1);
-		}
-		this.selection.attributes.points = pointsSerialize(path.segments.map((s) => [s.point.x, s.point.y]));
-		this.selection.attributes["data-savage-polygon"] = JSON.stringify(poly);
-		path.remove();
-	}
-
-	onPointDown(index: number, event: PointerEvent): void {
+	onPointDown(index: number | "start" | "end", event: PointerEvent): void {
 		event.preventDefault();
 		event.stopPropagation();
 		if (event.ctrlKey && event.shiftKey) {
@@ -335,21 +260,41 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	pointsMove(d: PointObjectNotation): void {
-		for (const pointIndex of this.selectedPoints) {
-			let point = applyToPoint(this.matrix, <PointArrayNotation> this.points[pointIndex]);
-			point[0] += d.x;
-			point[1] += d.y;
-			point = applyToPoint(inverse(this.matrix), point);
-			this.points[pointIndex][0] = point[0];
-			this.points[pointIndex][1] = point[1];
+		if (this.selectedPoints.every((i) => typeof i === "number")) {
+			for (const index of this.selectedPoints) {
+				let point = applyToPoint(this.matrix, <PointArrayNotation> this.points[index]);
+				point[0] += d.x;
+				point[1] += d.y;
+				point = applyToPoint(inverse(this.matrix), point);
+				this.points[index][0] = point[0];
+				this.points[index][1] = point[1];
+			}
+			this.external = false;
+			this.selection.attributes.points = pointsSerialize(this.points);
+			this.external = true;
+		} else {
+			let start: PointObjectNotation = { x: parseFloat(this.selection.attributes.x1), y: parseFloat(this.selection.attributes.y1) };
+			let end: PointObjectNotation = { x: parseFloat(this.selection.attributes.x2), y: parseFloat(this.selection.attributes.y2) };
+			start = applyToPoint(this.matrix, start);
+			end = applyToPoint(this.matrix, end);
+			if (this.selectedPoints.includes("start")) {
+				start.x += d.x;
+				start.y += d.y;
+			}
+			if (this.selectedPoints.includes("end")) {
+				end.x += d.x;
+				end.y += d.y;
+			}
+			start = applyToPoint(inverse(this.matrix), start);
+			end = applyToPoint(inverse(this.matrix), end);
+			this.selection.attributes.x1 = `${start.x}`;
+			this.selection.attributes.y1 = `${start.y}`;
+			this.selection.attributes.x2 = `${end.x}`;
+			this.selection.attributes.y2 = `${end.y}`;
 		}
-		this.external = false;
-		delete this.selection.attributes["data-savage-polygon"];
-		this.selection.attributes.points = pointsSerialize(this.points);
-		this.external = true;
 	}
 
-	handlePointDrag(index: number, event: DragEvent): void {
+	handlePointDrag(index: number | "start" | "end", event: DragEvent): void {
 		const position = screen2svg(this.overlay.nativeElement, { x: event.x, y: event.y });
 		const previous = screen2svg(this.overlay.nativeElement, { x: event.prevX, y: event.prevY });
 		const d = { x: position.x - previous.x, y: position.y - previous.y };
@@ -359,7 +304,7 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		}
 	}
 
-	onKeyDown(index: number, event: KeyboardEvent): void {
+	onKeyDown(index: number | "start" | "end", event: KeyboardEvent): void {
 		const alt = event.altKey;
 		const ctrl = event.ctrlKey;
 		const shift = event.shiftKey;
@@ -391,14 +336,19 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 			case "Delete":
 				event.preventDefault();
 				event.stopPropagation();
+				let deleted: boolean;
 				for (const i of [...this.selectedPoints].sort().reverse()) {
-					this.points.splice(i, 1);
+					if (i !== "start" && i !== "end") {
+						this.points.splice(i, 1);
+						deleted = true;
+					}
 				}
-				this.external = false;
-				delete this.selection.attributes["data-savage-polygon"];
-				this.selection.attributes.points = pointsSerialize(this.points);
-				this.external = true;
-				this.history.snapshot("Remove point");
+				if (deleted) {
+					this.external = false;
+					this.selection.attributes.points = pointsSerialize(this.points);
+					this.external = true;
+					this.history.snapshot("Remove point");
+				}
 				break;
 			case "a":
 				if (ctrl && !shift && !alt) {

@@ -34,7 +34,7 @@
 				<svg:polygon
 					pointer-events="all"
 					tabindex="-1"
-					[attr.points]="(segment.point.x + 4 * wx) + ',' + (segment.point.y) + ' ' + (segment.point.x + 8 * wx) + ',' + (segment.point.y + 4 * hx) + ' ' + (segment.point.x + 4 * wx) + ',' + (segment.point.y + 8 * hx) + ' ' + (segment.point.x) + ',' + (segment.point.y + 4 * hx)"
+					[attr.points]="(segment?.point.x + 4 * wx) + ',' + (segment?.point.y) + ' ' + (segment?.point.x + 8 * wx) + ',' + (segment?.point.y + 4 * hx) + ' ' + (segment?.point.x + 4 * wx) + ',' + (segment?.point.y + 8 * hx) + ' ' + (segment?.point.x) + ',' + (segment?.point.y + 4 * hx)"
 					[attr.transform]="'translate(' + (-4 * wx) + ', ' + (-4 * hx) + ')'"
 					vector-effect="non-scaling-size"
 					stroke="#212121"

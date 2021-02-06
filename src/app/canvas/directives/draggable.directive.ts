@@ -84,6 +84,7 @@ export class DraggableDirective implements OnInit, OnChanges, OnDestroy {
 	@Input() zIndex: IDraggableOptions["zIndex"];
 	@Input() disabled: boolean;
 	@Input() transform: string;
+	@Input() style: string;
 	@Output() dragging: EventEmitter<DragEvent>;
 
 	private listeners: Record<string, (event: MouseEvent) => void>;
@@ -149,6 +150,7 @@ export class DraggableDirective implements OnInit, OnChanges, OnDestroy {
 			};
 			this.dragging.emit(event);
 			(<HTMLElement> this.host.nativeElement).setAttribute("transform", this.transform || "");
+			(<HTMLElement> this.host.nativeElement).setAttribute("style", this.style || "");
 		}
 		if (end) {
 			this.prevPosition = null;
@@ -159,6 +161,7 @@ export class DraggableDirective implements OnInit, OnChanges, OnDestroy {
 
 	private resetTransform(): void {
 		(<HTMLElement> this.host.nativeElement).setAttribute("transform", this.transform || "");
+		(<HTMLElement> this.host.nativeElement).setAttribute("style", this.style || "");
 	}
 
 	ngOnInit(): void {
@@ -175,6 +178,7 @@ export class DraggableDirective implements OnInit, OnChanges, OnDestroy {
 		} as IDraggableOptions);
 		this.draggable.disabled = this.disabled;
 		(<HTMLElement> this.host.nativeElement).setAttribute("transform", this.transform || "");
+		(<HTMLElement> this.host.nativeElement).setAttribute("style", this.style || "");
 	}
 
 	ngOnChanges(changes: SimpleChanges): void {

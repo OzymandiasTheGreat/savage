@@ -27,6 +27,12 @@ export class ToolbarComponent implements OnInit {
 			(<any> this.canvas.tools.POLYGON).sides = val;
 		}
 	}
+	get polyline(): boolean { return (<any> this.canvas.tools.LINE).poly; }
+	set polyline(val: boolean) {
+		if (this.canvas.tools.LINE) {
+			(<any> this.canvas.tools.LINE).poly = val;
+		}
+	}
 
 	constructor(
 		public canvas: CanvasService,

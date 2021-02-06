@@ -129,10 +129,10 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 			} else {
 				const point = new Point(position.x, position.y);
 				const location = this.path.getNearestLocation(point);
-				const curve = location.curve;
-				const path = curve.path;
+				const curve = location?.curve;
+				const path = curve?.path;
 				const segment = new Segment(point);
-				path.addSegments([segment]);
+				(path || <paper.Path> this.path).addSegments([segment]);
 				const clone = this.path.clone({ insert: false });
 				clone.transform(this._matrix.inverted());
 				this.external = false;
@@ -191,7 +191,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 			this.selection = [];
 			if (this.segments) {
 				for (const segment of this.segments) {
-					if (segment.point.isInside(this.selectbox)) {
+					if (segment?.point.isInside(this.selectbox)) {
 						this.selection.push(segment);
 					}
 				}

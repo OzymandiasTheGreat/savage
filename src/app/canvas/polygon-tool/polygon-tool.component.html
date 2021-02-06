@@ -68,27 +68,24 @@
 			></svg:rect>
 		</ng-container>
 		<ng-container *ngIf="!regular && !!points" >
-			<svg:rect *ngFor="let point of points; let i = index"
+			<svg:polygon *ngFor="let point of points; let i = index"
 				pointer-events="all"
 				tabindex="-1"
 				appDraggable
 				[containment]="scrollable"
 				[autoScroll]="scrollable"
 				[snap]="canvas.snap"
-				[transform]="'rotate(' + 45 + ', ' + transformed(point).x + ', ' + transformed(point).y + ')'"
+				[transform]="'translate(' + (-4 * wx) + ', ' + (-4 * hx) + ')'"
 				(dragging)="handlePointDrag(i, $event)"
 				(mousedown)="onPointDown(i, $event)"
 				(keydown)="onKeyDown(i, $event)"
-				[attr.x]="transformed(point).x - (3.5 * wx)"
-				[attr.y]="transformed(point).y - (3.5 * hx)"
-				[attr.width]="7 * wx"
-				[attr.height]="7 * hx"
+				[attr.points]="(transformed(point).x + 4 * wx) + ',' + (transformed(point).y) + ' ' + (transformed(point).x + 8 * wx) + ',' + (transformed(point).y + 4 * hx) + ' ' + (transformed(point).x + 4 * wx) + ',' + (transformed(point).y + 8 * hx) + ' ' + (transformed(point).x) + ',' + (transformed(point).y + 4 * hx)"
 				fill="#424242"
 				stroke="#212121"
 				[attr.stroke-width]="1 * wx"
 				vector-effect="non-scaling-size"
 				[ngClass]="{ selected: selectedPoints.includes(i) }"
-			></svg:rect>
+			></svg:polygon>
 		</ng-container>
 		<ng-container *ngIf="!!selectbox" >
 			<svg:rect
