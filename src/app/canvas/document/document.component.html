@@ -251,11 +251,13 @@
 		<svg:linearGradient *ngSwitchCase="'linearGradient'" [appAttrs]="node" >
 			<ng-container *ngFor="let n of node.children" >
 				<ng-container *ngTemplateOutlet="animation; context: { $implicit: n }" ></ng-container>
+				<ng-container *ngTemplateOutlet="stop; context: { $implicit: n }"></ng-container>
 			</ng-container>
 		</svg:linearGradient>
 		<svg:radialGradient *ngSwitchCase="'radialGradient'" [appAttrs]="node" >
 			<ng-container *ngFor="let n of node.children" >
 				<ng-container *ngTemplateOutlet="animation; context: { $implicit: n }" ></ng-container>
+				<ng-container *ngTemplateOutlet="stop; context: { $implicit: n }"></ng-container>
 			</ng-container>
 		</svg:radialGradient>
 	</ng-container>

@@ -26,7 +26,7 @@
     "@angular/platform-browser-dynamic": "~10.2.0",
     "@angular/router": "~10.2.0",
     "@circlon/angular-tree-component": "^10.0.1",
-    "@mdi/angular-material": "^5.8.55",
+    "@mdi/angular-material": "^5.9.55",
     "@ngneat/edit-in-place": "^1.1.0",
     "element-to-path": "^1.2.0",
     "fast-deep-equal": "^3.1.3",

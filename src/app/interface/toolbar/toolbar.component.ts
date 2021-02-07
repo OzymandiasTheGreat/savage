@@ -47,6 +47,18 @@ export class ToolbarComponent implements OnInit {
 			(<any> this.canvas.tools.FREEHAND).smooth = val;
 		}
 	}
+	get gradientRadial(): boolean { return (<any> this.canvas.tools.GRADIENT).radial; }
+	set gradientRadial(val: boolean) {
+		if (this.canvas.tools.GRADIENT) {
+			(<any> this.canvas.tools.GRADIENT).radial = val;
+		}
+	}
+	get gradientStroke(): boolean { return (<any> this.canvas.tools.GRADIENT).stroke; }
+	set gradientStroke(val: boolean) {
+		if (this.canvas.tools.GRADIENT) {
+			(<any> this.canvas.tools.GRADIENT).stroke = val;
+		}
+	}
 
 	constructor(
 		public canvas: CanvasService,
