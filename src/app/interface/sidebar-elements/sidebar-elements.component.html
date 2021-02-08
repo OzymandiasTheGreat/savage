@@ -184,7 +184,7 @@
 	</mat-menu>
 </mat-menu>
 <mat-menu #addMenu >
-	<ng-template matMenuContent let-node="node" >
+	<ng-template matMenuContent let-node="nodes[0]" >
 		<button mat-menu-item *ngIf="render.includes(node?.data.name) || node?.data.name === 'animateMotion'" [matMenuTriggerFor]="animationMenu" [matMenuTriggerData]="{ node: node }" >Animation</button>
 		<button mat-menu-item *ngIf="node?.data.name === 'defs' || checkParent('defs', node)" (click)="addNode('filter', node)" >Filter</button>
 		<button mat-menu-item *ngIf="node?.data.name === 'filter' || checkParent('filter', node)" [matMenuTriggerFor]="primitiveMenu" [matMenuTriggerData]="{ node: node }" >Filter primitive</button>

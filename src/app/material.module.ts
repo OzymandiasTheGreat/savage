@@ -28,6 +28,7 @@ import { TextFieldModule } from "@angular/cdk/text-field";
 import { DragDropModule } from "@angular/cdk/drag-drop";
 
 import { NgxMatFileInputModule } from "@angular-material-components/file-input";
+import { MccColorPickerModule } from "material-community-components/color-picker";
 import { TreeModule } from "@circlon/angular-tree-component";
 import { EditableModule, EDITABLE_CONFIG, EditableConfig } from "@ngneat/edit-in-place";
 
@@ -61,6 +62,7 @@ import { EditableModule, EDITABLE_CONFIG, EditableConfig } from "@ngneat/edit-in
 		TextFieldModule,
 		DragDropModule,
 		NgxMatFileInputModule,
+		MccColorPickerModule.forRoot({ empty_color: "transparent" }),
 		TreeModule,
 		EditableModule,
 	],
@@ -90,6 +92,7 @@ import { EditableModule, EDITABLE_CONFIG, EditableConfig } from "@ngneat/edit-in
 		TextFieldModule,
 		DragDropModule,
 		NgxMatFileInputModule,
+		MccColorPickerModule,
 		TreeModule,
 		EditableModule,
 	],

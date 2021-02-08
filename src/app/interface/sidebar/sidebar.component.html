@@ -10,5 +10,16 @@
 
 			<app-sidebar-elements [selection]="canvas.selection" [scrollable]="scrollable" ></app-sidebar-elements>
 		</mat-expansion-panel>
+
+		<mat-expansion-panel >
+			<mat-expansion-panel-header>
+				<mat-panel-title class="savage-app-sidebar-header" >
+					<mat-icon svgIcon="scatter-plot" ></mat-icon>
+					<span class="savage-app-sidebar-header-text" >Properties</span>
+				</mat-panel-title>
+			</mat-expansion-panel-header>
+
+			<app-sidebar-props [selection]="canvas.selection" ></app-sidebar-props>
+		</mat-expansion-panel>
 	</mat-accordion>
 </div>

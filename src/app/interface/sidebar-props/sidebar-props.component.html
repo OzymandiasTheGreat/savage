@@ -1,0 +1,1030 @@
+<mat-list>
+	<mat-list-item>
+		<mat-form-field>
+			<mat-label>class</mat-label>
+			<input matInput (input)="edited()" [(ngModel)]="cls" type="text" name="class">
+		</mat-form-field>
+		<button mat-icon-button (click)="help('class')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+	</mat-list-item>
+	<mat-list-item *ngIf="selection.length !== 1">Please select a single element</mat-list-item>
+	<ng-container *ngIf="selection.length === 1">
+		<ng-container *ngIf="['a', 'mpath', 'discard', 'feImage', 'filter', 'image', 'linearGradient', 'radialGradient', 'pattern', 'textPath', 'use'].includes(selection[0].name)">
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>href</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.href" type="text" name="href" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('href')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['animateMotion', 'text', 'tspan'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>rotate</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.rotate" type="text" name="rotate" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('rotate')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['animateMotion', 'textPath'].includes(selection[0].name)" >
+			<mat-list-item style="height: 130px;">
+				<mat-form-field>
+					<mat-label>path</mat-label>
+					<textarea matInput (input)="edited()" [(ngModel)]="selection[0].attributes.path" name="path" rows="5"></textarea>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('path')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['animate', 'animateMotion', 'animateTransform', 'set'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>attributeName</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.attributeName" type="text" name="attributeName" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('attributeName')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>keyPoints</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.keyPoints" type="text" name="keyPoints" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('keyPoints')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['animate', 'animateMotion', 'animateTransform'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>by</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.by" type="text" name="by">
+				</mat-form-field>
+				<button mat-icon-button (click)="help('by')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>from</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.from" type="text" name="from" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('from')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['animate', 'animateMotion', 'animateTransform', 'set'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>to</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.to" type="text" name="to" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('to')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['animateTransform'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>type</mat-label>
+					<input matInput (input)="edited()" (input)="edited()" [(ngModel)]="selection[0].attributes.type" type="text" name="type" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('type')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['animate', 'animateMotion', 'animateTransform', 'set'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>additive</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.additive" name="additive" >
+						<mat-option value="replace" >replace</mat-option>
+						<mat-option value="sum" >sum</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('additive')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>accumulate</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.accumulate" name="accumulate" >
+						<mat-option value="none" >none</mat-option>
+						<mat-option value="sum" >sum</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('accumulate')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['animate', 'animateMotion', 'animateTransform'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>calcMode</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.calcMode" name="calcMode" >
+						<mat-option value="discrete" >discrete</mat-option>
+						<mat-option value="linear" >linear</mat-option>
+						<mat-option value="paced" >paced</mat-option>
+						<mat-option value="spline" >spline</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('calcMode')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>values</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.values" type="text" name="values" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('values')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>keyTimes</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.keyTimes" type="text" name="keyTimes" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('keyTimes')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>keySplines</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.keySplines" type="text" name="keySplines" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('keySplines')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['animate', 'animateMotion', 'animateTransform', 'set', 'discard'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>begin</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.begin" type="text" name="begin" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('begin')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['animate', 'animateMotion', 'animateTransform', 'set'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>dur</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.dur" type="text" name="dur" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('dur')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>end</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.end" type="text" name="end" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('end')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>min</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.min" type="text" name="min" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('min')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>max</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.max" type="text" name="max" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('max')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>restart</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.restart" name="restart" >
+						<mat-option value="always" >always</mat-option>
+						<mat-option value="whenNotActive" >whenNotActive</mat-option>
+						<mat-option value="never" >never</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('restart')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>repeatCount</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.repeatCount" type="text" name="repeatCount" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('repeatCount')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>repeatDur</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.repeatDur" type="text" name="repeatDur" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('repeatDur')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>fill</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.fill" name="fill" >
+						<mat-option value="freeze" >freeze</mat-option>
+						<mat-option value="remove" >remove</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('fill')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['circle', 'ellipse', 'radialGradient'].includes(selection[0].name)">
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>cx</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.cx" type="text" name="cx" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('cx')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>cy</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.cy" type="text" name="cy" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('cy')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['circle', 'radialGradient'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>r</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.r" type="text" name="r" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('r')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['ellipse', 'rect'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>rx</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.rx" type="text" name="rx" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('rx')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>ry</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.ry" type="text" name="ry" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('ry')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['circle', 'ellipse', 'line', 'path', 'polygon', 'polyline', 'rect'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>pathLength</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.pathLength" type="text" name="pathLength" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('pathLength')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['feBlend', 'feColorMatrix', 'feComponentTransfer', 'feComposite', 'feConvolveMatrix', 'feDiffuseLighting', 'feDisplacementMap', 'feDropShadow', 'feFlood', 'feFuncA', 'feFuncB', 'feFuncG', 'feFuncR', 'feGaussianBlur', 'feImage', 'feMerge', 'feMergeNode', 'feMorphology', 'feOffset', 'fePointLight', 'feSpecularLighting', 'feSpotLight', 'feTile', 'feTurbulence', 'filter', 'foreignObject', 'image', 'mask', 'pattern', 'rect', 'svg', 'text', 'tspan', 'use'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>x</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.x" type="text" name="x" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('x')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>y</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.y" type="text" name="y" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('y')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>width</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.width" type="text" name="width" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('width')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>height</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.height" type="text" name="height" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('height')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="selection[0].name === 'feBlend'" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>mode</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.mode" name="mode" >
+						<mat-option value="normal" >normal</mat-option>
+						<mat-option value="multiply" >multiply</mat-option>
+						<mat-option value="screen" >screen</mat-option>
+						<mat-option value="overlay" >overlay</mat-option>
+						<mat-option value="darken" >darken</mat-option>
+						<mat-option value="lighten" >lighten</mat-option>
+						<mat-option value="color-dodge" >color-dodge</mat-option>
+						<mat-option value="color-burn" >color-burn</mat-option>
+						<mat-option value="hard-light" >hard-light</mat-option>
+						<mat-option value="soft-light" >soft-light</mat-option>
+						<mat-option value="difference" >difference</mat-option>
+						<mat-option value="hue" >hue</mat-option>
+						<mat-option value="saturation" >saturation</mat-option>
+						<mat-option value="color" >color</mat-option>
+						<mat-option value="luminosity" >luminosity</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('mode')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="selection[0].name === 'feColorMatrix'" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>type</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.type" name="type" >
+						<mat-option value="matrix" >matrix</mat-option>
+						<mat-option value="saturate" >saturate</mat-option>
+						<mat-option value="hueRotate" >hueRotate</mat-option>
+						<mat-option value="luminanceToAlpha" >luminanceToAlpha</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('type')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>values</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.values" type="text" name="values" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('values')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="selection[0].name === 'feComposite'" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>operator</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.operator" >
+						<mat-option value="over" >over</mat-option>
+						<mat-option value="in" >in</mat-option>
+						<mat-option value="out" >out</mat-option>
+						<mat-option value="atop" >atop</mat-option>
+						<mat-option value="xor" >xor</mat-option>
+						<mat-option value="lighter" >lighter</mat-option>
+						<mat-option value="arithmetic" >arithmetic</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('operator')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field style="width: 75px;">
+					<mat-label>k1</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.k1" [disabled]="selection[0].attributes.operator !== 'arithmetic'" type="text" name="k1" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('k1')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+				<mat-form-field style="width: 75px;">
+					<mat-label>k2</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.k2" [disabled]="selection[0].attributes.operator !== 'arithmetic'" type="text" name="k2" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('k2')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+				<mat-form-field style="width: 75px;">
+					<mat-label>k3</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.k3" [disabled]="selection[0].attributes.operator !== 'arithmetic'" type="text" name="k3" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('k3')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+				<mat-form-field style="width: 75px;">
+					<mat-label>k4</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.k4" [disabled]="selection[0].attributes.operator !== 'arithmetic'" type="text" name="k4" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('k4')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="selection[0].name === 'feConvolveMatrix'" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>order</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.order" type="text" name="order" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('order')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>kernelMatrix</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.kernelMatrix" type="text" name="kernelMatrix" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('kernelMatrix')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>divisor</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.divisor" type="text" name="divisor" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('divisor')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>bias</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.bias" type="text" name="bias" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('bias')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>targetX</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.targetX" type="text" name="targetX" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('targetX')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>targetY</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.targetY" type="text" name="targetY" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('targetY')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-slide-toggle (toggleChange)="edited()" [(ngModel)]="selection[0].attributes.preserveAlpha" name="preserveAlpha" >preserveAlpha</mat-slide-toggle>
+				<button mat-icon-button (click)="help('preserveAlpha')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['feDiffuseLighting', 'feSpecularLighting'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>surfaceScale</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.surfaceScale" type="text" name="surfaceScale" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('surfaceScale')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="selection[0].name === 'feDiffuseLighting'" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>diffuseConstant</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.diffuseConstant" type="text" name="diffuseConstant" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('diffuseConstant')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="selection[0].name === 'feSpecularLighting'" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>specularConstant</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.specularConstant" type="text" name="specularConstant" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('specularConstant')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['feSpecularLighting', 'feSpotLight'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>specularExponent</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.specularExponent" type="text" name="specularExponent" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('specularExponent')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="selection[0].name === 'feDisplacementMap'" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>scale</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.scale" type="text" name="scale" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('scale')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>xChannelSelector</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.xChannelSelector" name="xChannelSelector" >
+						<mat-option value="A" >A</mat-option>
+						<mat-option value="R" >R</mat-option>
+						<mat-option value="G" >G</mat-option>
+						<mat-option value="B" >B</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('xChannelSelector')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>yChannelSelector</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.yChannelSelector" name="yChannelSelector" >
+						<mat-option value="A" >A</mat-option>
+						<mat-option value="R" >R</mat-option>
+						<mat-option value="G" >G</mat-option>
+						<mat-option value="B" >B</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('yChannelSelector')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="selection[0].name === 'feDistantLight'" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>azimuth</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.azimuth" type="text" name="azimuth" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('azimuth')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>elevation</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.elevation" type="text" name="elevation" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('elevation')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['feDropShadow', 'feFlood'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>flood-color</mat-label>
+					<input matInput (input)="edited()" mccColorPickerOrigin #floodColor="mccColorPickerOrigin" [(ngModel)]="selection[0].attributes['flood-color']" type="text" name="flood-color" >
+					<mcc-color-picker matSuffix mccConnectedColorPicker [mccConnectedColorPickerOrigin]="floodColor" alpha ></mcc-color-picker>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('flood-color')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>flood-opacity</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes['flood-opacity']" type="number" min="0" max="1" step="0.01" name="flood-opacity" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('flood-opacity')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['feDropShadow', 'feOffset', 'text', 'tspan'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>dx</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.dx" type="text" name="dx" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('dx')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>dy</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.dy" type="text" name="dy" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('dy')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['feDropShadow', 'feGaussianBlur'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>stdDeviation</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.stdDeviation" type="text" name="stdDeviation" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('stdDeviation')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['feConvolveMatrix', 'feGaussianBlur'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>edgeMode</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.edgeMode" name="edgeMode" >
+						<mat-option value="none" >none</mat-option>
+						<mat-option value="duplicate" >duplicate</mat-option>
+						<mat-option value="wrap" >wrap</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('edgeMode')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['feFuncA', 'feFuncR', 'feFuncG', 'feFuncB'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>type</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.type" name="type" >
+						<mat-option value="identity" >identity</mat-option>
+						<mat-option value="table" >table</mat-option>
+						<mat-option value="discrete" >discrete</mat-option>
+						<mat-option value="linear" >linear</mat-option>
+						<mat-option value="gamma" >gamma</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('type')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>amplitude</mat-label>
+					<input matInput (input)="edited()" [disabled]="selection[0].attributes.type !== 'gamma'" [(ngModel)]="selection[0].attributes.amplitude" type="text" name="amplitude" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('amplitude')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>exponent</mat-label>
+					<input matInput (input)="edited()" [disabled]="selection[0].attributes.type !== 'gamma'" [(ngModel)]="selection[0].attributes.exponent" type="text" name="exponent" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('exponent')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>intercept</mat-label>
+					<input matInput (input)="edited()" [disabled]="selection[0].attributes.type !== 'linear'" [(ngModel)]="selection[0].attributes.intercept" type="text" name="intercept" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('intercept')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>tableValues</mat-label>
+					<input matInput (input)="edited()" [disabled]="selection[0].attributes.type !== 'table'" [(ngModel)]="selection[0].attributes.tableValues" type="text" name="tableValues" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('tableValues')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['feFuncA', 'feFuncR', 'feFuncG', 'feFuncB', 'stop'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>offset</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.offset" type="text" name="offset" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('offset')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['feImage', 'image', 'marker', 'pattern', 'svg', 'symbol', 'view'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>preserveAspectRatio</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.preserveAspectRatio" type="text" name="preserveAspectRatio" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('preserveAspectRatio')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="selection[0].name === 'feMorphology'" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>operator</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.operator" name="operator" >
+						<mat-option value="erode" >erode</mat-option>
+						<mat-option value="dilate" >dilate</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('operator')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>radius</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.radius" type="text" name="radius" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('radius')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['fePointLight', 'feSpotLight'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>z</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.z" type="text" name="z" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('z')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="selection[0].name === 'feSpotLight'" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>limitingConeAngle</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.limitingConeAngle" type="text" name="limitingConeAngle" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('limitingConeAngle')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>pointsAtX</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.pointsAtX" type="text" name="pointsAtX" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('pointsAtX')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>pointsAtY</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.pointsAtY" type="text" name="pointsAtY" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('pointsAtY')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>pointsAtZ</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.pointsAtZ" type="text" name="pointsAtZ" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('pointsAtZ')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="selection[0].name === 'feTurbulence'" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>type</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.type" name="type" >
+						<mat-option value="fractalNoise" >fractalNoise</mat-option>
+						<mat-option value="turbulence" >turbulence</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('type')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>baseFrequency</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.baseFrequency" type="text" name="baseFrequency" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('baseFrequency')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>numOctaves</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.numOctaves" type="text" name="numOctaves" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('numOctaves')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>seed</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.seed" type="text" name="seed" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('seed')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>stitchTiles</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.stitchTiles" name="stitchTiles" >
+						<mat-option value="noStitch" >noStitch</mat-option>
+						<mat-option value="stitch" >stitch</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('stitchTiles')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['line', 'linearGradient'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>x1</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.x1" type="text" name="x1" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('x1')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>y1</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.y1" type="text" name="y1" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('y1')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>x2</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.x2" type="text" name="x2" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('x2')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>y2</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.y2" type="text" name="y2" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('y2')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="selection[0].name === 'radialGradient'" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>fx</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.fx" type="text" name="fx" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('fx')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>fy</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.fy" type="text" name="fy" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('fy')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>fr</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.fr" type="text" name="fr" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('fr')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['linearGradient', 'radialGradient'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>spreadMethod</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.spreadMethod" name="spreadMethod" >
+						<mat-option value="pad" >pad</mat-option>
+						<mat-option value="reflect" >reflect</mat-option>
+						<mat-option value="repeat" >repeat</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('spreadMethod')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>gradientUnits</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.gradientUnits" name="gradientUnits" >
+						<mat-option value="objectBoundingBox" >objectBoundingBox</mat-option>
+						<mat-option value="userSpaceOnUse" >userSpaceOnUse</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('gradientUnits')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['marker', 'pattern', 'svg', 'symbol', 'view'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>viewBox</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.viewBox" type="text" name="viewBox" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('viewBox')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="selection[0].name === 'marker'" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>markerWidth</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.markerWidth" type="text" name="markerWidth" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('markerWidth')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>markerHeight</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.markerHeight" type="text" name="markerHeight" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('markerHeight')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>orient</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.orient" type="text" name="orient" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('orient')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>markerUnits</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.markerUnits" name="markerUnits" >
+						<mat-option value="strokeWidth" >strokeWidth</mat-option>
+						<mat-option value="userSpaceOnUse" >userSpaceOnUse</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('markerUnits')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['marker', 'symbol'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>refX</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.refX" type="text" name="refX" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('refX')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>refY</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.refY" type="text" name="refY" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('refY')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="selection[0].name === 'path'" >
+			<mat-list-item style="height: 130px;" >
+				<mat-form-field>
+					<mat-label>d</mat-label>
+					<textarea matInput (input)="edited()" (input)="edited()" [(ngModel)]="selection[0].attributes.d" name="d" rows="5" ></textarea>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('d')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['polygon', 'polyline'].includes(selection[0].name)" >
+			<mat-list-item style="height: 130px;" >
+				<mat-form-field>
+					<mat-label>points</mat-label>
+					<textarea matInput (input)="edited()" [(ngModel)]="selection[0].attributes.points" name="points" rows="5" ></textarea>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('points')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="selection[0].name === 'stop'" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>stop-color</mat-label>
+					<input matInput (input)="edited()" mccColorPickerOrigin #stopColor="mccColorPickerOrigin" [(ngModel)]="selection[0].attributes['stop-color']" type="text" name="stop-color" >
+					<mcc-color-picker matSuffix mccConnectedColorPicker [mccConnectedColorPickerOrigin]="stopColor" alpha ></mcc-color-picker>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('stop-color')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>stop-opacity</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes['stop-opacity']" min="0" max="1" step="0.01" type="number" name="stop-opacity" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('stop-opacity')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="['text', 'tspan', 'textPath'].includes(selection[0].name)" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>textLength</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.textLength" type="text" name="textLength" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('textLength')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>lengthAdjust</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.lengthAdjust" name="lengthAdjust" >
+						<mat-option value="spacing" >spacing</mat-option>
+						<mat-option value="spacingAndGlyphs" >spacingAndGlyphs</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('lengthAdjust')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="selection[0].name === 'textPath'" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>side</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.side" name="side" >
+						<mat-option value="left" >left</mat-option>
+						<mat-option value="right" >right</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('side')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>spacing</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.spacing" name="spacing" >
+						<mat-option value="auto" >auto</mat-option>
+						<mat-option value="exact" >exact</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('spacing')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>startOffset</mat-label>
+					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.startOffset" type="text" name="startOffset" >
+				</mat-form-field>
+				<button mat-icon-button (click)="help('startOffset')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="selection[0].name === 'clipPath'" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>clipPathUnits</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.clipPathUnits" name="clipPathUnits" >
+						<mat-option value="objectBoundingBox" >objectBoundingBox</mat-option>
+						<mat-option value="userSpaceOnUse" >userSpaceOnUse</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('clipPathUnits')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="selection[0].name === 'filter'" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>filterUnits</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.filterUnits" name="filterUnits" >
+						<mat-option value="objectBoundingBox" >objectBoundingBox</mat-option>
+						<mat-option value="userSpaceOnUse" >userSpaceOnUse</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('filterUnits')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>primitiveUnits</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.primitiveUnits" name="primitiveUnits" >
+						<mat-option value="objectBoundingBox" >objectBoundingBox</mat-option>
+						<mat-option value="userSpaceOnUse" >userSpaceOnUse</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('primitiveUnits')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="selection[0].name === 'mask'" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>maskUnits</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.maskUnits" name="maskUnits" >
+						<mat-option value="objectBoundingBox" >objectBoundingBox</mat-option>
+						<mat-option value="userSpaceOnUse" >userSpaceOnUse</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('maskUnits')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>maskContentUnits</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.maskContentUnits" name="maskContentUnits" >
+						<mat-option value="objectBoundingBox" >objectBoundingBox</mat-option>
+						<mat-option value="userSpaceOnUse" >userSpaceOnUse</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('maskContentUnits')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+		<ng-container *ngIf="selection[0].name === 'pattern'" >
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>patternUnits</mat-label>
+					<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.patternUnits" name="patternUnits" >
+						<mat-option value="objectBoundingBox" >objectBoundingBox</mat-option>
+						<mat-option value="userSpaceOnUse" >userSpaceOnUse</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('patternUnits')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
+					<mat-label>patternContentUnits</mat-label>
+					<mat-select (selectionChange)="edited()" (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.patternContentUnits" name="patternContentUnits" >
+						<mat-option value="userSpaceOnUse" >userSpaceOnUse</mat-option>
+						<mat-option value="objectBoundingBox" >objectBoundingBox</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-icon-button (click)="help('patternContentUnits')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			</mat-list-item>
+		</ng-container>
+	</ng-container>
+</mat-list>
