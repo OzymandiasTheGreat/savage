@@ -1,0 +1,220 @@
+<mat-list>
+	<ng-container *ngIf="!includes">
+		<mat-list-item>Select a graphical element(s)</mat-list-item>
+		<mat-list-item>or renderable container(s)</mat-list-item>
+	</ng-container>
+	<ng-container *ngIf="includes" >
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>color</mat-label>
+				<input matInput [value]="getAttr('color')" (input)="setAttr('color', $event.target.value)" mccColorPickerOrigin #color="mccColorPickerOrigin" type="text" name="color" >
+				<mcc-color-picker matSuffix mccConnectedColorPicker (change)="setAttr('color', $event)" [mccConnectedColorPickerOrigin]="color" alpha ></mcc-color-picker>
+			</mat-form-field>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>opacity</mat-label>
+				<input matInput [value]="getAttr('opacity')" (input)="setAttr('opacity', $event.target.value)" min="0" max="1" step="0.01" type="number" name="opacity" >
+			</mat-form-field>
+		</mat-list-item>
+		<mat-divider></mat-divider>
+		<mat-list-item style="white-space: nowrap;">
+			<mat-form-field>
+				<mat-label>fill with...</mat-label>
+				<mat-select [(ngModel)]="fillWith" >
+					<mat-option value="color" >color</mat-option>
+					<mat-option value="gradient" >gradient</mat-option>
+					<mat-option value="pattern" >pattern</mat-option>
+				</mat-select>
+			</mat-form-field>
+			<mat-form-field style="height: 85px;">
+				<mat-label>fill</mat-label>
+				<ng-container [ngSwitch]="fillWith" >
+					<ng-container *ngSwitchCase="'gradient'" >
+						<input matInput [matAutocomplete]="autoFillG" [value]="getAttr('fill')" (input)="setAttr('fill', $event.target.value)" type="text" name="fillG" >
+						<mat-autocomplete #autoFillG (optionSelected)="setAttr('fill', $event.option.value)" >
+							<mat-option *ngFor="let gradient of defs.gradients" [value]="'url(#' + gradient.id + ')'" >{{ gradient.id }}</mat-option>
+						</mat-autocomplete>
+					</ng-container>
+					<ng-container *ngSwitchCase="'pattern'" >
+						<input matInput [matAutocomplete]="autoFillP" [value]="getAttr('fill')" (input)="setAttr('fill', $event.target.value)" type="text" name="fillP" >
+						<mat-autocomplete #autoFillP (optionSelected)="setAttr('fill', $event.option.value)" >
+							<mat-option *ngFor="let pattern of defs.patterns" [value]="'url(#' + pattern.id + ')'" >{{ pattern.id }}</mat-option>
+						</mat-autocomplete>
+					</ng-container>
+					<ng-container *ngSwitchDefault>
+						<input matInput [value]="getAttr('fill')" (input)="setAttr('fill', $event.target.value)" mccColorPickerOrigin #fill="mccColorPickerOrigin" type="text" name="fill" >
+						<mcc-color-picker matSuffix mccConnectedColorPicker (change)="setAttr('fill', $event)" [mccConnectedColorPickerOrigin]="fill" alpha ></mcc-color-picker>
+					</ng-container>
+				</ng-container>
+			</mat-form-field>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>fill-opacity</mat-label>
+				<input matInput [value]="getAttr('fill-opacity')" (input)="setAttr('fill-opacity', $event.target.value)" min="0" max="1" step="0.01" type="number" name="fill-opacity" >
+			</mat-form-field>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>fill-rule</mat-label>
+				<mat-select [value]="getAttr('fill-rule')" (selectionChange)="setAttr('fill-rule', $event.value)" name="fill-rule" >
+					<mat-option value="nonzero" >nonzero</mat-option>
+					<mat-option value="evenodd" >evenodd</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</mat-list-item>
+		<mat-divider></mat-divider>
+		<mat-list-item style="white-space: nowrap;">
+			<mat-form-field>
+				<mat-label>stroke with...</mat-label>
+				<mat-select [(ngModel)]="strokeWith" >
+					<mat-option value="color" >color</mat-option>
+					<mat-option value="gradient" >gradient</mat-option>
+					<mat-option value="pattern" >pattern</mat-option>
+				</mat-select>
+			</mat-form-field>
+			<mat-form-field style="height: 85px;">
+				<mat-label>stroke</mat-label>
+				<ng-container [ngSwitch]="strokeWith" >
+					<ng-container *ngSwitchCase="'gradient'" >
+						<input matInput [matAutocomplete]="autoStrokeG" [value]="getAttr('stroke')" (input)="setAttr('stroke', $event.target.value)" type="text" name="strokeG" >
+						<mat-autocomplete #autoStrokeG (optionSelected)="setAttr('stroke', $event.option.value)" >
+							<mat-option *ngFor="let gradient of defs.gradients" [value]="'url(#' + gradient.id + ')'" >{{ gradient.id }}</mat-option>
+						</mat-autocomplete>
+					</ng-container>
+					<ng-container *ngSwitchCase="'pattern'" >
+						<input matInput [matAutocomplete]="autoStrokeP" [value]="getAttr('stroke')" (input)="setAttr('stroke', $event.target.value)" type="text" name="strokeP" >
+						<mat-autocomplete #autoStrokeP (optionSelected)="setAttr('stroke', $event.option.value)" >
+							<mat-option *ngFor="let pattern of defs.patterns" [value]="'url(#' + pattern.id + ')'" >{{ pattern.id }}</mat-option>
+						</mat-autocomplete>
+					</ng-container>
+					<ng-container *ngSwitchDefault>
+						<input matInput [value]="getAttr('stroke')" (input)="setAttr('stroke', $event.target.value)" mccColorPickerOrigin #stroke="mccColorPickerOrigin" type="text" name="stroke" >
+						<mcc-color-picker matSuffix mccConnectedColorPicker (change)="setAttr('stroke', $event)" [mccConnectedColorPickerOrigin]="stroke" alpha ></mcc-color-picker>
+					</ng-container>
+				</ng-container>
+			</mat-form-field>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>stroke-opacity</mat-label>
+				<input matInput [value]="getAttr('stroke-opacity')" (input)="setAttr('stroke-opacity', $event.target.value)" min="0" max="1" step="0.01" type="number" name="stroke-opacity" >
+			</mat-form-field>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>stroke-width</mat-label>
+				<input matInput [value]="getAttr('stroke-width')" (input)="setAttr('stroke-width', $event.target.value)" type="text" name="stroke-width" >
+			</mat-form-field>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>stroke-linecap</mat-label>
+				<mat-select [value]="getAttr('stroke-linecap')" (selectionChange)="setAttr('stroke-linecap', $event.value)" name="stroke-linecap" >
+					<mat-option value="butt" >butt</mat-option>
+					<mat-option value="round" >round</mat-option>
+					<mat-option value="square" >square</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>stroke-linejoin</mat-label>
+				<mat-select [value]="getAttr('stroke-linejoin')" (selectionChange)="setAttr('stroke-linejoin', $event.value)" name="stroke-linejoin" >
+					<mat-option value="miter" >miter</mat-option>
+					<mat-option value="arcs" >arcs</mat-option>
+					<mat-option value="bevel" >bevel</mat-option>
+					<mat-option value="miter-clip" >miter-clip</mat-option>
+					<mat-option value="round" >round</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>stroke-miterlimit</mat-label>
+				<input matInput [value]="getAttr('stroke-miterlimit')" (input)="setAttr('stroke-miterlimit', $event.target.value)" type="text" name="stroke-miterlimit" >
+			</mat-form-field>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>stroke-dasharray</mat-label>
+				<input matInput [value]="getAttr('stroke-dasharray')" (input)="setAttr('stroke-dasharray', $event.target.value)" type="text" name="stroke-dasharray" >
+			</mat-form-field>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>stroke-dashoffset</mat-label>
+				<input matInput [value]="getAttr('stroke-dashoffset')" (input)="setAttr('stroke-dashoffset', $event.target.value)" type="text" name="stroke-dashoffset" >
+			</mat-form-field>
+		</mat-list-item>
+		<mat-divider></mat-divider>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>clip-path</mat-label>
+				<input matInput [matAutocomplete]="clipPath" [value]="getAttr('clip-path')" (input)="setAttr('clip-path', $event.target.value)" type="text" name="clip-path" >
+				<mat-autocomplete #clipPath (optionSelected)="setAttr('clip-path', $event.option.value)" >
+					<mat-option *ngFor="let clip of defs.clipPaths" [value]="'url(#' + clip.id + ')'">{{ clip.id }}</mat-option>
+				</mat-autocomplete>
+			</mat-form-field>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>clip-rule</mat-label>
+				<mat-select [value]="getAttr('clip-rule')" (selectionChange)="setAttr('clip-rule', $event.value)" name="clip-rule" >
+					<mat-option value="inherit" >inherit</mat-option>
+					<mat-option value="nonzero" >nonzero</mat-option>
+					<mat-option value="evenodd" >evenodd</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</mat-list-item>
+		<mat-divider></mat-divider>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>filter</mat-label>
+				<input matInput [matAutocomplete]="filter" [value]="getAttr('filter')" (input)="setAttr('filter', $event.target.value)" type="text" name="filter" >
+				<mat-autocomplete #filter (optionSelected)="setAttr('filter', $event.option.value)" >
+					<mat-option *ngFor="let fltr of defs.filters" [value]="'url(#' + fltr.id + ')'" >{{ fltr.id }}</mat-option>
+				</mat-autocomplete>
+			</mat-form-field>
+		</mat-list-item>
+		<mat-divider></mat-divider>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>marker-start</mat-label>
+				<input matInput [matAutocomplete]="markerStart" [value]="getAttr('marker-start')" (input)="setAttr('marker-start', $event.target.value)" type="text" name="marker-start" >
+				<mat-autocomplete #markerStart (optionSelected)="setAttr('marker-start', $event.option.value)" >
+					<mat-option *ngFor="let marker of defs.markers" [value]="'url(#' + marker.id + ')'" >{{ marker.id }}</mat-option>
+				</mat-autocomplete>
+			</mat-form-field>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>marker-mid</mat-label>
+				<input matInput [matAutocomplete]="markerMid" [value]="getAttr('marker-mid')" (input)="setAttr('marker-mid', $event.target.value)" type="text" name="marker-mid" >
+				<mat-autocomplete #markerMid (optionSelected)="setAttr('marker-mid', $event.option.value)" >
+					<mat-option *ngFor="let marker of defs.markers" [value]="'url(#' + marker.id + ')'" >{{ marker.id }}</mat-option>
+				</mat-autocomplete>
+			</mat-form-field>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>marker-end</mat-label>
+				<input matInput [matAutocomplete]="markerEnd" [value]="getAttr('marker-end')" (input)="setAttr('marker-end', $event.target.value)" type="text" name="marker-end" >
+				<mat-autocomplete #markerEnd (optionSelected)="setAttr('marker-end', $event.option.value)" >
+					<mat-option *ngFor="let marker of defs.markers" [value]="'url(#' + marker.id + ')'" >{{ marker.id }}</mat-option>
+				</mat-autocomplete>
+			</mat-form-field>
+		</mat-list-item>
+		<mat-divider></mat-divider>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>mask</mat-label>
+				<input matInput [matAutocomplete]="mask" [value]="getAttr('mask')" (input)="setAttr('mask', $event.target.value)" type="text" name="mask-image" >
+				<mat-autocomplete #mask (optionSelected)="setAttr('mask', $event.option.value)" >
+					<mat-option *ngFor="let msk of defs.masks" [value]="'url(#' + msk.id + ')'" >{{ msk.id }}</mat-option>
+				</mat-autocomplete>
+			</mat-form-field>
+		</mat-list-item>
+	</ng-container>
+</mat-list>

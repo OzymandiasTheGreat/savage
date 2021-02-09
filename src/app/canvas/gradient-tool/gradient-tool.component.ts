@@ -163,6 +163,7 @@ export class GradientToolComponent implements ICanvasTool, OnInit, OnDestroy {
 
 	handleMouseUp(event: PointerEvent): void {
 		this.gradient = null;
+		this.history.snapshot("Add gradient");
 	}
 
 	handleKeyDown(event: IDocumentEvent): void { }

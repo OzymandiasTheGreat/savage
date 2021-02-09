@@ -1,5 +1,5 @@
 <div #scrollable >
-	<mat-accordion class="savage-app-sidebar" >
+	<mat-accordion class="savage-app-sidebar" [multi]="true" >
 		<mat-expansion-panel #elemPanel [expanded]="true" >
 			<mat-expansion-panel-header>
 				<mat-panel-title class="savage-app-sidebar-header" >
@@ -20,6 +20,17 @@
 			</mat-expansion-panel-header>
 
 			<app-sidebar-props [selection]="canvas.selection" ></app-sidebar-props>
+		</mat-expansion-panel>
+
+		<mat-expansion-panel >
+			<mat-expansion-panel-header>
+				<mat-panel-title class="savage-app-sidebar-header" >
+					<mat-icon svgIcon="presentation" ></mat-icon>
+					<span class="savage-app-sidebar-header-text" >Presentation</span>
+				</mat-panel-title>
+			</mat-expansion-panel-header>
+
+			<app-sidebar-presentation [selection]="canvas.selection" ></app-sidebar-presentation>
 		</mat-expansion-panel>
 	</mat-accordion>
 </div>

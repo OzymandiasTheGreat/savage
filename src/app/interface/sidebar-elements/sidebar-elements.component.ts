@@ -33,8 +33,49 @@ import { HistoryService } from "../../services/history.service";
 export class SidebarElementsComponent implements OnInit, OnChanges {
 	private _treeObserver = (changes: Change[]) => {
 		for (const change of changes) {
-			if (!change.path.includes("attributes") && ["insert", "delete"].includes(change.type)) {
+			if (change.path.includes("children") && ["insert", "delete"].includes(change.type)) {
 				this.tree.treeModel.update();
+				if (change.type === "insert") {
+					const name = change.value.name;
+					const nid = change.value.nid;
+					const id = change.value.attributes.id || "";
+					if (PRIMITIVES.includes(name)) {
+						this.editablePrimitive[nid] = {
+							in: new FormControl("SourceGraphic"),
+							in2: new FormControl(""),
+							result: new FormControl(""),
+						};
+					} else {
+						this.editableNode[nid] = new FormControl(id);
+					}
+					if (name === "pattern") {
+						this.definitions.patterns.push({ nid, id });
+					} else if (["linearGradient", "radialGradient"].includes(name)) {
+						this.definitions.gradients.push({ nid, id });
+					} else if (name === "filter") {
+						this.definitions.filters.push({ nid, id });
+					} else if (name === "mask") {
+						this.definitions.masks.push({ nid, id });
+					} else if (name === "symbol") {
+						this.definitions.symbols.push({ nid, id });
+					} else if (name === "marker") {
+						this.definitions.markers.push({ nid, id });
+					} else if (name === "clipPath") {
+						this.definitions.clipPaths.push({ nid, id });
+					} else if (name !== "use" && GRAPHICS.includes(name)) {
+						this.definitions.graphics.push({ nid, id });
+					} else if (name === "path") {
+						this.definitions.paths.push({ nid, id });
+					}
+				} else {
+					const name = change.oldValue.name;
+					const nid = change.oldValue.nid;
+					if (PRIMITIVES.includes(name)) {
+						delete this.editablePrimitive[nid];
+					} else {
+						delete this.editableNode[nid];
+					}
+				}
 			}
 		}
 	}
@@ -565,6 +606,7 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 			attributes: <any> { id },
 			children: <any> [],
 		};
+		this.editableNode[nid] = new FormControl(id);
 		const parent = name === "symbol" ? this.root : this.defs;
 		nodes.forEach((node) => {
 			if (CONTAINMENT_MAP[name].includes(node.data.name)) {

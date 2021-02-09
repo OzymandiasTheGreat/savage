@@ -4,7 +4,8 @@
 </nav>
 
 <div class="savage-app-sidebar-el-tree">
-	<tree-root #tree [nodes]="data" [options]="options" [(state)]="state" >
+	<!-- [BUG] If tree's visibility is set to other than visible it also hides elements on canvas -->
+	<tree-root #tree [nodes]="data" [options]="options" [(state)]="state" style="visibility: visible;" >
 		<ng-template #treeNodeWrapperTemplate let-node let-index="index" >
 			<div class="node-wrapper" [style.padding-left]="node.getNodePadding()" >
 				<button mat-icon-button [disabled]="!node.hasChildren" (click)="node.toggleExpanded()" >

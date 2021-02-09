@@ -432,6 +432,13 @@
 		<ng-container *ngIf="['feDiffuseLighting', 'feSpecularLighting'].includes(selection[0].name)" >
 			<mat-list-item>
 				<mat-form-field>
+					<mat-label>lighting-color</mat-label>
+					<input matInput (input)="edited()" mccColorPickerOrigin #lightingColor="mccColorPickerOrigin" [(ngModel)]="selection[0].attributes['lighting-color']" type="text" name="lighting-color" >
+					<mcc-color-picker matSuffix mccConnectedColorPicker [mccConnectedColorPickerOrigin]="lightingColor" alpha ></mcc-color-picker>
+				</mat-form-field>
+			</mat-list-item>
+			<mat-list-item>
+				<mat-form-field>
 					<mat-label>surfaceScale</mat-label>
 					<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.surfaceScale" type="text" name="surfaceScale" >
 				</mat-form-field>
