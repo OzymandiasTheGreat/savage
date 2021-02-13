@@ -33,7 +33,8 @@ import { HistoryService } from "../../services/history.service";
 export class SidebarElementsComponent implements OnInit, OnChanges {
 	private _treeObserver = (changes: Change[]) => {
 		for (const change of changes) {
-			if (change.path.includes("children") && ["insert", "delete"].includes(change.type)) {
+			// if (change.path.includes("children") && ["insert", "delete"].includes(change.type)) {
+			if (!change.path.includes("attributes") && ["insert", "delete"].includes(change.type)) {
 				this.tree.treeModel.update();
 				if (change.type === "insert") {
 					const name = change.value.name;

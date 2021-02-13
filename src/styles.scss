@@ -4,6 +4,8 @@
 
 // @include mcc-theme($demo-theme);
 
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
 :root {
 	--accent: #33691e;
 	--text: #221122;
@@ -13,6 +15,7 @@
 }
 
 html, body {
+	font-family: 'Roboto', sans-serif;
 	height: 100%;
 	margin: 0;
 	color: var(--text);

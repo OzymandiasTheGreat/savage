@@ -47,12 +47,14 @@
     "text-to-svg": "^3.1.5",
     "transformation-matrix": "^2.5.0",
     "tslib": "^2.0.0",
+    "unmatrix": "^1.0.6",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1002.0",
     "@angular/cli": "~10.2.0",
     "@angular/compiler-cli": "~10.2.0",
+    "@types/css-font-loading-module": "0.0.4",
     "@types/jasmine": "~3.5.0",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^12.11.1",

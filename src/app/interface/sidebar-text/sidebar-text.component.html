@@ -1,0 +1,87 @@
+<mat-list>
+	<mat-list-item *ngIf="selection.length !== 1 || !['text', 'textPath', 'tspan'].includes(selection[0].name)" ></mat-list-item>
+	<ng-container *ngIf="selection.length === 1 && ['text', 'textPath', 'tspan'].includes(selection[0].name)" >
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>font-family</mat-label>
+				<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes['font-family']" name="font-family" >
+					<mat-option *ngFor="let fam of families" [value]="fam" >{{ fam }}</mat-option>
+				</mat-select>
+			</mat-form-field>
+			<button mat-icon-button (click)="help('font-family')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+			<mat-form-field style="width: 75px;">
+				<mat-label>font-size</mat-label>
+				<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes['font-size']" min="1" type="number" name="font-size" >
+			</mat-form-field>
+			<button mat-icon-button (click)="help('font-size')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>font-weight</mat-label>
+				<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes['font-weight']" min="100" step="100" max="900" type="number" name="font-weight" >
+			</mat-form-field>
+			<button mat-icon-button (click)="help('font-weight')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>font-style</mat-label>
+				<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes['font-style']" name="font-style" >
+					<mat-option value="normal" >normal</mat-option>
+					<mat-option value="italic" >italic</mat-option>
+					<mat-option value="oblique" >oblique</mat-option>
+				</mat-select>
+			</mat-form-field>
+			<button mat-icon-button (click)="help('font-style')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>font-variant</mat-label>
+				<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes['font-variant']" type="text" name="font-variant" >
+			</mat-form-field>
+			<button mat-icon-button (click)="help('font-variant')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>letter-spacing</mat-label>
+				<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes['letter-spacing']" type="text" name="letter-spacing" >
+			</mat-form-field>
+			<button mat-icon-button (click)="help('letter-spacing')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>word-spacing</mat-label>
+				<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes['word-spacing']" type="text" name="word-spacing" >
+			</mat-form-field>
+			<button mat-icon-button (click)="help('word-spacing')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>text-anchor</mat-label>
+				<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes['text-anchor']" name="text-anchor" >
+					<mat-option value="start" >start</mat-option>
+					<mat-option value="middle" >middle</mat-option>
+					<mat-option value="end" >end</mat-option>
+				</mat-select>
+			</mat-form-field>
+			<button mat-icon-button (click)="help('text-anchor')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>text-decoration</mat-label>
+				<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes['text-decoration']" type="text" name="text-decoration" >
+			</mat-form-field>
+			<button mat-icon-button (click)="help('text-decoration')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+		</mat-list-item>
+		<mat-list-item>
+			<mat-form-field>
+				<mat-label>writing-mode</mat-label>
+				<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes['writing-mode']" name="writing-mode" >
+					<mat-option value="horizontal-tb" >horizontal-tb</mat-option>
+					<mat-option value="vertical-lr" >vertical-lr</mat-option>
+					<mat-option value="vertical-rl" >vertical-rl</mat-option>
+				</mat-select>
+			</mat-form-field>
+			<button mat-icon-button (click)="help('writing-mode')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+		</mat-list-item>
+	</ng-container>
+</mat-list>

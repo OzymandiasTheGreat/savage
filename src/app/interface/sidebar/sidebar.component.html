@@ -32,5 +32,16 @@
 
 			<app-sidebar-presentation [selection]="canvas.selection" ></app-sidebar-presentation>
 		</mat-expansion-panel>
+
+		<mat-expansion-panel>
+			<mat-expansion-panel-header>
+				<mat-panel-title class="savage-app-sidebar-header" >
+					<mat-icon svgIcon="format-text" ></mat-icon>
+					<span class="savage-app-sidebar-header-text" >Text</span>
+				</mat-panel-title>
+			</mat-expansion-panel-header>
+
+			<app-sidebar-text [selection]="canvas.selection" ></app-sidebar-text>
+		</mat-expansion-panel>
 	</mat-accordion>
 </div>

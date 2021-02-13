@@ -10,12 +10,14 @@
 				<input matInput [value]="getAttr('color')" (input)="setAttr('color', $event.target.value)" mccColorPickerOrigin #color="mccColorPickerOrigin" type="text" name="color" >
 				<mcc-color-picker matSuffix mccConnectedColorPicker (change)="setAttr('color', $event)" [mccConnectedColorPickerOrigin]="color" alpha ></mcc-color-picker>
 			</mat-form-field>
+			<button mat-icon-button (click)="help('color')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		</mat-list-item>
 		<mat-list-item>
 			<mat-form-field>
 				<mat-label>opacity</mat-label>
 				<input matInput [value]="getAttr('opacity')" (input)="setAttr('opacity', $event.target.value)" min="0" max="1" step="0.01" type="number" name="opacity" >
 			</mat-form-field>
+			<button mat-icon-button (click)="help('opacity')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		</mat-list-item>
 		<mat-divider></mat-divider>
 		<mat-list-item style="white-space: nowrap;">
@@ -44,16 +46,18 @@
 					</ng-container>
 					<ng-container *ngSwitchDefault>
 						<input matInput [value]="getAttr('fill')" (input)="setAttr('fill', $event.target.value)" mccColorPickerOrigin #fill="mccColorPickerOrigin" type="text" name="fill" >
-						<mcc-color-picker matSuffix mccConnectedColorPicker (change)="setAttr('fill', $event)" [mccConnectedColorPickerOrigin]="fill" alpha ></mcc-color-picker>
+						<mcc-color-picker matSuffix mccConnectedColorPicker (change)="setAttr('fill', $event)" [mccConnectedColorPickerOrigin]="fill" alpha style="margin-left: -25px;" ></mcc-color-picker>
 					</ng-container>
 				</ng-container>
 			</mat-form-field>
+			<button mat-icon-button (click)="help('fill')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		</mat-list-item>
 		<mat-list-item>
 			<mat-form-field>
 				<mat-label>fill-opacity</mat-label>
 				<input matInput [value]="getAttr('fill-opacity')" (input)="setAttr('fill-opacity', $event.target.value)" min="0" max="1" step="0.01" type="number" name="fill-opacity" >
 			</mat-form-field>
+			<button mat-icon-button (click)="help('fill-opacity')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		</mat-list-item>
 		<mat-list-item>
 			<mat-form-field>
@@ -63,6 +67,7 @@
 					<mat-option value="evenodd" >evenodd</mat-option>
 				</mat-select>
 			</mat-form-field>
+			<button mat-icon-button (click)="help('fill-rule')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		</mat-list-item>
 		<mat-divider></mat-divider>
 		<mat-list-item style="white-space: nowrap;">
@@ -91,22 +96,25 @@
 					</ng-container>
 					<ng-container *ngSwitchDefault>
 						<input matInput [value]="getAttr('stroke')" (input)="setAttr('stroke', $event.target.value)" mccColorPickerOrigin #stroke="mccColorPickerOrigin" type="text" name="stroke" >
-						<mcc-color-picker matSuffix mccConnectedColorPicker (change)="setAttr('stroke', $event)" [mccConnectedColorPickerOrigin]="stroke" alpha ></mcc-color-picker>
+						<mcc-color-picker matSuffix mccConnectedColorPicker (change)="setAttr('stroke', $event)" [mccConnectedColorPickerOrigin]="stroke" alpha style="margin-left: -25px;" ></mcc-color-picker>
 					</ng-container>
 				</ng-container>
 			</mat-form-field>
+			<button mat-icon-button (click)="help('stroke')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		</mat-list-item>
 		<mat-list-item>
 			<mat-form-field>
 				<mat-label>stroke-opacity</mat-label>
 				<input matInput [value]="getAttr('stroke-opacity')" (input)="setAttr('stroke-opacity', $event.target.value)" min="0" max="1" step="0.01" type="number" name="stroke-opacity" >
 			</mat-form-field>
+			<button mat-icon-button (click)="help('stroke-opacity')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		</mat-list-item>
 		<mat-list-item>
 			<mat-form-field>
 				<mat-label>stroke-width</mat-label>
 				<input matInput [value]="getAttr('stroke-width')" (input)="setAttr('stroke-width', $event.target.value)" type="text" name="stroke-width" >
 			</mat-form-field>
+			<button mat-icon-button (click)="help('stroke-width')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		</mat-list-item>
 		<mat-list-item>
 			<mat-form-field>
@@ -117,6 +125,7 @@
 					<mat-option value="square" >square</mat-option>
 				</mat-select>
 			</mat-form-field>
+			<button mat-icon-button (click)="help('stroke-linecap')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		</mat-list-item>
 		<mat-list-item>
 			<mat-form-field>
@@ -129,24 +138,28 @@
 					<mat-option value="round" >round</mat-option>
 				</mat-select>
 			</mat-form-field>
+			<button mat-icon-button (click)="help('stroke-linejoin')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		</mat-list-item>
 		<mat-list-item>
 			<mat-form-field>
 				<mat-label>stroke-miterlimit</mat-label>
 				<input matInput [value]="getAttr('stroke-miterlimit')" (input)="setAttr('stroke-miterlimit', $event.target.value)" type="text" name="stroke-miterlimit" >
 			</mat-form-field>
+			<button mat-icon-button (click)="help('stroke-miterlimit')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		</mat-list-item>
 		<mat-list-item>
 			<mat-form-field>
 				<mat-label>stroke-dasharray</mat-label>
 				<input matInput [value]="getAttr('stroke-dasharray')" (input)="setAttr('stroke-dasharray', $event.target.value)" type="text" name="stroke-dasharray" >
 			</mat-form-field>
+			<button mat-icon-button (click)="help('stroke-dasharray')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		</mat-list-item>
 		<mat-list-item>
 			<mat-form-field>
 				<mat-label>stroke-dashoffset</mat-label>
 				<input matInput [value]="getAttr('stroke-dashoffset')" (input)="setAttr('stroke-dashoffset', $event.target.value)" type="text" name="stroke-dashoffset" >
 			</mat-form-field>
+			<button mat-icon-button (click)="help('stroke-dashoffset')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		</mat-list-item>
 		<mat-divider></mat-divider>
 		<mat-list-item>
@@ -157,6 +170,7 @@
 					<mat-option *ngFor="let clip of defs.clipPaths" [value]="'url(#' + clip.id + ')'">{{ clip.id }}</mat-option>
 				</mat-autocomplete>
 			</mat-form-field>
+			<button mat-icon-button (click)="help('clip-path')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		</mat-list-item>
 		<mat-list-item>
 			<mat-form-field>
@@ -167,6 +181,7 @@
 					<mat-option value="evenodd" >evenodd</mat-option>
 				</mat-select>
 			</mat-form-field>
+			<button mat-icon-button (click)="help('clip-rule')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		</mat-list-item>
 		<mat-divider></mat-divider>
 		<mat-list-item>
@@ -177,6 +192,7 @@
 					<mat-option *ngFor="let fltr of defs.filters" [value]="'url(#' + fltr.id + ')'" >{{ fltr.id }}</mat-option>
 				</mat-autocomplete>
 			</mat-form-field>
+			<button mat-icon-button (click)="help('filter')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		</mat-list-item>
 		<mat-divider></mat-divider>
 		<mat-list-item>
@@ -187,6 +203,7 @@
 					<mat-option *ngFor="let marker of defs.markers" [value]="'url(#' + marker.id + ')'" >{{ marker.id }}</mat-option>
 				</mat-autocomplete>
 			</mat-form-field>
+			<button mat-icon-button (click)="help('marker-start')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		</mat-list-item>
 		<mat-list-item>
 			<mat-form-field>
@@ -196,6 +213,7 @@
 					<mat-option *ngFor="let marker of defs.markers" [value]="'url(#' + marker.id + ')'" >{{ marker.id }}</mat-option>
 				</mat-autocomplete>
 			</mat-form-field>
+			<button mat-icon-button (click)="help('marker-mid')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		</mat-list-item>
 		<mat-list-item>
 			<mat-form-field>
@@ -205,6 +223,7 @@
 					<mat-option *ngFor="let marker of defs.markers" [value]="'url(#' + marker.id + ')'" >{{ marker.id }}</mat-option>
 				</mat-autocomplete>
 			</mat-form-field>
+			<button mat-icon-button (click)="help('marker-end')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		</mat-list-item>
 		<mat-divider></mat-divider>
 		<mat-list-item>
@@ -215,6 +234,7 @@
 					<mat-option *ngFor="let msk of defs.masks" [value]="'url(#' + msk.id + ')'" >{{ msk.id }}</mat-option>
 				</mat-autocomplete>
 			</mat-form-field>
+			<button mat-icon-button (click)="help('mask')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		</mat-list-item>
 	</ng-container>
 </mat-list>
