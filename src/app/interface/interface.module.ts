@@ -13,6 +13,7 @@ import { GuideDialogComponent } from "./guide-dialog/guide-dialog.component";
 import { SidebarPropsComponent } from "./sidebar-props/sidebar-props.component";
 import { SidebarPresentationComponent } from "./sidebar-presentation/sidebar-presentation.component";
 import { SidebarTextComponent } from "./sidebar-text/sidebar-text.component";
+import { SidebarTransformComponent } from "./sidebar-transform/sidebar-transform.component";
 
 
 @NgModule({
@@ -28,6 +29,7 @@ import { SidebarTextComponent } from "./sidebar-text/sidebar-text.component";
 		SidebarPropsComponent,
 		SidebarPresentationComponent,
 		SidebarTextComponent,
+		SidebarTransformComponent,
 	],
 	entryComponents: [
 		HrefDialogComponent,

@@ -43,5 +43,16 @@
 
 			<app-sidebar-text [selection]="canvas.selection" ></app-sidebar-text>
 		</mat-expansion-panel>
+
+		<mat-expansion-panel>
+			<mat-expansion-panel-header>
+				<mat-panel-title class="savage-app-sidebar-header" >
+					<mat-icon svgIcon="matrix" ></mat-icon>
+					<span class="savage-app-sidebar-header-text" >Transform</span>
+				</mat-panel-title>
+			</mat-expansion-panel-header>
+
+			<app-sidebar-transform [selection]="canvas.selection" ></app-sidebar-transform>
+		</mat-expansion-panel>
 	</mat-accordion>
 </div>
