@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, Input, ViewChild, ElementRef } from "@angular/core";
 import { nanoid } from "nanoid/non-secure";
+import { applyToPoint, compose, fromDefinition, fromTransformAttribute } from "transformation-matrix";
 
 import { Observable } from "../../types/observer";
 import { SavageSVG, findParent, screen2svg } from "../../types/svg";
@@ -71,7 +72,7 @@ export class RectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 
 	handleMouseMove(event: PointerEvent): void {
 		if (this.draw) {
-			const xy = screen2svg(this.overlay.nativeElement, { x: event.clientX, y: event.clientY });
+			const xy = screen2svg(this.overlay.nativeElement, { x: event.pageX, y: event.pageY });
 			if (this.drawing) {
 				const tl = { x: parseFloat(this.drawing.attributes.x), y: parseFloat(this.drawing.attributes.y) };
 				if (event.ctrlKey) {
@@ -137,11 +138,14 @@ export class RectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	get bbox(): DOMRect {
-		const rect = this.canvas.registry[this.selection?.nid]?.getBoundingClientRect();
+		const rect = this.canvas.registry[this.selection?.nid]?.getBBox();
 		if (rect) {
-			const lt = screen2svg(this.overlay.nativeElement, { x: rect.left, y: rect.top });
-			const rb = screen2svg(this.overlay.nativeElement, { x: rect.right, y: rect.bottom });
-			return new DOMRect(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
+			const transform = this.selection.attributes.transform;
+			const matrix = transform
+				? compose(fromDefinition(fromTransformAttribute(transform)))
+				: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
+			const lt = applyToPoint(matrix, { x: rect.x, y: rect.y });
+			return new DOMRect(lt.x, lt.y, rect.width, rect.height);
 		}
 		return new DOMRect(0, 0, 0, 0);
 	}

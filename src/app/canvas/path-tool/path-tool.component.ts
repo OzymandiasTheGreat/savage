@@ -111,7 +111,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		this.mouseDownTimeout = null;
 		const mEvent = <MouseEvent> event.event;
 		const shift = mEvent.shiftKey;
-		const position = screen2svg(this.overlay.nativeElement, { x: mEvent.clientX, y: mEvent.clientY });
+		const position = screen2svg(this.overlay.nativeElement, { x: mEvent.pageX, y: mEvent.pageY });
 		if (this.path) {
 			if (shift) {
 				const point = new Point(position.x, position.y);
@@ -158,7 +158,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 
 	handleMouseDown(event: IDocumentEvent): void {
 		const ev = <MouseEvent> event.event;
-		const point = screen2svg(this.overlay.nativeElement, { x: ev.clientX, y: ev.clientY });
+		const point = screen2svg(this.overlay.nativeElement, { x: ev.pageX, y: ev.pageY });
 		this.selectbox = new Rectangle(new Point(point.x, point.y), new Size(0, 0));
 		if (!this.mouseDownTimeout) {
 			this.mouseDownTimeout = setTimeout(() => {
@@ -181,8 +181,19 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 
 	handleMouseMove(event: MouseEvent): void {
 		if (this.selectbox) {
-			const point = screen2svg(this.overlay.nativeElement, { x: event.clientX, y: event.clientY });
-			this.selectbox.size.set(point.x - this.selectbox.x, point.y - this.selectbox.y);
+			const point = screen2svg(this.overlay.nativeElement, { x: event.pageX, y: event.pageY });
+			if (this.selectbox.x < point.x) {
+				this.selectbox.size.width = point.x - this.selectbox.x;
+			} else {
+				this.selectbox.size.width += this.selectbox.x - point.x;
+				this.selectbox.x = point.x;
+			}
+			if (this.selectbox.y < point.y) {
+				this.selectbox.size.height = point.y - this.selectbox.y;
+			} else {
+				this.selectbox.size.height += this.selectbox.y - point.y;
+				this.selectbox.y = point.y;
+			}
 		}
 	}
 

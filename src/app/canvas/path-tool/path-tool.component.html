@@ -4,47 +4,45 @@
 	pointer-events="none"
 	[appAttrs]="document"
 	[skipAttrs]="['overflow', 'pointer-events']"
-	[style.transform]="'scale(' + scale + ')'"
 >
 	<ng-container *ngIf="canvas.activeTool === name" >
 		<ng-container *ngIf="!!path" >
 			<ng-container *ngFor="let segment of segments" >
 				<ng-container *ngIf="selection?.includes(segment)" >
 					<svg:line
-						[attr.x1]="segment.point.x + 4 * wx"
-						[attr.y1]="segment.point.y + 4 * hx"
-						[attr.x2]="segment.point.x + segment.handleIn.x - (15 * wx)"
+						[attr.x1]="segment.point.x + 4 * (wx / scale)"
+						[attr.y1]="segment.point.y + 4 * (hx / scale)"
+						[attr.x2]="segment.point.x + segment.handleIn.x - (15 * (wx / scale))"
 						[attr.y2]="segment.point.y + segment.handleIn.y"
 						vector-effect="non-scaling-size"
 						stroke="#212121"
-						[attr.stroke-width]="wx"
+						[attr.stroke-width]="(wx / scale)"
 						fill="none"
 					></svg:line>
 					<svg:line
-						[attr.x1]="segment.point.x + 4 * wx"
-						[attr.y1]="segment.point.y + 4 * hx"
-						[attr.x2]="segment.point.x + segment.handleOut.x + (15 * wx)"
+						[attr.x1]="segment.point.x + 4 * (wx / scale)"
+						[attr.y1]="segment.point.y + 4 * (hx / scale)"
+						[attr.x2]="segment.point.x + segment.handleOut.x + (15 * (wx / scale))"
 						[attr.y2]="segment.point.y + segment.handleOut.y"
 						vector-effect="non-scaling-size"
 						stroke="#212121"
-						[attr.stroke-width]="wx"
+						[attr.stroke-width]="(wx / scale)"
 						fill="none"
 					></svg:line>
 				</ng-container>
 				<svg:polygon
 					pointer-events="all"
 					tabindex="-1"
-					[attr.points]="(segment?.point.x + 4 * wx) + ',' + (segment?.point.y) + ' ' + (segment?.point.x + 8 * wx) + ',' + (segment?.point.y + 4 * hx) + ' ' + (segment?.point.x + 4 * wx) + ',' + (segment?.point.y + 8 * hx) + ' ' + (segment?.point.x) + ',' + (segment?.point.y + 4 * hx)"
-					[attr.transform]="'translate(' + (-4 * wx) + ', ' + (-4 * hx) + ')'"
+					[attr.points]="(segment?.point.x + 4 * (wx / scale)) + ',' + (segment?.point.y) + ' ' + (segment?.point.x + 8 * (wx / scale)) + ',' + (segment?.point.y + 4 * (hx / scale)) + ' ' + (segment?.point.x + 4 * (wx / scale)) + ',' + (segment?.point.y + 8 * (hx / scale)) + ' ' + (segment?.point.x) + ',' + (segment?.point.y + 4 * (hx / scale))"
 					vector-effect="non-scaling-size"
 					stroke="#212121"
-					[attr.stroke-width]="wx"
+					[attr.stroke-width]="(wx / scale)"
 					fill="#424242"
 					appDraggable
 					[containment]="scrollable"
 					[autoScroll]="scrollable"
 					[snap]="canvas.snap"
-					[transform]="'translate(' + (-4 * wx) + ', ' + (-4 * hx) + ')'"
+					[transform]="'translate(' + (-4 * (wx / scale)) + ', ' + (-4 * (hx / scale)) + ')'"
 					(dragging)="handleSegmentDrag(segment.index, $event)"
 					(mousedown)="onSegmentDown(segment, $event)"
 					(keydown)="onKeyDown(segment, $event)"
@@ -53,12 +51,12 @@
 				<ng-container *ngIf="selection?.includes(segment)" >
 					<svg:circle
 						pointer-events="all"
-						[attr.cx]="segment.point.x + segment.handleIn.x - (15 * wx)"
+						[attr.cx]="segment.point.x + segment.handleIn.x - (15 * (wx / scale))"
 						[attr.cy]="segment.point.y + segment.handleIn.y"
-						[attr.r]="3 * wx"
+						[attr.r]="3 * (wx / scale)"
 						vector-effect="non-scaling-size"
 						stroke="#212121"
-						[attr.stroke-width]="wx"
+						[attr.stroke-width]="(wx / scale)"
 						fill="#424242"
 						appDraggable
 						[containment]="scrollable"
@@ -68,12 +66,12 @@
 					></svg:circle>
 					<svg:circle
 						pointer-events="all"
-						[attr.cx]="segment.point.x + segment.handleOut.x + (15 * wx)"
+						[attr.cx]="segment.point.x + segment.handleOut.x + (15 * (wx / scale))"
 						[attr.cy]="segment.point.y + segment.handleOut.y"
-						[attr.r]="3 * wx"
+						[attr.r]="3 * (wx / scale)"
 						vector-effect="non-scaling-size"
 						stroke="#212121"
-						[attr.stroke-width]="wx"
+						[attr.stroke-width]="(wx / scale)"
 						fill="#424242"
 						appDraggable
 						[containment]="scrollable"
@@ -91,8 +89,8 @@
 					[attr.height]="selectbox.size.height"
 					fill="#42424233"
 					stroke="#212121"
-					[attr.stroke-width]="1 * wx"
-					[attr.stroke-dasharray]="[1 * wx, 2 * wx].join(' ')"
+					[attr.stroke-width]="1 * (wx / scale)"
+					[attr.stroke-dasharray]="[1 * (wx / scale), 1 * (wx / scale)].join(' ')"
 					vector-effect="non-scaling-size"
 				></svg:rect>
 			</ng-container>

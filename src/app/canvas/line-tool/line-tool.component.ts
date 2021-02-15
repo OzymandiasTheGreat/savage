@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, Input, ViewChild, ElementRef } from "@angular/core";
 import { nanoid } from "nanoid/non-secure";
-import { compose, fromDefinition, fromTransformAttribute, Matrix, applyToPoint, inverse } from "transformation-matrix";
+import { compose, fromDefinition, fromTransformAttribute, Matrix, applyToPoint, inverse, scale } from "transformation-matrix";
 import { parse as pointsParse, serialize as pointsSerialize } from "svg-numbers";
 import { Point, Rectangle, Size } from "paper";
 
@@ -94,7 +94,7 @@ export class LineToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		this.mouseDownTimeout = null;
 		if (this.poly) {
 			const mEvent = <PointerEvent> event.event;
-			const position = screen2svg(this.overlay.nativeElement, { x: mEvent.clientX, y: mEvent.clientY });
+			const position = screen2svg(this.overlay.nativeElement, { x: mEvent.pageX, y: mEvent.pageY });
 			const point = applyToPoint(inverse(this.matrix), position);
 			if (this.points) {
 				if (mEvent.shiftKey) {
@@ -129,7 +129,7 @@ export class LineToolComponent implements ICanvasTool, OnInit, OnDestroy {
 			}
 		} else {
 			const mEvent = <PointerEvent> event.event;
-			const position = screen2svg(this.overlay.nativeElement, { x: mEvent.clientX, y: mEvent.clientY });
+			const position = screen2svg(this.overlay.nativeElement, { x: mEvent.pageX, y: mEvent.pageY });
 			if (this.drawing) {
 				const parent = findParent(this.document, this.selection?.nid);
 				this.drawing.attributes.x2 = `${position.x}`;
@@ -158,7 +158,7 @@ export class LineToolComponent implements ICanvasTool, OnInit, OnDestroy {
 
 	handleMouseDown(event: IDocumentEvent): void {
 		const ev = <PointerEvent> event.event;
-		const point = screen2svg(this.overlay.nativeElement, { x: ev.clientX, y: ev.clientY });
+		const point = screen2svg(this.overlay.nativeElement, { x: ev.pageX, y: ev.pageY });
 		this.selectbox = new Rectangle(new Point(point.x, point.y), new Size(0, 0));
 		if (!this.mouseDownTimeout) {
 			this.mouseDownTimeout = setTimeout(() => {
@@ -179,7 +179,7 @@ export class LineToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	handleMouseMove(event: PointerEvent): void {
-		const point = screen2svg(this.overlay.nativeElement, { x: event.clientX, y: event.clientY });
+		const point = screen2svg(this.overlay.nativeElement, { x: event.pageX, y: event.pageY });
 		if (this.selectbox) {
 			if (this.selectbox.x <= point.x) {
 				this.selectbox.size.width = point.x - this.selectbox.x;
@@ -231,11 +231,14 @@ export class LineToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	get bbox(): DOMRect {
-		const rect = this.canvas.registry[this.selection?.nid]?.getBoundingClientRect();
+		const rect = this.canvas.registry[this.selection?.nid]?.getBBox();
 		if (rect) {
-			const lt = screen2svg(this.overlay.nativeElement, { x: rect.x, y: rect.y });
-			const rb = screen2svg(this.overlay.nativeElement, { x: rect.right, y: rect.bottom });
-			return new DOMRect(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
+			const transform = this.selection.attributes.transform;
+			const matrix = transform
+				? compose(fromDefinition(fromTransformAttribute(transform)))
+				: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
+			const lt = applyToPoint(matrix, { x: rect.x, y: rect.y });
+			return new DOMRect(lt.x, lt.y, rect.width, rect.height);
 		}
 		return new DOMRect(0, 0, 0, 0);
 	}

@@ -112,7 +112,7 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		this.mouseDownTimeout = null;
 		if (!this.regular) {
 			const mEvent = <PointerEvent> event.event;
-			const position = screen2svg(this.overlay.nativeElement, { x: mEvent.clientX, y: mEvent.clientY });
+			const position = screen2svg(this.overlay.nativeElement, { x: mEvent.pageX, y: mEvent.pageY });
 			const point = applyToPoint(inverse(this.matrix), position);
 			if (this.points) {
 				delete this.selection?.attributes["data-savage-polygon"];
@@ -161,7 +161,7 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 			}
 		} else {
 			const ev = <PointerEvent> event.event;
-			const point = screen2svg(this.overlay.nativeElement, { x: ev.clientX, y: ev.clientY });
+			const point = screen2svg(this.overlay.nativeElement, { x: ev.pageX, y: ev.pageY });
 			this.selectbox = new Rectangle(new Point(point.x, point.y), new Size(0, 0));
 			if (!this.mouseDownTimeout) {
 				this.mouseDownTimeout = setTimeout(() => {
@@ -184,7 +184,7 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 
 	handleMouseMove(event: PointerEvent): void {
 		if (this.regular && this.draw) {
-			const xy = screen2svg(this.overlay.nativeElement, { x: event.clientX, y: event.clientY });
+			const xy = screen2svg(this.overlay.nativeElement, { x: event.pageX, y: event.pageY });
 			if (this.drawing) {
 				const poly: SavagePolygon = JSON.parse(this.drawing.attributes["data-savage-polygon"]);
 				const d = { x: xy.x - poly.cx, y: xy.y - poly.cy };
@@ -228,14 +228,14 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				}
 			}
 		} else if (this.selectbox) {
-			const point = screen2svg(this.overlay.nativeElement, { x: event.clientX, y: event.clientY });
-			if (this.selectbox.x <= point.x) {
+			const point = screen2svg(this.overlay.nativeElement, { x: event.pageX, y: event.pageY });
+			if (this.selectbox.x < point.x) {
 				this.selectbox.size.width = point.x - this.selectbox.x;
 			} else {
 				this.selectbox.size.width += this.selectbox.x - point.x;
 				this.selectbox.x = point.x;
 			}
-			if (this.selectbox.y <= point.y) {
+			if (this.selectbox.y < point.y) {
 				this.selectbox.size.height = point.y - this.selectbox.y;
 			} else {
 				this.selectbox.size.height += this.selectbox.y - point.y;
@@ -273,11 +273,14 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	get bbox(): DOMRect {
-		const rect = this.canvas.registry[this.selection?.nid]?.getBoundingClientRect();
+		const rect = this.canvas.registry[this.selection?.nid]?.getBBox();
 		if (rect) {
-			const lt = screen2svg(this.overlay.nativeElement, { x: rect.x, y: rect.y });
-			const rb = screen2svg(this.overlay.nativeElement, { x: rect.right, y: rect.bottom });
-			return new DOMRect(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
+			const transform = this.selection.attributes.transform;
+			const matrix = transform
+				? compose(fromDefinition(fromTransformAttribute(transform)))
+				: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
+			const lt = applyToPoint(matrix, { x: rect.x, y: rect.y });
+			return new DOMRect(lt.x, lt.y, rect.width, rect.height);
 		}
 		return new DOMRect(0, 0, 0, 0);
 	}
