@@ -22,7 +22,7 @@ export interface ICanvasTool {
 	providedIn: "root"
 })
 export class CanvasService {
-	registry: Record<string, SVGElement> = {};
+	registry: Record<string, SVGSVGElement> = {};
 	selection: Observable<SavageSVG>[] = [];
 	tools: Record<string, ICanvasTool> = {};
 	activeTool = "OBJECT";

@@ -19,7 +19,9 @@ export class SidebarTransformComponent implements OnInit {
 		if (render && render.length) {
 			const transform = render[0].attributes.transform;
 			if (render.every((e) => e.attributes.transform === transform)) {
-				return compose(fromDefinition(fromTransformAttribute(transform)));
+				return transform
+					? compose(fromDefinition(fromTransformAttribute(transform)))
+					: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
 			}
 			return null;
 		}

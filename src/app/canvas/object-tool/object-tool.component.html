@@ -4,7 +4,6 @@
 	pointer-events="none"
 	[appAttrs]="document"
 	[skipAttrs]="['overflow', 'pointer-events']"
-	[style.transform]="'scale(' + scale + ')'"
 >
 	<ng-container *ngIf="canvas.activeTool === name">
 		<ng-container *ngFor="let node of selection" >
@@ -15,8 +14,8 @@
 				[attr.height]="bbox(node).height"
 				fill="none"
 				stroke="#212121"
-				[attr.stroke-width]="2 * wx"
-				[attr.stroke-dasharray]="[2 * wx, 3 * wx].join(' ')"
+				[attr.stroke-width]="1 * wx / scale"
+				[attr.stroke-dasharray]="[1 * wx / scale, 1 * wx / scale].join(' ')"
 				vector-effect="non-scaling-size"
 			></svg:rect>
 			<!-- Scale handles -->
@@ -29,14 +28,14 @@
 					[snap]="canvas.snap"
 					(dragging)="scaleNode(node, corner, $event)"
 					(mousedown)="onMouseDown($event, node)"
-					[attr.x]="corner.endsWith('Left') ? bbox(node).x - 7 * wx : bbox(node).right - 11 * wx"
-					[attr.y]="corner.startsWith('top') ? bbox(node).y - 7 * hx : bbox(node).bottom - 11 * hx"
-					[attr.width]="18 * wx"
-					[attr.height]="18 * hx"
+					[attr.x]="corner.endsWith('Left') ? bbox(node).x - 7 * (wx / scale) : bbox(node).right - 11 * (wx / scale)"
+					[attr.y]="corner.startsWith('top') ? bbox(node).y - 7 * (hx / scale) : bbox(node).bottom - 11 * (hx / scale)"
+					[attr.width]="18 * wx / scale"
+					[attr.height]="18 * hx / scale"
 					viewBox="0 0 24 24"
 					fill="#212121"
 					stroke="#212121"
-					stroke-width="1"
+					[attr.stroke-width]="1 / scale"
 					vector-effect="non-scaling-size"
 				>
 					<ng-container [ngSwitch]="corner" >
@@ -59,14 +58,14 @@
 					[snap]="canvas.snap"
 					(dragging)="rotateNode(node, $event)"
 					(mousedown)="onMouseDown($event, node)"
-					[attr.x]="bbox(node).x - 11 * wx"
-					[attr.y]="bbox(node).y - 11 * hx"
-					[attr.width]="18 * wx"
-					[attr.height]="18 * hx"
+					[attr.x]="bbox(node).x - 11 * (wx / scale)"
+					[attr.y]="bbox(node).y - 11 * (hx / scale)"
+					[attr.width]="18 * wx / scale"
+					[attr.height]="18 * hx / scale"
 					viewBox="0 0 24 24"
 					fill="#212121"
 					stroke="#212121"
-					stroke-width="1"
+					[attr.stroke-width]="1 / scale"
 					vector-effect="non-scaling-size"
 				>
 					<svg:path transform="translate(-2, -2) rotate(-45, 7, 7)" d="M18.4,10.6C16.55,9 14.15,8 11.5,8C6.85,8 2.92,11.03 1.54,15.22L3.9,16C4.95,12.81 7.95,10.5 11.5,10.5C13.45,10.5 15.23,11.22 16.62,12.38L13,16H22V7L18.4,10.6Z" ></svg:path>
@@ -85,14 +84,14 @@
 						[snap]="canvas.snap"
 						(dragging)="skewNode(node, axis, $event)"
 						(mousedown)="onMouseDown($event, node)"
-						[attr.x]="axis === 'x' ? bbox(node).x + bbox(node).width / 2 - 9 * wx : bbox(node).right - 9 * wx"
-						[attr.y]="axis === 'y' ? bbox(node).y + bbox(node).height / 2 - 9 * hx : bbox(node).bottom - 9 * hx"
-						[attr.width]="18 * wx"
-						[attr.height]="18 * hx"
+						[attr.x]="axis === 'x' ? bbox(node).x + bbox(node).width / 2 - 9 * (wx / scale) : bbox(node).right - 9 * (wx / scale)"
+						[attr.y]="axis === 'y' ? bbox(node).y + bbox(node).height / 2 - 9 * (hx / scale) : bbox(node).bottom - 9 * (hx / scale)"
+						[attr.width]="18 * wx / scale"
+						[attr.height]="18 * hx / scale"
 						viewBox="0 0 24 24"
 						fill="#212121"
 						stroke="#212121"
-						stroke-width="1"
+						[attr.stroke-width]="1 / scale"
 						vector-effect="non-scaling-size"
 					>
 						<svg:path *ngIf="axis === 'x'" d="M8,14V18L2,12L8,6V10H16V6L22,12L16,18V14H8Z" ></svg:path>
@@ -110,8 +109,8 @@
 				[attr.height]="selectbox.height"
 				fill="#42424233"
 				stroke="#212121"
-				[attr.stroke-width]="1 * wx"
-				[attr.stroke-dasharray]="[1 * wx, 2 * wx].join(' ')"
+				[attr.stroke-width]="1 * wx / scale"
+				[attr.stroke-dasharray]="[1 * wx / scale, 1 * wx / scale].join(' ')"
 				vector-effect="non-scaling-size"
 			></svg:rect>
 		</ng-container>

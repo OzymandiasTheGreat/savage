@@ -66,11 +66,14 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	bbox(node: Observable<SavageSVG>): DOMRect {
-		const rect = this.canvas.registry[node?.nid]?.getBoundingClientRect();
+		const rect = this.canvas.registry[node?.nid]?.getBBox();
 		if (rect) {
-			const lt = screen2svg(this.overlay.nativeElement, { x: rect.left, y: rect.top });
-			const rb = screen2svg(this.overlay.nativeElement, { x: rect.right, y: rect.bottom });
-			return new DOMRect(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
+			const transform = node.attributes.transform;
+			const matrix = transform
+				? compose(fromDefinition(fromTransformAttribute(transform)))
+				: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
+			const lt = applyToPoint(matrix, { x: rect.x, y: rect.y });
+			return new DOMRect(lt.x, lt.y, rect.width, rect.height);
 		}
 		return new DOMRect(0, 0, 0, 0);
 	}
@@ -127,7 +130,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		const alt = ev.altKey;
 		if (!node) {
 			if (!shift) {
-				const point = screen2svg(this.overlay.nativeElement, { x: ev.clientX, y: ev.clientY });
+				const point = screen2svg(this.overlay.nativeElement, { x: ev.pageX, y: ev.pageY });
 				this.selectbox = new Rectangle(point.x, point.y, 0, 0);
 				this.canvas.selection = [];
 			}
@@ -157,8 +160,19 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 
 	handleMouseMove(event: MouseEvent): void {
 		if (this.selectbox) {
-			const point = screen2svg(this.overlay.nativeElement, { x: event.clientX, y:  event.clientY });
-			this.selectbox.set(this.selectbox.x, this.selectbox.y, point.x - this.selectbox.x, point.y - this.selectbox.y);
+			const point = screen2svg(this.overlay.nativeElement, { x: event.pageX, y:  event.pageY });
+			if (this.selectbox.x < point.x) {
+				this.selectbox.size.width = point.x - this.selectbox.x;
+			} else {
+				this.selectbox.size.width += this.selectbox.x - point.x;
+				this.selectbox.x = point.x;
+			}
+			if (this.selectbox.y < point.y) {
+				this.selectbox.size.height = point.y - this.selectbox.y;
+			} else {
+				this.selectbox.size.height += this.selectbox.y - point.y;
+				this.selectbox.y = point.y;
+			}
 		}
 	}
 

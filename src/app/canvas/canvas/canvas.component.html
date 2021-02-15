@@ -22,7 +22,7 @@
 				(handleDblClick)="handleDblClick($event)"
 				(handleMouseDown)="handleMouseDown($event)"
 				(handleKeyDown)="handleKeyDown($event)" ></app-document>
-			<app-object-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" ></app-object-tool>
+			<app-object-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" [scale]="scale" ></app-object-tool>
 			<app-path-tool [document]="document" [scrollable]="scrollable" [node]="canvas.selection" ></app-path-tool>
 			<app-line-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" ></app-line-tool>
 			<app-rect-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" ></app-rect-tool>

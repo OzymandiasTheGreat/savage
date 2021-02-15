@@ -552,7 +552,6 @@
 	pointer-events="all"
 	[appAttrs]="document"
 	[skipAttrs]="['tabindex', 'overflow', 'pointer-events']"
-	[style.transform]="'scale(' + scale + ')'"
 >
 	<ng-container *ngFor="let node of document.children" >
 		<ng-container *ngTemplateOutlet="animation; context: { $implicit: node }" ></ng-container>
