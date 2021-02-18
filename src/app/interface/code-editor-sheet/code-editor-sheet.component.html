@@ -1,0 +1,9 @@
+<div class="savage-app-code-sheet" (keydown)="onKeyDown($event)" >
+	<div class="savage-app-code-sheet-editor">
+		<ngx-monaco-editor cdkFocusInitial style="height: 100%;" [options]="options" [(ngModel)]="data.data" ></ngx-monaco-editor>
+	</div>
+	<div class="savage-app-code-sheet-actions" >
+		<button mat-button color="accent" (click)="close()" >Cancel</button>
+		<button mat-button color="accent" (click)="save()" >Save</button>
+	</div>
+</div>

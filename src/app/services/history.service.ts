@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { Subject, Observable as RxObservable } from "rxjs";
 
 import { Change, Observable, recursiveUnobserve } from "../types/observer";
 import { SavageSVG } from "../types/svg";
@@ -20,8 +21,10 @@ export class HistoryService {
 	private history: Change[];
 	private observer = this.changeObserver.bind(this);
 	private currentIndex = 0;
+	private _operation: Subject<boolean>;
 	_undo: HistorySnapshot[] = [];
 	_redo: HistorySnapshot[] = [];
+	operation: RxObservable<boolean>;
 
 	constructor(
 		protected file: SvgFileService,
@@ -36,6 +39,8 @@ export class HistoryService {
 			this.currentFile = openFile;
 			this.currentFile.observe(this.observer);
 		});
+		this._operation = new Subject<boolean>();
+		this.operation = this._operation.asObservable();
 	}
 
 	private changeObserver(changes: Change[]): void {
@@ -49,6 +54,7 @@ export class HistoryService {
 	}
 
 	undo(amount: number): void {
+		this._operation.next(true);
 		const snapshots = this._undo.slice().reverse();
 		const last = snapshots[0];
 		const first = snapshots[amount - 1];
@@ -79,9 +85,11 @@ export class HistoryService {
 		this.currentFile.observe(this.observer);
 		const slice = this._undo.splice(this._undo.length - amount, amount);
 		this._redo = this._redo.concat(slice.reverse());
+		this._operation.next(false);
 	}
 
 	redo(amount: number): void {
+		this._operation.next(true);
 		const snapshots = this._redo.slice().reverse().slice(0, amount);
 		this.currentFile.unobserve(this.observer);
 		for (const snapshot of snapshots) {
@@ -106,5 +114,6 @@ export class HistoryService {
 		}
 		this.currentFile.observe(this.observer);
 		this._undo = this._undo.concat(this._redo.splice(this._redo.length - amount, amount).reverse());
+		this._operation.next(false);
 	}
 }

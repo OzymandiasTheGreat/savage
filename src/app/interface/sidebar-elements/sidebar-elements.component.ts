@@ -23,6 +23,7 @@ import { SvgFileService, IDefinitions } from "../../services/svg-file.service";
 import { CanvasService } from "../../services/canvas.service";
 import { HrefDialogComponent, HrefData } from "../href-dialog/href-dialog.component";
 import { HistoryService } from "../../services/history.service";
+import { HotkeyService } from "../../services/hotkey.service";
 
 
 @Component({
@@ -35,7 +36,9 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 		for (const change of changes) {
 			// if (change.path.includes("children") && ["insert", "delete"].includes(change.type)) {
 			if (!change.path.includes("attributes") && ["insert", "delete"].includes(change.type)) {
-				this.tree.treeModel.update();
+				if (!this.historyOp) {
+					this.tree.treeModel.update();
+				}
 				if (change.type === "insert") {
 					const name = change.value.name;
 					const nid = change.value.nid;
@@ -206,10 +209,12 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 	primitives = PRIMITIVES;
 	primitivesFiltered = PRIMITIVES.filter((p) => !p.startsWith("feFunc") && !p.endsWith("Node"));
 	containmentMap = CONTAINMENT_MAP;
+	historyOp: boolean;
 
 	constructor(
 		protected dialog: MatDialog,
 		protected history: HistoryService,
+		protected hotkey: HotkeyService,
 		public file: SvgFileService,
 		public canvas: CanvasService,
 	) { }
@@ -261,6 +266,18 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 			this.root.observe(this._treeObserver);
 		});
 		this.file.definitions.subscribe((defs) => this.definitions = defs);
+		this.history.operation.subscribe((start) => this.historyOp = start);
+		this.hotkey.triggered.subscribe((key) => {
+			switch (key) {
+				case "elements":
+					document.getElementById("savage-app-sidebar-el-tree").focus();
+					this.tree.treeModel.setFocus(true);
+					break;
+				case "elem-toolbar":
+					document.getElementById("savage-app-sidebar-toolbar").focus();
+					break;
+			}
+		});
 	}
 
 	ngOnChanges(changes: SimpleChanges): void {

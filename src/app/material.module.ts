@@ -23,6 +23,7 @@ import { MatTabsModule } from "@angular/material/tabs";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatSelectModule } from "@angular/material/select";
+import { MatBottomSheetModule } from "@angular/material/bottom-sheet";
 
 import { TextFieldModule } from "@angular/cdk/text-field";
 import { DragDropModule } from "@angular/cdk/drag-drop";
@@ -31,6 +32,7 @@ import { NgxMatFileInputModule } from "@angular-material-components/file-input";
 import { MccColorPickerModule } from "material-community-components/color-picker";
 import { TreeModule } from "@circlon/angular-tree-component";
 import { EditableModule, EDITABLE_CONFIG, EditableConfig } from "@ngneat/edit-in-place";
+import { MonacoEditorModule } from "ngx-monaco-editor";
 
 
 @NgModule({
@@ -59,12 +61,14 @@ import { EditableModule, EDITABLE_CONFIG, EditableConfig } from "@ngneat/edit-in
 		MatAutocompleteModule,
 		MatDialogModule,
 		MatSelectModule,
+		MatBottomSheetModule,
 		TextFieldModule,
 		DragDropModule,
 		NgxMatFileInputModule,
 		MccColorPickerModule.forRoot({ empty_color: "transparent" }),
 		TreeModule,
 		EditableModule,
+		MonacoEditorModule.forRoot(),
 	],
 	exports: [
 		BrowserAnimationsModule,
@@ -89,12 +93,14 @@ import { EditableModule, EDITABLE_CONFIG, EditableConfig } from "@ngneat/edit-in
 		MatAutocompleteModule,
 		MatDialogModule,
 		MatSelectModule,
+		MatBottomSheetModule,
 		TextFieldModule,
 		DragDropModule,
 		NgxMatFileInputModule,
 		MccColorPickerModule,
 		TreeModule,
 		EditableModule,
+		MonacoEditorModule,
 	],
 	providers: [
 		{

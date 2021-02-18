@@ -14,6 +14,7 @@ import { SidebarPropsComponent } from "./sidebar-props/sidebar-props.component";
 import { SidebarPresentationComponent } from "./sidebar-presentation/sidebar-presentation.component";
 import { SidebarTextComponent } from "./sidebar-text/sidebar-text.component";
 import { SidebarTransformComponent } from "./sidebar-transform/sidebar-transform.component";
+import { CodeEditorSheetComponent } from "./code-editor-sheet/code-editor-sheet.component";
 
 
 @NgModule({
@@ -30,10 +31,12 @@ import { SidebarTransformComponent } from "./sidebar-transform/sidebar-transform
 		SidebarPresentationComponent,
 		SidebarTextComponent,
 		SidebarTransformComponent,
+		CodeEditorSheetComponent,
 	],
 	entryComponents: [
 		HrefDialogComponent,
 		GuideDialogComponent,
+		CodeEditorSheetComponent,
 	],
 	imports: [
 		CommonModule,

@@ -79,7 +79,6 @@ export class DocumentComponent implements OnInit {
 
 	onKeyDown(event: KeyboardEvent, node: Observable<SavageSVG>): void {
 		if (event.key !== " ") {
-			event.stopPropagation();
 			this.handleKeyDown.emit({ event, node });
 		}
 	}

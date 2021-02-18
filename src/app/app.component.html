@@ -1,14 +1,16 @@
-<app-menubar [sidedrawer]="sidedrawer" [sidebar]="sidebar" ></app-menubar>
-<mat-sidenav-container class="savage-app-container" >
-	<mat-sidenav #sidedrawer mode="over" [fixedInViewport]="true" class="savage-app-drawer" >
-		<app-drawer></app-drawer>
-	</mat-sidenav>
-	<mat-sidenav #sidebar mode="side" [fixedInViewport]="true" fixedTopGap="48" position="end" opened class="savage-app-sidebar" >
-		<app-sidebar></app-sidebar>
-	</mat-sidenav>
-	<mat-sidenav-content class="savage-app-content" >
-		<app-toolbar>
-			<app-canvas></app-canvas>
-		</app-toolbar>
-	</mat-sidenav-content>
-</mat-sidenav-container>
+<div class="savage-app" (keydown)="onKeyDown($event)" >
+	<app-menubar [sidedrawer]="sidedrawer" [sidebar]="sidebar" ></app-menubar>
+	<mat-sidenav-container class="savage-app-container" >
+		<mat-sidenav #sidedrawer mode="over" [fixedInViewport]="true" class="savage-app-drawer" >
+			<app-drawer></app-drawer>
+		</mat-sidenav>
+		<mat-sidenav #sidebar mode="side" [fixedInViewport]="true" fixedTopGap="48" position="end" opened class="savage-app-sidebar" >
+			<app-sidebar></app-sidebar>
+		</mat-sidenav>
+		<mat-sidenav-content class="savage-app-content" >
+			<app-toolbar>
+				<app-canvas></app-canvas>
+			</app-toolbar>
+		</mat-sidenav-content>
+	</mat-sidenav-container>
+</div>

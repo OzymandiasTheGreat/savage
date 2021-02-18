@@ -5,6 +5,7 @@
 // @include mcc-theme($demo-theme);
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
 
 :root {
 	--accent: #33691e;
@@ -37,6 +38,11 @@ html, body {
 			}
 		}
 	}
+}
+
+.savage-app-bottom-sheet {
+	min-width: 80vw !important;
+	max-width: 80vw !important;
 }
 
 .node-drop-slot.is-dragging-over {

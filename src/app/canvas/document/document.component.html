@@ -1,5 +1,5 @@
 <ng-template #animation let-node >
-	<ng-container [ngSwitch]="node.name" >
+	<ng-container [ngSwitch]="node?.name" >
 		<svg:animate *ngSwitchCase="'animate'" [appAttrs]="node" ></svg:animate>
 		<svg:animateMotion *ngSwitchCase="'animateMotion'" [appAttrs]="node" >
 			<svg:mpath *ngFor="let n of node.children" [appAttrs]="n" ></svg:mpath>
@@ -12,7 +12,7 @@
 
 
 <ng-template #text let-node >
-	<ng-container [ngSwitch]="node.name" >
+	<ng-container [ngSwitch]="node?.name" >
 		<svg:tspan *ngSwitchCase="'tspan'"
 			[appAttrs]="node"
 			[skipAttrs]="['tabindex', 'pointer-events']"
@@ -40,7 +40,7 @@
 
 
 <ng-template #graphics let-node >
-	<ng-container [ngSwitch]="node.name" >
+	<ng-container [ngSwitch]="node?.name" >
 		<svg:circle *ngSwitchCase="'circle'"
 			[appAttrs]="node"
 			[skipAttrs]="['tabindex', 'pointer-events']"
@@ -247,7 +247,7 @@
 
 
 <ng-template #gradient let-node >
-	<ng-container [ngSwitch]="node.name" >
+	<ng-container [ngSwitch]="node?.name" >
 		<svg:linearGradient *ngSwitchCase="'linearGradient'" [appAttrs]="node" >
 			<ng-container *ngFor="let n of node.children" >
 				<ng-container *ngTemplateOutlet="animation; context: { $implicit: n }" ></ng-container>
@@ -272,7 +272,7 @@
 
 
 <ng-template #primitive let-node >
-	<ng-container [ngSwitch]="node.name" >
+	<ng-container [ngSwitch]="node?.name" >
 		<svg:feBlend *ngSwitchCase="'feBlend'" [appAttrs]="node" >
 			<ng-container *ngFor="let n of node.children" >
 				<ng-container *ngTemplateOutlet="animation; context: { $implicit: n } "></ng-container>
@@ -420,7 +420,7 @@
 
 
 <ng-template #misc let-node >
-	<ng-container [ngSwitch]="node.name" >
+	<ng-container [ngSwitch]="node?.name" >
 		<svg:clipPath *ngSwitchCase="'clipPath'" [appAttrs]="node" >
 			<ng-container *ngFor="let n of node.children" >
 				<ng-container *ngTemplateOutlet="animation; context: { $implicit: n }"></ng-container>
@@ -451,7 +451,7 @@
 
 
 <ng-template #container let-node >
-	<ng-container [ngSwitch]="node.name" >
+	<ng-container [ngSwitch]="node?.name" >
 		<svg:a *ngSwitchCase="'a'" [appAttrs]="node" >
 			<ng-container *ngFor="let n of node.children" >
 				<ng-container *ngTemplateOutlet="animation; context: { $implicit: n }" ></ng-container>

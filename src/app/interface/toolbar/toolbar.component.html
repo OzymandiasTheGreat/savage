@@ -1,56 +1,65 @@
 <mat-toolbar color="primary">
-	<mat-button-toggle-group [vertical]="true" (click)="options.close()" (contextmenu)="$event.preventDefault(); options.toggle()" >
+	<mat-button-toggle-group [disabled]="disabled" [vertical]="true" (click)="options.close()" (contextmenu)="rightClick($event)" >
 		<mat-button-toggle matTooltip="Select and transform objects"
 			[checked]="canvas.activeTool === 'OBJECT'"
 			(click)="setTool('OBJECT')"
+			(contextmenu)="setTool('OBJECT')"
 		>
 			<mat-icon svgIcon="cursor-default" ></mat-icon>
 		</mat-button-toggle>
 		<mat-button-toggle matTooltip="Edit paths and curves"
 			[checked]="canvas.activeTool === 'PATH'"
 			(click)="setTool('PATH')"
+			(contextmenu)="setTool('PATH')"
 		>
 			<mat-icon svgIcon="vector-curve" ></mat-icon>
 		</mat-button-toggle>
 		<mat-button-toggle matTooltip="Draw lines"
 			[checked]="canvas.activeTool === 'LINE'"
 			(click)="setTool('LINE')"
+			(contextmenu)="setTool('LINE')"
 		>
 			<mat-icon svgIcon="vector-line" ></mat-icon>
 		</mat-button-toggle>
 		<mat-button-toggle matTooltip="Draw rectangles or squares"
 			[checked]="canvas.activeTool === 'RECT'"
 			(click)="setTool('RECT')"
+			(contextmenu)="setTool('RECT')"
 		>
 			<mat-icon svgIcon="vector-square" ></mat-icon>
 		</mat-button-toggle>
 		<mat-button-toggle matTooltip="Draw arcs, circles or ellipses"
 			[checked]="canvas.activeTool === 'CIRCLE'"
 			(click)="setTool('CIRCLE')"
+			(contextmenu)="setTool('CIRCLE')"
 		>
 			<mat-icon svgIcon="vector-circle-variant" ></mat-icon>
 		</mat-button-toggle>
 		<mat-button-toggle matTooltip="Draw stars and polygons"
 			[checked]="canvas.activeTool === 'POLYGON'"
 			(click)="setTool('POLYGON')"
+			(contextmenu)="setTool('POLYGON')"
 		>
 			<mat-icon svgIcon="vector-polygon" ></mat-icon>
 		</mat-button-toggle>
 		<mat-button-toggle matTooltip="Add or edit text"
 			[checked]="canvas.activeTool === 'TEXT'"
 			(click)="setTool('TEXT')"
+			(contextmenu)="setTool('TEXT')"
 		>
 			<mat-icon svgIcon="signature-text" ></mat-icon>
 		</mat-button-toggle>
 		<mat-button-toggle matTooltip="Draw freehand lines and curves"
 			[checked]="canvas.activeTool === 'FREEHAND'"
 			(click)="setTool('FREEHAND')"
+			(contextmenu)="setTool('FREEHAND')"
 		>
 			<mat-icon svgIcon="pencil" ></mat-icon>
 		</mat-button-toggle>
 		<mat-button-toggle matTooltip="Create gradients"
 			[checked]="canvas.activeTool === 'GRADIENT'"
 			(click)="setTool('GRADIENT')"
+			(contextmenu)="setTool('GRADIENT')"
 		>
 			<mat-icon svgIcon="gradient" ></mat-icon>
 		</mat-button-toggle>
@@ -190,5 +199,8 @@
 			</div>
 		</ng-container>
 	</mat-drawer>
-	<mat-drawer-content><ng-content></ng-content></mat-drawer-content>
+	<mat-drawer-content>
+		<ng-content></ng-content>
+		<button mat-fab class="savage-app-toolbar-fab" [disabled]="disabled" color="accent" (click)="rawEdit()" ><mat-icon svgIcon="xml" ></mat-icon></button>
+	</mat-drawer-content>
 </mat-drawer-container>

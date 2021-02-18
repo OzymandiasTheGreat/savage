@@ -127,7 +127,7 @@ export class SvgFileService {
 		}
 	}
 
-	private async parseSVG(data: string): Promise<SavageSVG> {
+	async parseSVG(data: string): Promise<SavageSVG> {
 		this._definitions =  {
 			gradients: [], patterns: [], masks: [], filters: [], symbols: [], paths: [], markers: [], graphics: [], clipPaths: [],
 		};

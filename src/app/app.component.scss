@@ -1,27 +1,31 @@
-.savage-app-container {
-	height: calc(100% - 48px);
+.savage-app {
+	display: contents;
 
-	.savage-app-drawer {
-		min-width: 300px;
-	}
+	&-container {
+		height: calc(100% - 48px);
 
-	// .savage-app-content {
-	// 	display: grid;
-	// 	grid-template-rows: [top] 100%;
-	// 	grid-template-columns: [left] 48px [center] calc(100% - 48px);
+		.savage-app-drawer {
+			min-width: 300px;
+		}
 
-	// 	app-toolbar {
-	// 		grid-row: top;
-	// 		grid-column: left;
-	// 	}
+		// .savage-app-content {
+		// 	display: grid;
+		// 	grid-template-rows: [top] 100%;
+		// 	grid-template-columns: [left] 48px [center] calc(100% - 48px);
 
-	// 	app-canvas {
-	// 		grid-row: top;
-	// 		grid-column: center;
-	// 	}
-	// }
+		// 	app-toolbar {
+		// 		grid-row: top;
+		// 		grid-column: left;
+		// 	}
 
-	.savage-app-sidebar {
-		min-width: 375px;
+		// 	app-canvas {
+		// 		grid-row: top;
+		// 		grid-column: center;
+		// 	}
+		// }
+
+		.savage-app-sidebar {
+			min-width: 375px;
+		}
 	}
 }

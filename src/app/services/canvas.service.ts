@@ -25,7 +25,7 @@ export class CanvasService {
 	registry: Record<string, SVGSVGElement> = {};
 	selection: Observable<SavageSVG>[] = [];
 	tools: Record<string, ICanvasTool> = {};
-	activeTool = "OBJECT";
+	activeTool = null;
 
 	grid: { enabled: boolean, step: number } = { enabled: false, step: 50 };
 	guides: ISnapTarget[] = [];

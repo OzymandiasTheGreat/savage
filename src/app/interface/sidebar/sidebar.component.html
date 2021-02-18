@@ -1,6 +1,6 @@
-<div #scrollable >
-	<mat-accordion class="savage-app-sidebar" [multi]="true" >
-		<mat-expansion-panel #elemPanel [expanded]="true" >
+<div #scrollable (keydown)="onKeyDown($event)" >
+	<mat-accordion #accordion="matAccordion" class="savage-app-sidebar" [multi]="true" >
+		<mat-expansion-panel #elemPanel="matExpansionPanel" [expanded]="true" >
 			<mat-expansion-panel-header>
 				<mat-panel-title class="savage-app-sidebar-header" >
 					<mat-icon svgIcon="vector-selection" ></mat-icon>
@@ -11,7 +11,7 @@
 			<app-sidebar-elements [selection]="canvas.selection" [scrollable]="scrollable" ></app-sidebar-elements>
 		</mat-expansion-panel>
 
-		<mat-expansion-panel >
+		<mat-expansion-panel #propPanel="matExpansionPanel" >
 			<mat-expansion-panel-header>
 				<mat-panel-title class="savage-app-sidebar-header" >
 					<mat-icon svgIcon="scatter-plot" ></mat-icon>
@@ -22,7 +22,7 @@
 			<app-sidebar-props [selection]="canvas.selection" ></app-sidebar-props>
 		</mat-expansion-panel>
 
-		<mat-expansion-panel >
+		<mat-expansion-panel #presentationPanel="matExpansionPanel" >
 			<mat-expansion-panel-header>
 				<mat-panel-title class="savage-app-sidebar-header" >
 					<mat-icon svgIcon="presentation" ></mat-icon>
@@ -33,7 +33,7 @@
 			<app-sidebar-presentation [selection]="canvas.selection" ></app-sidebar-presentation>
 		</mat-expansion-panel>
 
-		<mat-expansion-panel>
+		<mat-expansion-panel #textPanel="matExpansionPanel" >
 			<mat-expansion-panel-header>
 				<mat-panel-title class="savage-app-sidebar-header" >
 					<mat-icon svgIcon="format-text" ></mat-icon>
@@ -44,7 +44,7 @@
 			<app-sidebar-text [selection]="canvas.selection" ></app-sidebar-text>
 		</mat-expansion-panel>
 
-		<mat-expansion-panel>
+		<mat-expansion-panel #transformPanel="matExpansionPanel" >
 			<mat-expansion-panel-header>
 				<mat-panel-title class="savage-app-sidebar-header" >
 					<mat-icon svgIcon="matrix" ></mat-icon>

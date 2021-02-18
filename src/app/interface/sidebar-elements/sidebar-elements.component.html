@@ -3,7 +3,7 @@
 	<a mat-tab-link [active]="activeView === 'defs'" (click)="switchView('defs')" >Definitions</a>
 </nav>
 
-<div class="savage-app-sidebar-el-tree">
+<div tabindex="-1" id="savage-app-sidebar-el-tree" class="savage-app-sidebar-el-tree">
 	<!-- [BUG] If tree's visibility is set to other than visible it also hides elements on canvas -->
 	<tree-root #tree [nodes]="data" [options]="options" [(state)]="state" style="visibility: visible;" >
 		<ng-template #treeNodeWrapperTemplate let-node let-index="index" >
@@ -110,7 +110,7 @@
 </div>
 
 
-<mat-toolbar class="savage-app-sidebar-toolbar" >
+<mat-toolbar tabindex="-1" id="savage-app-sidebar-toolbar" class="savage-app-sidebar-toolbar" >
 	<div class="savage-app-sidebar-toolbar-left">
 		<button mat-icon-button matTooltip="Group" [disabled]="!canGroup(tree.treeModel.activeNodes)" (click)="groupNodes(tree.treeModel.activeNodes)" ><mat-icon svgIcon="group" ></mat-icon></button>
 		<button mat-icon-button matTooltip="Link" [disabled]="!canLink(tree.treeModel.activeNodes)" (click)="linkNodes(tree.treeModel.activeNodes)" ><mat-icon svgIcon="link" ></mat-icon></button>
