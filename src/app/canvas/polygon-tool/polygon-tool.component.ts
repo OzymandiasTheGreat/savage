@@ -140,7 +140,7 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 					type: "element",
 					value: "",
 					children: <any> [],
-					attributes: <any> { points: `${position.x},${position.y}` },
+					attributes: <any> { points: `${position.x},${position.y}`, fill: "currentColor" },
 				};
 				this.document.children.push(<any> node);
 				this.canvas.selection = [find(this.document, nid)];
@@ -220,6 +220,7 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 						value: "",
 						attributes: <any> {
 							points: pointsSerialize(path.segments.map((s) => [s.point.x, s.point.y])),
+							fill: "currentColor",
 							"data-savage-polygon": JSON.stringify(poly),
 						},
 						children: <any> [],
@@ -273,14 +274,18 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	get bbox(): DOMRect {
-		const rect = this.canvas.registry[this.selection?.nid]?.getBBox();
+		// const rect = this.canvas.registry[this.selection?.nid]?.getBBox();
+		const rect = this.canvas.registry[this.selection?.nid]?.getBoundingClientRect();
 		if (rect) {
-			const transform = this.selection.attributes.transform;
-			const matrix = transform
-				? compose(fromDefinition(fromTransformAttribute(transform)))
-				: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
-			const lt = applyToPoint(matrix, { x: rect.x, y: rect.y });
-			return new DOMRect(lt.x, lt.y, rect.width, rect.height);
+			// const transform = this.selection.attributes.transform;
+			// const matrix = transform
+			// 	? compose(fromDefinition(fromTransformAttribute(transform)))
+			// 	: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
+			// const lt = applyToPoint(matrix, { x: rect.x, y: rect.y });
+			const lt = screen2svg(this.overlay.nativeElement, { x: rect.x, y: rect.y });
+			const rb = screen2svg(this.overlay.nativeElement, { x: rect.right, y: rect.bottom });
+			// return new DOMRect(lt.x, lt.y, rect.width, rect.height);
+			return new DOMRect(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
 		}
 		return new DOMRect(0, 0, 0, 0);
 	}

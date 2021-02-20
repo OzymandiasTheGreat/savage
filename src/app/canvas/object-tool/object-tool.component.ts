@@ -66,14 +66,18 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	bbox(node: Observable<SavageSVG>): DOMRect {
-		const rect = this.canvas.registry[node?.nid]?.getBBox();
+		// const rect = this.canvas.registry[node?.nid]?.getBBox();
+		const rect = this.canvas.registry[node?.nid]?.getBoundingClientRect();
 		if (rect) {
-			const transform = node.attributes.transform;
-			const matrix = transform
-				? compose(fromDefinition(fromTransformAttribute(transform)))
-				: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
-			const lt = applyToPoint(matrix, { x: rect.x, y: rect.y });
-			return new DOMRect(lt.x, lt.y, rect.width, rect.height);
+			// const transform = node.attributes.transform;
+			// const matrix = transform
+				// ? compose(fromDefinition(fromTransformAttribute(transform)))
+				// : { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
+			// const lt = applyToPoint(matrix, { x: rect.x, y: rect.y });
+			const lt = screen2svg(this.overlay.nativeElement, { x: rect.x, y: rect.y });
+			const rb = screen2svg(this.overlay.nativeElement, { x: rect.right, y: rect.bottom });
+			// return new DOMRect(lt.x, lt.y, rect.width, rect.height);
+			return new DOMRect(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
 		}
 		return new DOMRect(0, 0, 0, 0);
 	}

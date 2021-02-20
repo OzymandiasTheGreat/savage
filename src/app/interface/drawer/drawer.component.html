@@ -9,7 +9,7 @@
 			</mat-expansion-panel-header>
 
 			<mat-action-list>
-				<button mat-list-item >
+				<button mat-list-item (click)="emptyDoc()" >
 					<mat-icon mat-list-icon svgIcon="file-image-outline" ></mat-icon>
 					<span>Empty Document</span>
 				</button>
@@ -38,35 +38,12 @@
 					<div mat-line class="savage-app-drawer-subheader" >URL</div>
 					<div mat-line >
 						<mat-form-field>
-							<input matInput type="url" >
-							<mat-icon matSuffix svgIcon="cloud-upload" ></mat-icon>
+							<input #url matInput type="url" >
+							<mat-icon matSuffix (click)="file.openRemoteSVG(url.value); url.value = '';" svgIcon="cloud-upload" ></mat-icon>
 						</mat-form-field>
 					</div>
 				</mat-list-item>
 			</mat-list>
-		</mat-expansion-panel>
-		<mat-expansion-panel>
-			<mat-expansion-panel-header>
-				<mat-panel-title class="savage-app-drawer-header" >
-					<mat-icon svgIcon="download" class="savage-app-drawer-header-icon" ></mat-icon>
-					<span class="savage-app-drawer-header-text">Download</span>
-				</mat-panel-title>
-			</mat-expansion-panel-header>
-
-			<mat-action-list>
-				<button mat-list-item >
-					<mat-icon mat-list-icon svgIcon="xml" ></mat-icon>
-					<span>SVG</span>
-				</button>
-				<button mat-list-item >
-					<mat-icon mat-list-icon svgIcon="xml" ></mat-icon>
-					<span>Optimized SVG</span>
-				</button>
-				<button mat-list-item >
-					<mat-icon mat-list-icon svgIcon="language-css3" ></mat-icon>
-					<span>CSS</span>
-				</button>
-			</mat-action-list>
 		</mat-expansion-panel>
 		<mat-expansion-panel>
 			<mat-expansion-panel-header>
@@ -82,6 +59,39 @@
 					<div mat-line class="savage-app-drawer-title"> {{ recent.name }}</div>
 					<div mat-line class="savage-app-drawer-subtitle">{{ recent.modified | date }}</div>
 				</button>
+			</mat-action-list>
+		</mat-expansion-panel>
+		<mat-expansion-panel>
+			<mat-expansion-panel-header>
+				<mat-panel-title class="savage-app-drawer-header" >
+					<mat-icon class="savage-app-drawer-header-icon" svgIcon="file-import" ></mat-icon>
+					<span class="savage-app-drawer-header-text" >Import</span>
+				</mat-panel-title>
+			</mat-expansion-panel-header>
+
+			<mat-action-list>
+				<mat-list>
+					<mat-list-item>
+						<div mat-line class="savage-app-drawer-subheader" >Inline SVG</div>
+						<div mat-line >
+							<mat-form-field>
+								<ngx-mat-file-input accept="image/svg+xml" [formControl]="inlineSVG" >
+									<mat-icon ngxMatFileInputIcon svgIcon="upload" ></mat-icon>
+								</ngx-mat-file-input>
+							</mat-form-field>
+						</div>
+					</mat-list-item>
+					<mat-list-item>
+						<div mat-line class="savage-app-drawer-subheader" >Inline Raster Image</div>
+						<div mat-line >
+							<mat-form-field>
+								<ngx-mat-file-input accept="image/*" [formControl]="inlineRaster" >
+									<mat-icon ngxMatFileInputIcon svgIcon="upload" ></mat-icon>
+								</ngx-mat-file-input>
+							</mat-form-field>
+						</div>
+					</mat-list-item>
+				</mat-list>
 			</mat-action-list>
 		</mat-expansion-panel>
 	</mat-accordion>

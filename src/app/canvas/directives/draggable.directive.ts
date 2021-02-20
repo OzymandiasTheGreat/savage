@@ -93,7 +93,7 @@ export class DraggableDirective implements OnInit, OnChanges, OnDestroy {
 	private restrict: boolean;
 
 	constructor(
-		protected host: ElementRef,
+		protected host: ElementRef<HTMLElement>,
 	) {
 		Draggable.draggableCursor = false;
 		Draggable.draggingCursor = false;
@@ -177,6 +177,7 @@ export class DraggableDirective implements OnInit, OnChanges, OnDestroy {
 			onDragEnd: () => this.handleEvent({ left: this.prevPosition?.left, top: this.prevPosition?.top }, true),
 		} as IDraggableOptions);
 		this.draggable.disabled = this.disabled;
+		this.style = this.style || this.host.nativeElement.getAttribute("style");
 		(<HTMLElement> this.host.nativeElement).setAttribute("transform", this.transform || "");
 		(<HTMLElement> this.host.nativeElement).setAttribute("style", this.style || "");
 	}

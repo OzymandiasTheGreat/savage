@@ -1,0 +1,14 @@
+<h3 mat-dialog-title class="savage-app-shortcuts-title" >Keyboard Shortcuts</h3>
+<div><a href="https://github.com/OzymandiasTheGreat/savage/blob/master/README.md" target="_blank" >View README on github.com</a></div>
+<div mat-dialog-content class="savage-app-shortcuts-content" >
+	<mat-list *ngFor="let list of shortcuts" class="savage-app-shortcuts-content-list" >
+		<mat-list-item><h5 class="savage-app-shortcuts-content-list-title" >{{ list.section }}</h5></mat-list-item>
+		<mat-list-item *ngFor="let shortcut of list.keys" >
+			<span class="savage-app-shortcuts-content-list-keys">
+				<kbd *ngFor="let key of shortcut.keys" class="savage-app-shortcuts-content-list-keys-item" >{{ key }}</kbd>
+			</span>
+			<span class="savage-app-shortcuts-content-list-desc" >{{ shortcut.desc }}</span>
+		</mat-list-item>
+	</mat-list>
+</div>
+<button mat-icon-button mat-dialog-close class="savage-app-shortcuts-close" ><mat-icon svgIcon="close" ></mat-icon></button>

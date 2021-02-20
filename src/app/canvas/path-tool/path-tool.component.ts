@@ -148,7 +148,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				type: "element",
 				value: "",
 				children: <any> [],
-				attributes: <any> { d: `M ${position.x},${position.y}` },
+				attributes: <any> { d: `M ${position.x},${position.y}`, fill: "currentColor" },
 			};
 			this.document.children.push(<any> pathNode);
 			this.canvas.selection = [find(this.document, nid)];

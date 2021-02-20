@@ -14,7 +14,7 @@ export class AttrsDirective implements OnChanges, OnDestroy {
 	protected listener: (event: Change[]) => void;
 
 	constructor(
-		protected host: ElementRef,
+		protected host: ElementRef<HTMLElement>,
 	) {
 		this.listener = this.onAttrChange.bind(this);
 	}

@@ -1,0 +1,18 @@
+<h3 mat-dialog-title >New document</h3>
+<form (submit)="create()" >
+	<div mat-dialog-content >
+		<mat-form-field style="width: 75px;">
+			<mat-label>Width</mat-label>
+			<input matInput [(ngModel)]="width" min="1" type="number" name="width" >
+		</mat-form-field>
+		<span style="margin: 0 10px;">x</span>
+		<mat-form-field style="width: 75px;">
+			<mat-label>Height</mat-label>
+			<input matInput [(ngModel)]="height" min="1" type="number" name="height" >
+		</mat-form-field>
+	</div>
+	<div mat-dialog-actions >
+		<button mat-button color="warn" (click)="cancel()" type="reset" >Cancel</button>
+		<button mat-button color="accent" type="submit" >Create</button>
+	</div>
+</form>

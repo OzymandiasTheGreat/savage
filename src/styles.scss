@@ -40,6 +40,14 @@ html, body {
 	}
 }
 
+.savage-app-canvas-document *:focus {
+	outline: none;
+}
+
+.savage-app-canvas-document * {
+	user-select: none;
+}
+
 .savage-app-bottom-sheet {
 	min-width: 80vw !important;
 	max-width: 80vw !important;

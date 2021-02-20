@@ -1,10 +1,11 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, ViewChild, ElementRef } from "@angular/core";
 import { Matrix, compose, fromDefinition, fromTransformAttribute, toSVG, smoothMatrix, translate, rotate, scale, skew } from "transformation-matrix";
 import unmatrix from "unmatrix";
 
 import { Observable } from "../../types/observer";
 import { SavageSVG, RENDER } from "../../types/svg";
 import { HistoryService } from "../../services/history.service";
+import { HotkeyService } from "../../services/hotkey.service";
 
 
 @Component({
@@ -13,6 +14,7 @@ import { HistoryService } from "../../services/history.service";
 	styleUrls: ["./sidebar-transform.component.scss"]
 })
 export class SidebarTransformComponent implements OnInit {
+	@ViewChild("panel", { static: true }) panel: ElementRef<HTMLElement>;
 	@Input() selection: Observable<SavageSVG>[];
 	get matrix(): Matrix {
 		const render = this.selection.filter((e) => RENDER.includes(e.name));
@@ -92,9 +94,19 @@ export class SidebarTransformComponent implements OnInit {
 
 	constructor(
 		public history: HistoryService,
+		public hotkey: HotkeyService,
 	) { }
 
-	ngOnInit(): void { }
+	ngOnInit(): void {
+		this.hotkey.triggered.subscribe((key) => {
+			switch (key) {
+				case "transform":
+					setTimeout(() => {
+						this.panel.nativeElement.focus();
+					}, 250);
+			}
+		});
+	}
 
 	edited(): void {
 		this.history.snapshot("Transform attribute edited");

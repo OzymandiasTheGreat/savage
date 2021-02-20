@@ -30,7 +30,6 @@ export class TextToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 	get node(): Observable<SavageSVG> { return this._node; }
 	@ViewChild("overlay", { static: true }) overlay: ElementRef<HTMLDivElement>;
-	@ViewChild("ref", { static: true }) ref: ElementRef<SVGSVGElement>;
 	@ViewChild("editable", {static: false }) editable: ElementRef<HTMLTextAreaElement>;
 	text: Observable<SavageSVG>;
 	textParent: Observable<SavageSVG>;
@@ -62,7 +61,7 @@ export class TextToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		let node = event.node;
 		const ev: MouseEvent = <MouseEvent> event.event;
 		if (!node || !["text", "tspan", "textPath"].includes(node.name)) {
-			const position = screen2svg(this.ref.nativeElement, { x: ev.clientX, y: ev.clientY });
+			const position = screen2svg(this.canvas.registry[this.document.nid], { x: ev.clientX, y: ev.clientY });
 			if (this.node && !this.text.value.trim()) {
 				this.node.attributes.x = `${position.x}`;
 				this.node.attributes.y = `${position.y}`;
@@ -80,7 +79,7 @@ export class TextToolComponent implements ICanvasTool, OnInit, OnDestroy {
 					name: "tspan",
 					type: "element",
 					value: "",
-					attributes: <any> {},
+					attributes: <any> { },
 					children: <any> [text],
 				};
 				node = <Observable<SavageSVG>> {
@@ -88,7 +87,7 @@ export class TextToolComponent implements ICanvasTool, OnInit, OnDestroy {
 					name: "text",
 					type: "element",
 					value: "",
-					attributes: <any> { x: `${position.x}`, y: `${position.y}` },
+					attributes: <any> { x: `${position.x}`, y: `${position.y}`, fill: "currentColor" },
 					children: <any> [textParent],
 				};
 				this.document.children.push(node);
@@ -118,11 +117,14 @@ export class TextToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	handleKeyDown(event: IDocumentEvent): void { }
 
 	get bbox(): DOMRect {
-		if (this.text.value.trim() || !(this.node.attributes.x && this.node.attributes.y)) {
-			return this.canvas.registry[this.node.nid]?.getBoundingClientRect();
+		if (this.text?.value.trim()) {
+			const rect = this.canvas.registry[this.node.nid]?.getBoundingClientRect();
+			return rect;
 		}
-		const point = svg2screen(this.ref.nativeElement, { x: parseFloat(this.node.attributes.x), y: parseFloat(this.node.attributes.y) });
-		return new DOMRect(point.x, point.y, 1, 1);
+		const x = parseFloat(this.node.attributes.x);
+		const y = parseFloat(this.node.attributes.y);
+		const lt = svg2screen(this.canvas.registry[this.document.nid], { x, y });
+		return new DOMRect(lt.x, lt.y, 25, 25);
 	}
 
 	onInput(event: InputEvent): void {

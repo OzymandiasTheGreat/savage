@@ -19,7 +19,8 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
 	document: Observable<SavageSVG>;
 	pointerMoved = false;
 	panning = false;
-	scale = 1;
+	get scale(): number { return this.canvas.scale; }
+	set scale(val: number) { this.canvas.scale = val; }
 	get guides(): { width: number, height: number, top: number, left: number, borderRight: number, borderBottom: number }[] {
 		const guides: { width: number, height: number, top: number, left: number, borderRight: number, borderBottom: number }[] = [];
 		for (const target of this.canvas.guides) {

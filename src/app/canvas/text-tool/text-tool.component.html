@@ -2,8 +2,7 @@
 	class="savage-app-canvas-text-tool"
 	[style.overflow]="'visible'"
 	[style.pointer-events]="'none'"
-	[ngStyle]="{ 'width.px': document.attributes.width, 'height.px': document.attributes.height, position: 'relative' }"
-	[style.transform]="'scale(' + scale + ')'"
+	[ngStyle]="{ 'width.px': document.attributes.width, 'height.px': document.attributes.height }"
 >
 	<ng-container *ngIf="canvas.activeTool === name && !!node" >
 		<div class="savage-app-canvas-text-tool-outline"
@@ -43,7 +42,3 @@
 		</mat-form-field>
 	</ng-container>
 </div>
-<svg #ref
-	[style.display]="'none'"
-	[appAttrs]="document"
-></svg>

@@ -153,10 +153,10 @@ export class CircleToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				let attributes: Record<string, string>;
 				switch (name) {
 					case "circle":
-						attributes = { cx: `${xy.x}`, cy: `${xy.y}`, r: "1" };
+						attributes = { cx: `${xy.x}`, cy: `${xy.y}`, r: "1", fill: "currentColor" };
 						break;
 					case "ellipse":
-						attributes = { cx: `${xy.x}`, cy: `${xy.y}`, rx: "1", ry: "1" };
+						attributes = { cx: `${xy.x}`, cy: `${xy.y}`, rx: "1", ry: "1", fill: "currentColor" };
 						break;
 					case "path":
 						let arc = partialCircle(xy.x, xy.y, 1, 1.57, 1.57 * 2);
@@ -169,6 +169,7 @@ export class CircleToolComponent implements ICanvasTool, OnInit, OnDestroy {
 								r: 1,
 								start: 1.57,
 								end: 1.57 * 2,
+								fill: "currentColor",
 							}),
 						};
 						break;
@@ -201,14 +202,18 @@ export class CircleToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	handleKeyDown(event: IDocumentEvent): void { }
 
 	get bbox(): DOMRect {
-		const rect = this.canvas.registry[this.selection?.nid]?.getBBox();
+		// const rect = this.canvas.registry[this.selection?.nid]?.getBBox();
+		const rect = this.canvas.registry[this.selection?.nid]?.getBoundingClientRect();
 		if (rect) {
-			const transform = this.selection.attributes.transform;
-			const matrix = transform
-				? compose(fromDefinition(fromTransformAttribute(transform)))
-				: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
-			const lt = applyToPoint(matrix, { x: rect.x, y: rect.y });
-			return new DOMRect(lt.x, lt.y, rect.width, rect.height);
+			// const transform = this.selection.attributes.transform;
+			// const matrix = transform
+			// 	? compose(fromDefinition(fromTransformAttribute(transform)))
+			// 	: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
+			// const lt = applyToPoint(matrix, { x: rect.x, y: rect.y });
+			const lt = screen2svg(this.overlay.nativeElement, { x: rect.x, y: rect.y });
+			const rb = screen2svg(this.overlay.nativeElement, { x: rect.right, y: rect.bottom });
+			// return new DOMRect(lt.x, lt.y, rect.width, rect.height);
+			return new DOMRect(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
 		}
 		return new DOMRect(0, 0, 0, 0);
 	}

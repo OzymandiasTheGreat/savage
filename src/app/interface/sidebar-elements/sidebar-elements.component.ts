@@ -734,6 +734,9 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 						children: <any> [],
 					});
 				}
+				if (name === "image") {
+					node.attributes.crossorigin = "anonymous";
+				}
 				if (selection.isRoot && CONTAINMENT_MAP.svg.includes(name)) {
 					this.data.push(<any> node);
 				} else if (CONTAINMENT_MAP[selection?.data.name].includes(name)) {

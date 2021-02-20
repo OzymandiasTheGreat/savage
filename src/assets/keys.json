@@ -1,0 +1,116 @@
+[
+  {
+    "section": "General",
+    "keys": [
+      {
+        "keys": ["CTRL", "o"],
+        "desc": "Toggle side navigation"
+      },
+      {
+        "keys": ["CTRL", "`"],
+        "desc": "Toggle sidebar"
+      },
+      {
+        "keys": ["CTRL", "s"],
+        "desc": "Download SVG"
+      },
+      {
+        "keys": ["CTRL", "SHIFT", "s"],
+        "desc": "Download optimized SVG"
+      },
+      {
+        "keys": ["ALT", "s"],
+        "desc": "Download PNG"
+      },
+      {
+        "keys": ["CTRL", "z"],
+        "desc": "Undo"
+      },
+      {
+        "keys": ["CTRL", "y"],
+        "desc": "Redo"
+      },
+      {
+        "keys": ["PageUp", "PageDown"],
+        "desc": "Move elements up/down tree"
+      },
+      {
+        "keys": ["Del"],
+        "desc": "Remove element/node"
+      },
+      {
+        "keys": ["Up", "Down", "Left", "Right"],
+        "desc": "Move elements/nodes"
+      },
+      {
+        "keys": ["CTRL", "e"],
+        "desc": "Focus element panel"
+      },
+      {
+        "keys": ["CTRL", "SHIFT", "e"],
+        "desc": "Focus element panel toolbar"
+      },
+      {
+        "keys": ["ALT", "p"],
+        "desc": "Focus properties panel"
+      },
+      {
+        "keys": ["ALT", "c"],
+        "desc": "Focus presentation panel"
+      },
+      {
+        "keys": ["ALT", "t"],
+        "desc": "Focus text panel"
+      },
+      {
+        "keys": ["ALT", "m"],
+        "desc": "Focus transform panel"
+      }
+    ]
+  },
+  {
+    "section": "Tools",
+    "keys": [
+      {
+        "keys": ["s"],
+        "desc": "Select/transform tool"
+      },
+      {
+        "keys": ["n"],
+        "desc": "Path tool"
+      },
+      {
+        "keys": ["l"],
+        "desc": "Line tool"
+      },
+      {
+        "keys": ["r"],
+        "desc": "Rectangle tool"
+      },
+      {
+        "keys": ["e"],
+        "desc": "Circle/Ellipse/Arc tool"
+      },
+      {
+        "keys": ["p"],
+        "desc": "Polygon tool"
+      },
+      {
+        "keys": ["t"],
+        "desc": "Text tool"
+      },
+      {
+        "keys": ["f"],
+        "desc": "Freehand draw tool"
+      },
+      {
+        "keys": ["g"],
+        "desc": "Gradient tool"
+      },
+      {
+        "keys": ["CTRL", "SHIFT", "p"],
+        "desc": "Tool options"
+      }
+    ]
+  }
+]

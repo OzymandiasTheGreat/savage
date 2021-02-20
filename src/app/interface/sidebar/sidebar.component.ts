@@ -33,6 +33,22 @@ export class SidebarComponent implements OnInit {
 					this.accordion.closeAll();
 					this.elemPanel.open();
 					break;
+				case "properties":
+					this.accordion.closeAll();
+					this.propPanel.open();
+					break;
+				case "presentation":
+					this.accordion.closeAll();
+					this.presentationPanel.open();
+					break;
+				case "text-props":
+					this.accordion.closeAll();
+					this.textPanel.open();
+					break;
+				case "transform":
+					this.accordion.closeAll();
+					this.transformPanel.open();
+					break;
 			}
 		});
 	}

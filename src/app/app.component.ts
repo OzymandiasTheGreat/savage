@@ -3,6 +3,7 @@ import { MatSidenav } from "@angular/material/sidenav";
 import googleFonts from "google-fonts-complete/google-fonts.json";
 
 import { HotkeyService } from "./services/hotkey.service";
+import { HistoryService } from "./services/history.service";
 
 
 @Component({
@@ -17,6 +18,7 @@ export class AppComponent implements OnInit {
 
 	constructor(
 		public hotkey: HotkeyService,
+		public history: HistoryService,
 	) { }
 
 	ngOnInit(): void {
@@ -51,6 +53,18 @@ export class AppComponent implements OnInit {
 			case "s":
 				if (!ctrl && !alt && !shift) {
 					this.hotkey.trigger("object");
+				} else if (ctrl && !alt && !shift) {
+					event.preventDefault();
+					this.hotkey.trigger("download");
+				} else if (!ctrl && alt && !shift) {
+					event.preventDefault();
+					this.hotkey.trigger("download-png");
+				}
+				break;
+			case "S":
+				if (ctrl && !alt && shift) {
+					event.preventDefault();
+					this.hotkey.trigger("download-optimized");
 				}
 				break;
 			case "n":
@@ -82,6 +96,9 @@ export class AppComponent implements OnInit {
 			case "p":
 				if (!ctrl && !alt && !shift) {
 					this.hotkey.trigger("polygon");
+				} else if (!ctrl && alt && !shift) {
+					event.preventDefault();
+					this.hotkey.trigger("properties");
 				}
 				break;
 			case "P":
@@ -103,6 +120,9 @@ export class AppComponent implements OnInit {
 			case "t":
 				if (!ctrl && !alt && !shift) {
 					this.hotkey.trigger("text");
+				} else if (!ctrl && alt && !shift) {
+					event.preventDefault();
+					this.hotkey.trigger("text-props");
 				}
 				break;
 			case "g":
@@ -121,6 +141,33 @@ export class AppComponent implements OnInit {
 					event.preventDefault();
 					this.sidebar.toggle();
 				}
+				break;
+			case "z":
+				if (ctrl && !alt && !shift) {
+					event.preventDefault();
+					this.history.undo(1);
+				}
+				break;
+			case "y":
+				if (ctrl && !alt && !shift) {
+					event.preventDefault();
+					this.history.redo(1);
+				}
+				break;
+			case "c":
+				if (!ctrl && alt && !shift) {
+					event.preventDefault();
+					this.hotkey.trigger("presentation");
+				}
+				break;
+			case "m":
+				if (!ctrl && alt && !shift) {
+					event.preventDefault();
+					this.hotkey.trigger("transform");
+				}
+				break;
+			case "?":
+				this.hotkey.trigger("shortcuts");
 				break;
 		}
 	}

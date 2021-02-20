@@ -547,9 +547,11 @@
 
 
 <svg xmlns="http://www.w3.org/2000/svg"
+	id="savage-app-canvas-svg-document"
 	class="savage-app-canvas-svg-document"
 	overflow="visible"
 	pointer-events="all"
+	[appRegistry]="document.nid"
 	[appAttrs]="document"
 	[skipAttrs]="['tabindex', 'overflow', 'pointer-events']"
 >

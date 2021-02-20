@@ -2,9 +2,12 @@
 	<span class="savage-app-menubar-left" >
 		<button mat-icon-button matTooltip="Open Sidedrawer" (click)="sidedrawer.toggle()" ><mat-icon svgIcon="menu" ></mat-icon></button>
 		<mat-divider [vertical]="true" ></mat-divider>
-		<button mat-icon-button matTooltip="Save" ><mat-icon svgIcon="content-save" ></mat-icon></button>
-	</span>
-	<span class="savage-app-menubar-center" >
+		<button mat-icon-button matTooltip="Download" [disabled]="disabled" (click)="download()" ><mat-icon svgIcon="download" ></mat-icon></button>
+		<button mat-icon-button [matMenuTriggerFor]="downloadMenu" [disabled]="disabled" ><mat-icon svgIcon="menu-down" ></mat-icon></button>
+		<mat-menu #downloadMenu >
+			<button mat-menu-item (click)="downloadOptimized()" ><mat-icon svgIcon="svg" ></mat-icon>Optimized SVG</button>
+			<button mat-menu-item (click)="downloadPNG()" ><mat-icon svgIcon="image" ></mat-icon>PNG</button>
+		</mat-menu>
 		<button mat-icon-button (click)="history.undo(1)" [disabled]="!history._undo.length" ><mat-icon svgIcon="undo" ></mat-icon></button>
 		<button mat-icon-button [matMenuTriggerFor]="undoMenu" [disabled]="!history._undo.length" ><mat-icon svgIcon="menu-down" ></mat-icon></button>
 		<mat-menu #undoMenu >
@@ -15,6 +18,9 @@
 		<mat-menu #redoMenu >
 			<button mat-menu-item *ngFor="let snapshot of history._redo.slice().reverse(); let i = index" (click)="history.redo(i + 1)" >{{ snapshot.name }}</button>
 		</mat-menu>
+	</span>
+	<mat-divider [vertical]="true" ></mat-divider>
+	<span class="savage-app-menubar-center" >
 		<button mat-flat-button [matMenuTriggerFor]="gridMenu" >Grid <mat-icon svgIcon="menu-down" ></mat-icon></button>
 		<mat-menu #gridMenu >
 			<button mat-menu-item (click)="toggleGrid()" >Toggle grid</button>
@@ -27,18 +33,46 @@
 			<button mat-menu-item *ngFor="let guide of canvas.guides" (click)="removeGuide(guide)" >Remove {{ !!guide.x ? "vertical" : "horizontal" }} guide at {{ guide.x || guide.y }}</button>
 		</mat-menu>
 		<mat-slide-toggle [checked]="canvas.snapping" (toggleChange)="toggleSnapping()" >Snap</mat-slide-toggle>
+		<ng-container *ngIf="!!document" >
+			<mat-divider [vertical]="true" ></mat-divider>
+			<mat-form-field>
+				<mat-label>Width</mat-label>
+				<input matInput [(ngModel)]="document.attributes.width" min="1" type="number" name="width" >
+			</mat-form-field>
+			<mat-form-field>
+				<mat-label>Height</mat-label>
+				<input matInput [(ngModel)]="document.attributes.height" min="1" type="number" name="height" >
+			</mat-form-field>
+			<mat-form-field>
+				<mat-label>ViewBox</mat-label>
+				<input matInput [(ngModel)]="document.attributes.viewBox" type="text" name="viewbox" >
+			</mat-form-field>
+			<mat-form-field>
+				<mat-label>Color</mat-label>
+				<input matInput [(ngModel)]="document.attributes.color" mccColorPickerOrigin #color="mccColorPickerOrigin" type="text" name="color" >
+				<mcc-color-picker matSuffix mccConnectedColorPicker [mccConnectedColorPickerOrigin]="color" alpha ></mcc-color-picker>
+			</mat-form-field>
+			<mat-form-field>
+				<mat-label>Zoom</mat-label>
+				<input matInput [(ngModel)]="zoom" min="25" max="1000" step="25" type="number" name="zoom" >
+			</mat-form-field>
+		</ng-container>
+		<mat-divider [vertical]="true" ></mat-divider>
 	</span>
 	<span class="savage-app-menubar-right" >
-		<iframe src="https://ghbtns.com/github-btn.html?user=OzymandiasTheGreat&repo=savage-app&type=star&count=true&size=large"
-			frameborder="0"
-			scrolling="0"
-			width="170"
-			height="30"
-			title="GitHub"
-		></iframe>
+		<button mat-flat-button class="savage-app-menubar-show-love" (click)="openRepo()" >
+			<mat-icon class="savage-app-menubar-show-love-icon" svgIcon="github" ></mat-icon>
+			<span class="savage-app-menubar-show-love-text">{{ stars }}</span>
+		</button>
 		<mat-divider [vertical]="true" ></mat-divider>
+		<button mat-icon-button matTooltip="Show keyboard shortcuts" (click)="showShortcuts()" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 		<button mat-icon-button [matTooltip]="sidebar.opened ? 'Close sidebar' : 'Open sidebar'" (click)="sidebar.toggle()" >
 			<mat-icon [svgIcon]="sidebar.opened ? 'chevron-right' : 'chevron-left'" ></mat-icon>
 		</button>
 	</span>
+	<svg width="0" height="0" xmlns="http://www.w3.org/2000/svg">
+		<clipPath id="savage-app-heart" >
+			<path d="M4 13A10 10 0 0 1 24 13 10 10 0 0 1 44 13Q44 24 24 43 4 24 4 13z"/>
+		</clipPath>
+	</svg>
 </mat-toolbar>

@@ -1,9 +1,10 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, ViewChild, ElementRef } from "@angular/core";
 
 import { Observable } from "../../types/observer";
 import { SavageSVG, CONTAINER_RENDER } from "../../types/svg";
 import { HistoryService } from "../../services/history.service";
 import { SvgFileService, IDefinitions } from "../../services/svg-file.service";
+import { HotkeyService } from "../../services/hotkey.service";
 
 
 const MDN_URI = "https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute";
@@ -16,6 +17,7 @@ const RENDER = ["circle", "ellipse", "path", "polygon", "polyline", "rect", "tex
 	styleUrls: ["./sidebar-presentation.component.scss"]
 })
 export class SidebarPresentationComponent implements OnInit {
+	@ViewChild("panel", { static: true }) panel: ElementRef<HTMLElement>;
 	@Input() selection: Observable<SavageSVG>[];
 	defs: IDefinitions;
 	fillWith: "color" | "gradient" | "pattern" = "color";
@@ -24,10 +26,20 @@ export class SidebarPresentationComponent implements OnInit {
 	constructor(
 		public history: HistoryService,
 		public file: SvgFileService,
+		public hotkey: HotkeyService,
 	) { }
 
 	ngOnInit(): void {
 		this.file.definitions.subscribe((defs) => this.defs = defs);
+		this.hotkey.triggered.subscribe((key) => {
+			switch (key) {
+				case "presentation":
+					setTimeout(() => {
+						this.panel.nativeElement.focus();
+					}, 250);
+					break;
+			}
+		});
 	}
 
 	get includes(): boolean {

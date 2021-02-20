@@ -1,0 +1,44 @@
+.savage-app-shortcuts {
+	&-title {
+		font-size: 20px;
+	}
+
+	&-close {
+		position: absolute;
+		top: 25px;
+		right: 25px;
+	}
+
+	&-content {
+		display: flex;
+		flex-flow: column wrap;
+		justify-content: flex-start;
+		align-items: center;
+
+		&-list {
+			display: inline-block;
+			width: 30vw;
+
+			&-title {
+				font-size: 17px;
+			}
+
+			&-keys {
+				font-size: 14px;
+
+				&-item {
+					margin-right: 10px;
+
+					&:not(:last-child)::after {
+						content: "+";
+						margin-left: 10px;
+					}
+				}
+			}
+
+			&-desc {
+				font-size: 16px;
+			}
+		}
+	}
+}

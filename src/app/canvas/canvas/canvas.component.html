@@ -28,10 +28,10 @@
 			<app-rect-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" [scale]="scale" ></app-rect-tool>
 			<app-circle-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" [scale]="scale" ></app-circle-tool>
 			<app-polygon-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" [scale]="scale" ></app-polygon-tool>
-			<app-text-tool [document]="document" [scrollable]="scrollable" [node]="canvas.selection" ></app-text-tool>
 			<app-freehand-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" ></app-freehand-tool>
 			<app-gradient-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" ></app-gradient-tool>
 		</div>
+		<app-text-tool *ngIf="!!document" [document]="document" [scrollable]="scrollable" [node]="canvas.selection" ></app-text-tool>
 		<ng-container *ngIf="!!document && canvas.grid.enabled" >
 			<div class="savage-app-canvas-gridline" *ngFor="let line of gridY" [style.transform]="'scale(' + scale + ')'" [style.top.px]="line" [style.width.%]="100" ></div>
 			<div class="savage-app-canvas-gridline" *ngFor="let line of gridX" [style.transform]="'scale(' + scale + ')'" [style.left.px]="line" [style.height.%]="100" ></div>
