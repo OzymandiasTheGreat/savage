@@ -6,6 +6,8 @@ import { MaterialModule } from "./material.module";
 import { InterfaceModule } from "./interface/interface.module";
 import { CanvasModule } from "./canvas/canvas.module";
 import { AppComponent } from "./app.component";
+import { ServiceWorkerModule } from "@angular/service-worker";
+import { environment } from "../environments/environment";
 
 
 @NgModule({
@@ -19,6 +21,7 @@ import { AppComponent } from "./app.component";
 		MaterialModule,
 		InterfaceModule,
 		CanvasModule,
+		ServiceWorkerModule.register("ngsw-worker.js", { enabled: environment.production }),
 	],
 	providers: [],
 	bootstrap: [AppComponent]

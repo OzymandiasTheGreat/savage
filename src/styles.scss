@@ -2,7 +2,33 @@
 @import '~@circlon/angular-tree-component/css/angular-tree-component.css';
 @import '~material-community-components/theming';
 
-// @include mcc-theme($demo-theme);
+@include mat-core();
+
+$savage-app-primary: mat-palette($mat-gray, 800);
+$savage-app-accent:  mat-palette($mat-green, 900);
+$savage-app-warn:    mat-palette($mat-red);
+
+$savage-app-light-theme:   mat-light-theme((
+  color: (
+    primary: $savage-app-primary,
+    accent: $savage-app-accent,
+    warn: $savage-app-warn,
+  )
+));
+@include angular-material-theme($savage-app-light-theme);
+@include mcc-theme($savage-app-light-theme);
+
+$savage-app-dark-theme: mat-dark-theme((
+  color: (
+    primary: $savage-app-primary,
+    accent: $savage-app-accent,
+    warn: $savage-app-warn,
+  )
+));
+
+.savage-app-dark-theme {
+  @include angular-material-color($savage-app-dark-theme);
+}
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
