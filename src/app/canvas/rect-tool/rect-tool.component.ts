@@ -29,10 +29,14 @@ export class RectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 	get selection(): Observable<SavageSVG> { return this.rect; }
 	get wx(): number {
-		return (parseFloat(this.document.attributes.viewBox?.split(" ")[2]) || parseFloat(this.document.attributes.width)) / 350;
+		const viewBox = parseFloat(this.document.attributes.viewBox?.split(" ")[2]);
+		const width = parseFloat(this.document.attributes.width || `${viewBox}`);
+		return width / viewBox || 1.5;
 	}
 	get hx(): number {
-		return (parseFloat(this.document.attributes.viewBox?.split(" ")[3]) || parseFloat(this.document.attributes.height)) / 350;
+		const viewBox = parseFloat(this.document.attributes.viewBox?.split(" ")[3]);
+		const height = parseFloat(this.document.attributes.height || `${viewBox}`);
+		return height / viewBox || 1.5;
 	}
 	get rx(): number {
 		return parseFloat(this.selection.attributes.rx) || parseFloat(this.selection.attributes.ry) || 0;

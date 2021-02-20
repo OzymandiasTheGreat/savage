@@ -220,12 +220,17 @@ export class SvgFileService {
 
 	emptyDoc(dimensions: { width: number, height: number }): void {
 		this.textNodes = [];
-		const node: INode = {
+		this._definitions =  {
+			gradients: [], patterns: [], masks: [], filters: [], symbols: [], paths: [], markers: [], graphics: [], clipPaths: [],
+		};
+		const node: SavageSVG = {
+			nid: nanoid(13),
 			name: "svg",
 			type: "element",
 			value: "",
-			attributes: { xmlns: "http://www.w3.org/2000/svg", width: `${dimensions.width}`, height: `${dimensions.height}` },
-			children: [{
+			attributes: <any> { xmlns: "http://www.w3.org/2000/svg", width: `${dimensions.width}`, height: `${dimensions.height}` },
+			children: <any> [{
+				nid: nanoid(13),
 				name: "defs",
 				type: "element",
 				value: "",
@@ -233,11 +238,13 @@ export class SvgFileService {
 				children: [],
 			}],
 		};
-		this.recent.unshift({ name: "New_document.svg", data: stringify(node), modified: Date.now() });
+		this.recent.unshift({ name: "New_document.svg", data: stringify(<any> node), modified: Date.now() });
 		this.recent = this.recent.slice(0, 5);
 		set(SAVAGE_RECENT_SVG, this.recent);
+		this.paper.setup(new this.paper.Size(dimensions.width, dimensions.height));
 		this._currentFile = Observer.from(node);
 		this._openFile.next(this._currentFile);
+		this._definitions$.next(this._definitions);
 		this.openFileName = "New_document.svg";
 	}
 

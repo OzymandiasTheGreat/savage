@@ -23,10 +23,14 @@ export class FreehandToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	@Input() scrollable: HTMLElement;
 	@Input() selection: Observable<SavageSVG>[];
 	get wx(): number {
-		return (parseFloat(this.document.attributes.viewBox?.split(" ")[2]) || parseFloat(this.document.attributes.width)) / 350;
+		const viewBox = parseFloat(this.document.attributes.viewBox?.split(" ")[2]);
+		const width = parseFloat(this.document.attributes.width || `${viewBox}`);
+		return width / viewBox || 1.5;
 	}
 	get hx(): number {
-		return (parseFloat(this.document.attributes.viewBox?.split(" ")[3]) || parseFloat(this.document.attributes.height)) / 350;
+		const viewBox = parseFloat(this.document.attributes.viewBox?.split(" ")[3]);
+		const height = parseFloat(this.document.attributes.height || `${viewBox}`);
+		return height / viewBox || 1.5;
 	}
 	@ViewChild("overlay", { static: true }) overlay: ElementRef<SVGSVGElement>;
 	simplify = 2.5;
