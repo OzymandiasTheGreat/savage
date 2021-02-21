@@ -51,6 +51,7 @@ export class HistoryService {
 	snapshot(name: string): void {
 		this._undo.push({ name, start: this.currentIndex, end: this.history.length });
 		this.currentIndex = this.history.length;
+		this.file.save();
 	}
 
 	undo(amount: number): void {
@@ -86,6 +87,7 @@ export class HistoryService {
 		const slice = this._undo.splice(this._undo.length - amount, amount);
 		this._redo = this._redo.concat(slice.reverse());
 		this._operation.next(false);
+		this.file.save();
 	}
 
 	redo(amount: number): void {
@@ -115,5 +117,6 @@ export class HistoryService {
 		this.currentFile.observe(this.observer);
 		this._undo = this._undo.concat(this._redo.splice(this._redo.length - amount, amount).reverse());
 		this._operation.next(false);
+		this.file.save();
 	}
 }

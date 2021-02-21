@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from "@angular/core";
 import { MatSidenav } from "@angular/material/sidenav";
 import { MatDialog } from "@angular/material/dialog";
+import { BreakpointObserver, Breakpoints } from "@angular/cdk/layout";
 import { stringify } from "svgson";
 import { html } from "js-beautify";
 import svgo from "svgo/dist/svgo.browser.js";
@@ -27,9 +28,12 @@ export class MenubarComponent implements OnInit {
 	get zoom(): number { return this.canvas.scale * 100; }
 	set zoom(val: number) { this.canvas.scale = val / 100; }
 	stars: number;
+	saved: boolean;
+	smallScreen: boolean;
 
 	constructor(
 		protected dialog: MatDialog,
+		protected breakpoint: BreakpointObserver,
 		public history: HistoryService,
 		public canvas: CanvasService,
 		public file: SvgFileService,
@@ -48,6 +52,7 @@ export class MenubarComponent implements OnInit {
 			this.document = file;
 			this.disabled = !file;
 		});
+		this.file.saved.subscribe((saved) => this.saved = saved);
 		this.hotkey.triggered.subscribe((key) => {
 			if (key === "shortcuts") {
 				this.showShortcuts();
@@ -65,6 +70,9 @@ export class MenubarComponent implements OnInit {
 						break;
 				}
 			}
+		});
+		this.breakpoint.observe([Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium]).subscribe((result) => {
+			this.smallScreen = result.matches;
 		});
 	}
 

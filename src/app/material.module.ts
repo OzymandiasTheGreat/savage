@@ -24,9 +24,11 @@ import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatSelectModule } from "@angular/material/select";
 import { MatBottomSheetModule } from "@angular/material/bottom-sheet";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 
 import { TextFieldModule } from "@angular/cdk/text-field";
 import { DragDropModule } from "@angular/cdk/drag-drop";
+import { LayoutModule } from "@angular/cdk/layout";
 
 import { NgxMatFileInputModule } from "@angular-material-components/file-input";
 import { MccColorPickerModule } from "material-community-components/color-picker";
@@ -62,8 +64,10 @@ import { MonacoEditorModule } from "ngx-monaco-editor";
 		MatDialogModule,
 		MatSelectModule,
 		MatBottomSheetModule,
+		MatProgressSpinnerModule,
 		TextFieldModule,
 		DragDropModule,
+		LayoutModule,
 		NgxMatFileInputModule,
 		MccColorPickerModule.forRoot({ empty_color: "transparent" }),
 		TreeModule,
@@ -94,8 +98,10 @@ import { MonacoEditorModule } from "ngx-monaco-editor";
 		MatDialogModule,
 		MatSelectModule,
 		MatBottomSheetModule,
+		MatProgressSpinnerModule,
 		TextFieldModule,
 		DragDropModule,
+		LayoutModule,
 		NgxMatFileInputModule,
 		MccColorPickerModule,
 		TreeModule,

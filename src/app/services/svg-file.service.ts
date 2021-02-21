@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Observable, ReplaySubject } from "rxjs";
+import { Observable, ReplaySubject, Subject } from "rxjs";
 import { parse as parseSVG, INode, stringify } from "svgson";
 import { Observable as Observer } from "object-observer";
 import { nanoid } from "nanoid/non-secure";
@@ -7,7 +7,7 @@ import { PaperScope } from "paper";
 import { get, set } from "idb-keyval";
 import parseStyle from "style-to-object";
 
-import { Observable as ObserverType, recursiveUnobserve } from "../types/observer";
+import { Observable as ObserverType, recursiveUnobserve, Change } from "../types/observer";
 import { SavageSVG, SavageRecentSVG, GRAPHICS } from "../types/svg";
 
 
@@ -57,6 +57,13 @@ export class SvgFileService {
 	recent: SavageRecentSVG[] = [];
 	textNodes: string[];
 	graphics: IDef[] = [];
+	changeObserver = (changes: Change[]) => {
+		if (changes.length) {
+			this._saved.next(false);
+		}
+	}
+	private _saved: Subject<boolean>;
+	saved: Observable<boolean>;
 
 	constructor() {
 		this.paper = new PaperScope();
@@ -67,11 +74,22 @@ export class SvgFileService {
 			file.observe((change) => {
 				this._definitions$.next(this._definitions);
 			});
+			file.observe(this.changeObserver);
 		});
 		this._definitions$ = new ReplaySubject<IDefinitions>();
 		this.definitions = this._definitions$.asObservable();
 
 		get(SAVAGE_RECENT_SVG).then((recent) => this.recent = (<SavageRecentSVG[]> recent).sort((a, b) => b.modified - a.modified));
+
+		this._saved = new Subject<boolean>();
+		this.saved = this._saved.asObservable();
+	}
+
+	save(): void {
+		this.recent[0].data = stringify(<any> this._currentFile);
+		this.recent[0].modified = Date.now();
+		set(SAVAGE_RECENT_SVG, this.recent);
+		this._saved.next(true);
 	}
 
 	private transformNode(node: INode): INode {
@@ -171,8 +189,12 @@ export class SvgFileService {
 				this.recent.unshift(savageFile);
 				this.recent = this.recent.slice(0, 5);
 				set(SAVAGE_RECENT_SVG, this.recent);
+				if (this._currentFile) {
+					recursiveUnobserve(this._currentFile);
+				}
 				this._currentFile = <ObserverType<SavageSVG>> Observer.from(svg);
 				this._openFile.next(this._currentFile);
+				this._saved.next(true);
 			}).catch((err) => console.error(err));
 		});
 
@@ -186,8 +208,12 @@ export class SvgFileService {
 			file.modified = Date.now();
 			this.recent.sort((a, b) => b.modified - a.modified);
 			set(SAVAGE_RECENT_SVG, this.recent);
+			if (this._currentFile) {
+				recursiveUnobserve(this._currentFile);
+			}
 			this._currentFile = <ObserverType<SavageSVG>> Observer.from(svg);
 			this._openFile.next(this._currentFile);
+			this._saved.next(true);
 		});
 		this.openFileName = file.name;
 	}
@@ -211,9 +237,13 @@ export class SvgFileService {
 			return null;
 		}).then((svg) => {
 			if (svg) {
+				if (this._currentFile) {
+					recursiveUnobserve(this._currentFile);
+				}
 				this.openFileName = filename;
 				this._currentFile = Observer.from(svg);
 				this._openFile.next(this._currentFile);
+				this._saved.next(true);
 			}
 		});
 	}
@@ -242,10 +272,14 @@ export class SvgFileService {
 		this.recent = this.recent.slice(0, 5);
 		set(SAVAGE_RECENT_SVG, this.recent);
 		this.paper.setup(new this.paper.Size(dimensions.width, dimensions.height));
+		if (this._currentFile) {
+			recursiveUnobserve(this._currentFile);
+		}
 		this._currentFile = Observer.from(node);
 		this._openFile.next(this._currentFile);
 		this._definitions$.next(this._definitions);
 		this.openFileName = "New_document.svg";
+		this._saved.next(true);
 	}
 
 	inlineSVG(file: File): void {
