@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1613842883543,
+  "timestamp": 1613908579150,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -13,7 +13,7 @@
       "urls": [
         "/favicon.ico",
         "/index.html",
-        "/main.6987d5a0837ce61e1d0a.js",
+        "/main.f7021b378842c53ecf1b.js",
         "/manifest.webmanifest",
         "/polyfills.5b1d01c8c5791f328043.js",
         "/runtime.acf0dec4155e77772545.js",
@@ -121,7 +121,8 @@
         "/assets/monaco/vs/language/json/jsonWorker.js",
         "/assets/monaco/vs/language/typescript/tsMode.js",
         "/assets/monaco/vs/language/typescript/tsWorker.js",
-        "/assets/monaco/vs/loader.js"
+        "/assets/monaco/vs/loader.js",
+        "/assets/savage.svg"
       ],
       "patterns": []
     },
@@ -140,14 +141,14 @@
   ],
   "dataGroups": [],
   "hashTable": {
-    "/assets/icons/icon-128x128.png": "dae3b6ed49bdaf4327b92531d4b5b4a5d30c7532",
-    "/assets/icons/icon-144x144.png": "b0bd89982e08f9bd2b642928f5391915b74799a7",
-    "/assets/icons/icon-152x152.png": "7479a9477815dfd9668d60f8b3b2fba709b91310",
-    "/assets/icons/icon-192x192.png": "1abd80d431a237a853ce38147d8c63752f10933b",
-    "/assets/icons/icon-384x384.png": "329749cd6393768d3131ed6304c136b1ca05f2fd",
-    "/assets/icons/icon-512x512.png": "559d9c4318b45a1f2b10596bbb4c960fe521dbcc",
-    "/assets/icons/icon-72x72.png": "c457e56089a36952cd67156f9996bc4ce54a5ed9",
-    "/assets/icons/icon-96x96.png": "3914125a4b445bf111c5627875fc190f560daa41",
+    "/assets/icons/icon-128x128.png": "d240965a022f79edf1f9aee35037ff6b44cf221f",
+    "/assets/icons/icon-144x144.png": "9a3723c77bfd217d0ca02a903f9d3e8c58c0896a",
+    "/assets/icons/icon-152x152.png": "bbac6b194c1eddadbc67a4b5110ce2b17ffe7568",
+    "/assets/icons/icon-192x192.png": "944f1520971b47ce329eb909ad741c0337e95755",
+    "/assets/icons/icon-384x384.png": "ce9e1c9d73a33c7978bea2abf0a6bd107dfe20e8",
+    "/assets/icons/icon-512x512.png": "22fae4739e1f73794529cc2a3fcd31d6c6683296",
+    "/assets/icons/icon-72x72.png": "c0be13e76b9a4c331d1e419f7e44ed9511664f71",
+    "/assets/icons/icon-96x96.png": "e7ae1829be6cadc282d747e4f713f66d84049d4e",
     "/assets/keys.json": "1ac775ce1390ca386039e7a699a9f0d05761f438",
     "/assets/mdi.svg": "5f383669c6cb349c6a326116b0de97da66b0e076",
     "/assets/monaco/vs/base/browser/ui/codiconLabel/codicon/codicon.ttf": "ec4737d0b4e9ae7f6f814c5d787a597bfb9e89b7",
@@ -233,9 +234,10 @@
     "/assets/monaco/vs/language/typescript/tsMode.js": "537dd775b3318eb462b41b0ccb626c82c44fdd14",
     "/assets/monaco/vs/language/typescript/tsWorker.js": "0175cd4cd93201d8446fdd32865191d5a816d617",
     "/assets/monaco/vs/loader.js": "6c3281f164b358a8cee96e826829f1758bd32201",
-    "/favicon.ico": "22f6a4a3bcaafafb0254e0f2fa4ceb89e505e8b2",
-    "/index.html": "a39a793e367cb2d7a6cb179e619654c9cc550106",
-    "/main.6987d5a0837ce61e1d0a.js": "40e7d7f7f0154df75134b81fd2b0def97d8ad404",
+    "/assets/savage.svg": "e0f985e8ef2bdc67546d6937590b7660322bac16",
+    "/favicon.ico": "fada3441688b134002fbf01f985d438bba5e8d34",
+    "/index.html": "b2b7815760b9a7f162a4fe0cf9deecba3325c3d8",
+    "/main.f7021b378842c53ecf1b.js": "56dfd84bf8d957479e5b27cb64d74b963f01128b",
     "/manifest.webmanifest": "432ba0895441fa795632e55c8b6bd2385e0963aa",
     "/polyfills.5b1d01c8c5791f328043.js": "2598a02fe90a269920909ce1e0d72d0f92529d2a",
     "/runtime.acf0dec4155e77772545.js": "c2f19a5c64c718ebecb901ee3f30667ccab567b6",
