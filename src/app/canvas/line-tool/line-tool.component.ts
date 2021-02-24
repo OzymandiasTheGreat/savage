@@ -3,13 +3,13 @@ import { nanoid } from "nanoid/non-secure";
 import { compose, fromDefinition, fromTransformAttribute, Matrix, applyToPoint, inverse, scale } from "transformation-matrix";
 import { parse as pointsParse, serialize as pointsSerialize } from "svg-numbers";
 import { Point, Rectangle, Size } from "paper";
+import { DragEvent } from "@interactjs/types/index";
 
 import { Observable, Change } from "../../types/observer";
 import { SavageSVG, screen2svg, findParent, find } from "../../types/svg";
 import { ICanvasTool, CanvasService } from "../../services/canvas.service";
 import { HistoryService } from "../../services/history.service";
 import { IDocumentEvent } from "../document/document.component";
-import { DragEvent } from "../directives/draggable.directive";
 import { ObjectToolComponent } from "../object-tool/object-tool.component";
 
 
@@ -306,11 +306,8 @@ export class LineToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	handlePointDrag(index: number | "start" | "end", event: DragEvent): void {
-		const position = screen2svg(this.overlay.nativeElement, { x: event.x, y: event.y });
-		const previous = screen2svg(this.overlay.nativeElement, { x: event.prevX, y: event.prevY });
-		const d = { x: position.x - previous.x, y: position.y - previous.y };
-		this.pointsMove(d);
-		if (event.end) {
+		this.pointsMove(event.delta);
+		if (event.type === "dragend") {
 			this.history.snapshot("Move point");
 		}
 	}

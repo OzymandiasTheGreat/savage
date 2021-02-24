@@ -2,12 +2,12 @@ import { Component, OnInit, OnDestroy, Input, ViewChild, ElementRef } from "@ang
 import { PathItem, Segment, Point, Matrix, Rectangle, Size } from "paper";
 import { compose, fromDefinition, fromTransformAttribute } from "transformation-matrix";
 import { nanoid } from "nanoid/non-secure";
+import { DragEvent } from "@interactjs/types/index";
 
 import { Change, Observable } from "../../types/observer";
 import { SavageSVG, screen2svg, find } from "../../types/svg";
 import { ICanvasTool, CanvasService } from "../../services/canvas.service";
 import { IDocumentEvent } from "../document/document.component";
-import { DragEvent } from "../directives/draggable.directive";
 import { HistoryService } from "../../services/history.service";
 import { ObjectToolComponent } from "../object-tool/object-tool.component";
 
@@ -341,11 +341,8 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	handleSegmentDrag(index: number, event: DragEvent): void {
-		const position = screen2svg(this.overlay.nativeElement, { x: event.x, y: event.y });
-		const previous = screen2svg(this.overlay.nativeElement, { x: event.prevX, y: event.prevY });
-		const d = { x: position.x - previous.x, y: position.y - previous.y };
 		for (const segment of this.selection) {
-			segment.point.set(segment.point.x + d.x, segment.point.y + d.y);
+			segment.point.set(segment.point.x + event.dx, segment.point.y + event.dy);
 		}
 		// this.segments[index].point.set(position.x, position.y);
 		const clone = this.path.clone({ insert: false });
@@ -353,23 +350,20 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		this.external = false;
 		this.node.attributes.d = clone.pathData;
 		this.external = true;
-		if (event.end) {
+		if (event.type === "dragend") {
 			this.history.snapshot("Move path segment");
 		}
 	}
 
 	handleHandleDrag(segment: paper.Segment, handle: "in" | "out", event: DragEvent): void {
-		const position = screen2svg(this.overlay.nativeElement, { x: event.x, y: event.y });
-		const previous = screen2svg(this.overlay.nativeElement, { x: event.prevX, y: event.prevY });
-		const d = { x: position.x - previous.x, y: position.y - previous.y };
 		const point = segment[handle === "in" ? "handleIn" : "handleOut"];
-		point.set(point.x + d.x, point.y + d.y);
+		point.set(point.x + event.dx, point.y + event.dy);
 		const clone = this.path.clone({ insert: false });
 		clone.transform(this._matrix.inverted());
 		this.external = false;
 		this.node.attributes.d = clone.pathData;
 		this.external = true;
-		if (event.end) {
+		if (event.type === "dragend") {
 			this.history.snapshot("Edit path curve");
 		}
 	}

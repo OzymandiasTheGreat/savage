@@ -7,12 +7,12 @@ import {
 	compose, fromDefinition, fromTransformAttribute, Matrix, applyToPoint, applyToPoints,
 	translate, scale, toSVG, inverse, smoothMatrix, rotateDEG, skew } from "transformation-matrix";
 import { parse as pointsParse, serialize as pointsSerialize } from "svg-numbers";
+import { DragEvent } from "@interactjs/types/index";
 
 import { Observable, recursiveUnobserve } from "../../types/observer";
 import { find, findParent, SavageSVG, screen2svg, applyTransformed, applyTransformedPoly, Point } from "../../types/svg";
 import { ICanvasTool, CanvasService } from "../../services/canvas.service";
 import { IDocumentEvent } from "../document/document.component";
-import { DragEvent } from "../directives/draggable.directive";
 import { HistoryService } from "../../services/history.service";
 
 
@@ -97,17 +97,14 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	handleDrag(event: IDocumentEvent): void {
 		this.selectbox = null;
 		const drag = <DragEvent> event.event;
-		const position = screen2svg(this.overlay.nativeElement, { x: drag.x, y: drag.y });
-		const previous = screen2svg(this.overlay.nativeElement, { x: drag.prevX, y: drag.prevY });
-		const d = { x: position.x - previous.x, y: position.y - previous.y };
 		for (const node of this.selection) {
 			if (movableNodes.includes(node.name) && this.applyTransform) {
-				this.moveNodeApplied(node, d);
+				this.moveNodeApplied(node, drag.delta);
 			} else {
-				this.moveNode(node, d);
+				this.moveNode(node, drag.delta);
 			}
 		}
-		if ((<DragEvent> event.event).end) {
+		if (drag.type === "dragend") {
 			this.history.snapshot("Move (translate) element");
 		}
 	}
@@ -484,14 +481,11 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	scaleNode(node: Observable<SavageSVG>, corner: "topLeft" | "topRight" | "bottomRight" | "bottomLeft", event: DragEvent): void {
-		const position = screen2svg(this.overlay.nativeElement, { x: event.x, y: event.y });
-		const previous = screen2svg(this.overlay.nativeElement, { x: event.prevX, y: event.prevY });
-		const d = { x: position.x - previous.x, y: position.y - previous.y };
 		const bbox = this.bbox(node);
 		let sx: number;
 		let sy: number;
 		if (scalableNodes.includes(node.name) && this.applyTransform) {
-			this.scaleNodeApplied(node, corner, d, bbox);
+			this.scaleNodeApplied(node, corner, event.delta, bbox);
 		} else {
 			let matrix: Matrix;
 			if (node.attributes.transform) {
@@ -501,29 +495,29 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 			}
 			switch (corner) {
 				case "topLeft":
-					sx = bbox.width / (bbox.width + d.x);
-					sy = bbox.height / (bbox.height + d.y);
+					sx = bbox.width / (bbox.width + event.dx);
+					sy = bbox.height / (bbox.height + event.dy);
 					matrix = compose(scale(sx, sy, bbox.right, bbox.bottom), matrix);
 					break;
 				case "topRight":
-					sx = bbox.width / (bbox.width - d.x);
-					sy = bbox.height / (bbox.height + d.y);
+					sx = bbox.width / (bbox.width - event.dx);
+					sy = bbox.height / (bbox.height + event.dy);
 					matrix = compose(scale(sx, sy, bbox.x, bbox.bottom), matrix);
 					break;
 				case "bottomLeft":
-					sx = bbox.width / (bbox.width + d.x);
-					sy = bbox.height / (bbox.height - d.y);
+					sx = bbox.width / (bbox.width + event.dx);
+					sy = bbox.height / (bbox.height - event.dy);
 					matrix = compose(scale(sx, sy, bbox.right, bbox.y), matrix);
 					break;
 				case "bottomRight":
-					sx = bbox.width / (bbox.width - d.x);
-					sy = bbox.height / (bbox.height - d.y);
+					sx = bbox.width / (bbox.width - event.dx);
+					sy = bbox.height / (bbox.height - event.dy);
 					matrix = compose(scale(sx, sy, bbox.x, bbox.y), matrix);
 					break;
 			}
 			node.attributes.transform = toSVG(smoothMatrix(matrix, 10 ** 7));
 		}
-		if (event.end) {
+		if (event.type === "dragend") {
 			this.history.snapshot("Scale element");
 		}
 	}
@@ -831,7 +825,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	rotateNode(node: Observable<SavageSVG>, event: DragEvent): void {
-		const d = { x: event.x - event.prevX, y: event.y - event.prevY };
+		const d = { x: event.dx, y: event.dy };
 		const angle = Math.abs(d.x) > Math.abs(d.y) ? d.x : d.y;
 		const bbox = this.bbox(node);
 		const cx = bbox.x + bbox.width / 2;
@@ -847,7 +841,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 			}
 			node.attributes.transform = toSVG(smoothMatrix(compose(rotateDEG(angle, cx, cy), matrix), 10 ** 7));
 		}
-		if (event.end) {
+		if (event.type === "dragend") {
 			this.history.snapshot("Rotate element");
 		}
 	}
@@ -899,9 +893,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	skewNode(node: Observable<SavageSVG>, axis: "x" | "y", event: DragEvent): void {
-		const position = screen2svg(this.overlay.nativeElement, { x: event.x, y: event.y });
-		const previous = screen2svg(this.overlay.nativeElement, { x: event.prevX, y: event.prevY });
-		const angle = axis === "x" ? (position.x - previous.x) / 100 : (position.y - previous.y) / 100;
+		const angle = axis === "x" ? event.dx / 100 : event.dy / 100;
 		if (skewableNodes.includes(node.name) && this.applyTransform) {
 			this.skewNodeApplied(node, axis, angle);
 		} else {
@@ -914,7 +906,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 			node.attributes.transform = toSVG(smoothMatrix(
 				compose(skew(axis === "x" ? angle : 0, axis === "y" ? angle : 0), matrix), 10 ** 7));
 		}
-		if (event.end) {
+		if (event.type === "dragend") {
 			this.history.snapshot("Skew element");
 		}
 	}

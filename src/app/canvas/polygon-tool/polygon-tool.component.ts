@@ -3,13 +3,13 @@ import { nanoid } from "nanoid/non-secure";
 import { compose, fromDefinition, fromTransformAttribute, Matrix, applyToPoint, inverse } from "transformation-matrix";
 import { Path, Point, Rectangle, Size } from "paper";
 import { parse as pointsParse, serialize as pointsSerialize } from "svg-numbers";
+import { DragEvent } from "@interactjs/types/index";
 
 import { Change, Observable } from "../../types/observer";
 import { SavageSVG, screen2svg, findParent, find } from "../../types/svg";
 import { ICanvasTool, CanvasService } from "../../services/canvas.service";
 import { HistoryService } from "../../services/history.service";
 import { IDocumentEvent } from "../document/document.component";
-import { DragEvent } from "../directives/draggable.directive";
 import { ObjectToolComponent } from "../object-tool/object-tool.component";
 
 
@@ -299,27 +299,21 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	move(event: DragEvent): void {
-		const position = screen2svg(this.overlay.nativeElement, { x: event.x, y: event.y });
-		const previous = screen2svg(this.overlay.nativeElement, { x: event.prevX, y: event.prevY });
-		const d = { x: position.x - previous.x, y: position.y - previous.y };
-		(<ObjectToolComponent> this.canvas.tools.OBJECT).moveNodeApplied(this.selection, d);
+		(<ObjectToolComponent> this.canvas.tools.OBJECT).moveNodeApplied(this.selection, event.delta);
 		if (this.poly) {
 			const poly = {...this.poly};
-			poly.cx += d.x;
-			poly.cy += d.y;
+			poly.cx += event.dx;
+			poly.cy += event.dy;
 			this.selection.attributes["data-savage-polygon"] = JSON.stringify(poly);
 		}
-		if (event.end) {
+		if (event.type === "dragend") {
 			this.history.snapshot("Move (translate) element");
 		}
 	}
 
 	radius(radius: "r1" | "r2", event: DragEvent): void {
-		const position = screen2svg(this.overlay.nativeElement, { x: event.x, y: event.y });
-		const previous = screen2svg(this.overlay.nativeElement, { x: event.prevX, y: event.prevY });
-		const rd = position.x - previous.x;
 		const poly = {...this.poly};
-		poly[radius] += rd;
+		poly[radius] += event.dx;
 		let path: paper.Path;
 		if (poly.star) {
 			path = new Path.Star(new Point(poly.cx, poly.cy), poly.sides, poly.r1, poly.r2);
@@ -362,11 +356,8 @@ export class PolygonToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	handlePointDrag(index: number, event: DragEvent): void {
-		const position = screen2svg(this.overlay.nativeElement, { x: event.x, y: event.y });
-		const previous = screen2svg(this.overlay.nativeElement, { x: event.prevX, y: event.prevY });
-		const d = { x: position.x - previous.x, y: position.y - previous.y };
-		this.pointsMove(d);
-		if (event.end) {
+		this.pointsMove(event.delta);
+		if (event.type === "dragend") {
 			this.history.snapshot("Move point");
 		}
 	}

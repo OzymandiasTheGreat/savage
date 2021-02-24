@@ -1,9 +1,9 @@
 import { Injectable } from "@angular/core";
+import { SnapPosition } from "@interactjs/modifiers/snap/pointer";
 
 import { Observable } from "../types/observer";
 import { SavageSVG } from "../types/svg";
 import { IDocumentEvent } from "../canvas/document/document.component";
-import { ISnapTarget } from "../canvas/directives/draggable.directive";
 
 
 export interface ICanvasTool {
@@ -28,21 +28,17 @@ export class CanvasService {
 	activeTool = null;
 	scale = 1;
 
-	grid: { enabled: boolean, step: number } = { enabled: false, step: 50 };
-	guides: ISnapTarget[] = [];
-	boundaries: { x: number, y: number, width: number, height: number };
+	grid: {
+		enabled: boolean,
+		step: number,
+		limits: { top: number, left: number, bottom: number, right: number }
+	} = {
+		enabled: false,
+		step: 50,
+		limits: { top: 0, left: 0, bottom: 50, right: 50 },
+	};
+	guides: SnapPosition[] = [];
 	snapping: boolean;
-	get snap(): ISnapTarget[] {
-		const targets: ISnapTarget[] = [];
-		if (this.snapping) {
-			targets.push({ ...this.boundaries, corner: "all" });
-			if (this.grid.enabled) {
-				targets.push({ step: this.grid.step, gravity: this.grid.step / 4, corner: "all" });
-			}
-			targets.concat(this.guides.map((g) => ({ ...g, corner: "all" })));
-		}
-		return targets;
-	}
 
 	constructor() { }
 }

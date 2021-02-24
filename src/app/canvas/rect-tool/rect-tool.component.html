@@ -21,9 +21,10 @@
 			<svg:rect *ngFor="let corner of ['topLeft', 'bottomRight']"
 				pointer-events="all"
 				appDraggable
-				[containment]="scrollable"
-				[autoScroll]="scrollable"
-				[snap]="canvas.snap"
+				[grid]="canvas.grid"
+				[guides]="canvas.guides"
+				[snap]="canvas.snapping"
+				[doc]="overlay"
 				(dragging)="scaleSelection(corner, $event)"
 				[attr.x]="corner.endsWith('Left') ? bbox.x - 3.5 * (wx / scale) : bbox.right - 3.5 * (wx / scale)"
 				[attr.y]="corner.startsWith('top') ? bbox.y - 3.5 * (hx / scale) : bbox.bottom - 3.5 * (hx / scale)"
@@ -37,9 +38,10 @@
 			<svg:circle
 				pointer-events="all"
 				appDraggable
-				[containment]="{ x: bbox.x + (bbox.width / 2) + (3.5 * (wx / scale)), y: bbox.y, width: (bbox.width / 2) + (7 * (wx / scale)) , height: 0 }"
-				[autoScroll]="scrollable"
-				[snap]="canvas.snap"
+				[grid]="canvas.grid"
+				[guides]="canvas.guides"
+				[snap]="canvas.snapping"
+				[doc]="overlay"
 				(dragging)="radius('rx', $event)"
 				[attr.cx]="bbox.right - rx"
 				[attr.cy]="bbox.y"
@@ -52,9 +54,10 @@
 			<svg:circle
 				pointer-events="all"
 				appDraggable
-				[containment]="{ x: bbox.right, y: bbox.bottom - (3.5 * (hx / scale)), width: 0, height: (bbox.height / 2) + (7 * (hx / scale)) }"
-				[autoScroll]="scrollable"
-				[snap]="canvas.snap"
+				[grid]="canvas.grid"
+				[guides]="canvas.guides"
+				[snap]="canvas.snapping"
+				[doc]="overlay"
 				(dragging)="radius('ry', $event)"
 				[attr.cx]="bbox.right"
 				[attr.cy]="bbox.y + ry"
@@ -67,9 +70,10 @@
 			<svg:rect
 				pointer-events="all"
 				appDraggable
-				[containment]="scrollable"
-				[autoScroll]="scrollable"
-				[snap]="canvas.snap"
+				[grid]="canvas.grid"
+				[guides]="canvas.guides"
+				[snap]="canvas.snapping"
+				[doc]="overlay"
 				(dragging)="move($event)"
 				[attr.x]="bbox.x + (bbox.width / 2) - (3.5 * (wx / scale))"
 				[attr.y]="bbox.y + (bbox.height / 2) - (3.5 * (hx / scale))"
@@ -79,7 +83,7 @@
 				stroke="#212121"
 				[attr.stroke-width]="1 * (wx / scale)"
 				vector-effect="non-scaling-size"
-				[transform]="'rotate(' + 45 + ', ' + (bbox.x + (bbox.width / 2)) + ', ' + (bbox.y + (bbox.height / 2)) + ')'"
+				[attr.transform]="'rotate(' + 45 + ', ' + (bbox.x + (bbox.width / 2)) + ', ' + (bbox.y + (bbox.height / 2)) + ')'"
 			></svg:rect>
 		</ng-container>
 	</ng-container>

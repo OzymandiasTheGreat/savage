@@ -1,13 +1,12 @@
 import { Component, OnInit, OnDestroy, Input, ViewChild, ElementRef } from "@angular/core";
 import { nanoid } from "nanoid/non-secure";
-import { applyToPoint, compose, fromDefinition, fromTransformAttribute } from "transformation-matrix";
+import { DragEvent } from "@interactjs/types/index";
 
 import { Observable } from "../../types/observer";
 import { SavageSVG, findParent, screen2svg } from "../../types/svg";
 import { ICanvasTool, CanvasService } from "../../services/canvas.service";
 import { HistoryService } from "../../services/history.service";
 import { IDocumentEvent } from "../document/document.component";
-import { DragEvent } from "../directives/draggable.directive";
 import { ObjectToolComponent } from "../object-tool/object-tool.component";
 
 
@@ -159,33 +158,25 @@ export class RectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	scaleSelection(corner: "topLeft" | "topRight" | "bottomRight" | "bottomLeft", event: DragEvent): void {
-		const position = screen2svg(this.overlay.nativeElement, { x: event.x, y: event.y });
-		const previous = screen2svg(this.overlay.nativeElement, { x: event.prevX, y: event.prevY });
-		const d = { x: position.x - previous.x, y: position.y - previous.y };
-		(<ObjectToolComponent> this.canvas.tools.OBJECT).scaleNodeApplied(this.selection, corner, d, this.bbox);
-		if (event.end) {
+		(<ObjectToolComponent> this.canvas.tools.OBJECT).scaleNodeApplied(this.selection, corner, event.delta, this.bbox);
+		if (event.type === "dragend") {
 			this.history.snapshot("Scale element");
 		}
 	}
 
 	radius(axis: "rx" | "ry", event: DragEvent): void {
-		const position = screen2svg(this.overlay.nativeElement, { x: event.x, y: event.y });
-		const previous = screen2svg(this.overlay.nativeElement, { x: event.prevX, y: event.prevY });
-		const d = { rx: previous.x - position.x, ry: position.y - previous.y};
+		const d = { rx: -event.dx, ry: event.dy};
 		if (d[axis]) {
 			this.selection.attributes[axis] = `${this[axis] + d[axis]}`;
 		}
-		if (event.end) {
+		if (event.type === "dragend") {
 			this.history.snapshot("Change corner radius");
 		}
 	}
 
 	move(event: DragEvent): void {
-		const position = screen2svg(this.overlay.nativeElement, { x: event.x, y: event.y });
-		const previous = screen2svg(this.overlay.nativeElement, { x: event.prevX, y: event.prevY });
-		const d = { x: position.x - previous.x, y: position.y - previous.y };
-		(<ObjectToolComponent> this.canvas.tools.OBJECT).moveNodeApplied(this.selection, d);
-		if (event.end) {
+		(<ObjectToolComponent> this.canvas.tools.OBJECT).moveNodeApplied(this.selection, event.delta);
+		if (event.type === "dragend") {
 			this.history.snapshot("Move (translate) element");
 		}
 	}

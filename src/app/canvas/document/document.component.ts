@@ -1,10 +1,10 @@
 import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { INode, stringify } from "svgson";
+import { DragEvent } from "@interactjs/types/index";
 
 import { Observable } from "../../types/observer";
 import { SavageSVG, findParent } from "../../types/svg";
 import { CanvasService } from "../../services/canvas.service";
-import { DragEvent } from "../directives/draggable.directive";
 
 
 export interface IDocumentEvent {

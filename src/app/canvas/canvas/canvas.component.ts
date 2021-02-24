@@ -21,26 +21,32 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
 	panning = false;
 	get scale(): number { return this.canvas.scale; }
 	set scale(val: number) { this.canvas.scale = val; }
-	get guides(): { width: number, height: number, top: number, left: number, borderRight: number, borderBottom: number }[] {
-		const guides: { width: number, height: number, top: number, left: number, borderRight: number, borderBottom: number }[] = [];
+	get wx(): number {
+		const viewBox = parseFloat(this.document.attributes.viewBox?.split(" ")[2]);
+		const width = parseFloat(this.document.attributes.width || `${viewBox}`);
+		return width / viewBox || 1.5;
+	}
+	get hx(): number {
+		const viewBox = parseFloat(this.document.attributes.viewBox?.split(" ")[3]);
+		const height = parseFloat(this.document.attributes.height || `${viewBox}`);
+		return height / viewBox || 1.5;
+	}
+	get guides(): { x1: number, x2: number, y1: number, y2: number }[] {
+		const guides: { x1: number, x2: number, y1: number, y2: number }[] = [];
 		for (const target of this.canvas.guides) {
 			if (target.x) {
 				guides.push({
-					width: 0,
-					height: 100,
-					top: 0,
-					left: <number> target.x + this.container.nativeElement.offsetLeft,
-					borderRight: 1,
-					borderBottom: 0,
+					x1: target.x,
+					x2: target.x,
+					y1: 0,
+					y2: parseFloat(this.height),
 				});
 			} else {
 				guides.push({
-					width: 100,
-					height: 0,
-					top: <number> target.y + this.container.nativeElement.offsetTop,
-					left: 0,
-					borderRight: 0,
-					borderBottom: 1,
+					x1: 0,
+					x2: parseFloat(this.width),
+					y1: target.y,
+					y2: target.y,
 				});
 			}
 		}
@@ -49,9 +55,9 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
 	get gridX(): number[] {
 		const grid: number[] = [];
 		if (this.container) {
-			const offset = (this.scrollable.nativeElement.clientWidth % this.container.nativeElement.clientWidth) / 2;
-			for (let i = 0; i < this.scrollable.nativeElement.clientWidth; i += this.canvas.grid.step) {
-				grid.push(offset + i);
+			const width = parseFloat(this.width) + this.canvas.grid.step;
+			for (let i = 0; i < width; i += this.canvas.grid.step) {
+				grid.push(i);
 			}
 		}
 		return grid;
@@ -59,9 +65,9 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
 	get gridY(): number[] {
 		const grid: number[] = [];
 		if (this.container) {
-			const offset = (this.scrollable.nativeElement.clientHeight % this.container.nativeElement.clientHeight) / 2;
-			for (let i = 0; i < this.scrollable.nativeElement.clientHeight; i += this.canvas.grid.step) {
-				grid.push(offset + i);
+			const height = parseFloat(this.height) + this.canvas.grid.step;
+			for (let i = 0; i < height; i += this.canvas.grid.step) {
+				grid.push(i);
 			}
 		}
 		return grid;
@@ -96,6 +102,9 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
 		}
 		this.file.openFile.subscribe((file) => {
 			this.document = file;
+			const width = this.scrollable.nativeElement.getBoundingClientRect().width;
+			const height = this.scrollable.nativeElement.getBoundingClientRect().height;
+			this.canvas.grid = { ...this.canvas.grid, limits: { top: 0, left: 0, right: width, bottom: height } };
 		});
 	}
 
@@ -117,7 +126,6 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
 			setTimeout(() => {
 				const rect = this.container.nativeElement.getBoundingClientRect();
 				this.container.nativeElement.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
-				this.canvas.boundaries = { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
 			}, 100);
 		});
 	}

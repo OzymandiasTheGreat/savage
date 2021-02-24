@@ -2,13 +2,13 @@ import { Component, OnInit, OnDestroy, Input, ViewChild, ElementRef } from "@ang
 import { nanoid } from "nanoid/non-secure";
 import { compose, fromDefinition, fromTransformAttribute, applyToPoint } from "transformation-matrix";
 import partialCircle from "svg-partial-circle";
+import { DragEvent } from "@interactjs/types/index";
 
 import { Observable } from "../../types/observer";
 import { findParent, SavageSVG, screen2svg } from "../../types/svg";
 import { ICanvasTool, CanvasService } from "../../services/canvas.service";
 import { HistoryService } from "../../services/history.service";
 import { IDocumentEvent } from "../document/document.component";
-import { DragEvent } from "../directives/draggable.directive";
 import { ObjectToolComponent } from "../object-tool/object-tool.component";
 
 
@@ -203,7 +203,9 @@ export class CircleToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		this.drawing = null;
 	}
 
-	handleKeyDown(event: IDocumentEvent): void { }
+	handleKeyDown(event: IDocumentEvent): void {
+		this.canvas.tools.OBJECT.handleKeyDown(event);
+	}
 
 	get bbox(): DOMRect {
 		// const rect = this.canvas.registry[this.selection?.nid]?.getBBox();
@@ -235,29 +237,24 @@ export class CircleToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	move(event: DragEvent): void {
-		const position = screen2svg(this.overlay.nativeElement, { x: event.x, y: event.y });
-		const previous = screen2svg(this.overlay.nativeElement, { x: event.prevX, y: event.prevY });
-		const d = { x: position.x - previous.x, y: position.y - previous.y };
-		(<ObjectToolComponent> this.canvas.tools.OBJECT).moveNodeApplied(this.selection, d);
+		(<ObjectToolComponent> this.canvas.tools.OBJECT).moveNodeApplied(this.selection, event.delta);
 		if (this.arc) {
 			const arc: Omit<SavageArc, "startX" | "startY" | "endX" | "endY"> = {
-				cx: this.arc.cx + d.x,
-				cy: this.arc.cy + d.y,
+				cx: this.arc.cx + event.dx,
+				cy: this.arc.cy + event.dy,
 				r: this.arc.r,
 				start: this.arc.start,
 				end: this.arc.end,
 			};
 			this.selection.attributes["data-savage-arc"] = JSON.stringify(arc);
 		}
-		if (event.end) {
+		if (event.type === "dragend") {
 			this.history.snapshot("Move (translate) element");
 		}
 	}
 
 	radius(axis: "r" | "rx" | "ry", event: DragEvent): void {
-		const position = screen2svg(this.overlay.nativeElement, { x: event.x, y: event.y });
-		const previous = screen2svg(this.overlay.nativeElement, { x: event.prevX, y: event.prevY });
-		const d: any = { rx: position.x - previous.x, ry: position.y - previous.y };
+		const d: any = { rx: event.dx, ry: event.dy };
 		d.r = Math.abs(d.rx) > Math.abs(d.ry) ? d.rx : d.ry;
 		if (d[axis]) {
 			if (this.arc) {
@@ -273,13 +270,13 @@ export class CircleToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				this.selection.attributes[axis] = parseFloat(this.selection.attributes[axis]) + d[axis];
 			}
 		}
-		if (event.end) {
+		if (event.type === "dragend") {
 			this.history.snapshot("Scale element");
 		}
 	}
 
 	changeArc(end: "start" | "end", event: DragEvent): void {
-		const position = screen2svg(this.overlay.nativeElement, { x: event.x, y: event.y });
+		const position = { x: event.pageX, y: event.pageY };
 		const angle = Math.atan2(position.y - this.arc.cy, position.x - this.arc.cx);
 		const arc = {...this.arc};
 		delete arc.startX;
@@ -289,5 +286,8 @@ export class CircleToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		arc[end] = angle;
 		this.selection.attributes.d = partialCircle(arc.cx, arc.cy, arc.r, arc.start, arc.end).map((c) => c.join(" ")).join(" ");
 		this.selection.attributes["data-savage-arc"] = JSON.stringify(arc);
+		if (event.type === "dragend") {
+			this.history.snapshot("Adjust arc");
+		}
 	}
 }

@@ -22,6 +22,50 @@
 				(handleDblClick)="handleDblClick($event)"
 				(handleMouseDown)="handleMouseDown($event)"
 				(handleKeyDown)="handleKeyDown($event)" ></app-document>
+
+			<svg *ngIf="canvas.grid.enabled" xmlns="http://www.w3.org/2000/svg"
+				class="savage-app-canvas-grid"
+				[appAttrs]="document"
+				[skipAttrs]="['overflow', 'pointer-events']"
+				[ngStyle]="{ 'pointer-events': 'none', overflow: 'visible' }"
+			>
+				<svg:line *ngFor="let line of gridX" class="savage-app-canvas-grid-line"
+					[attr.x1]="line"
+					[attr.x2]="line"
+					y1="0"
+					[attr.y2]="height"
+					stroke="#212121"
+					[attr.stroke-width]="1 * wx / scale"
+					vector-effect="non-scaling-size"
+				></svg:line>
+				<svg:line *ngFor="let line of gridY" class="savage-app-canvas-grid-line"
+					[attr.y1]="line"
+					[attr.y2]="line"
+					x1="0"
+					[attr.x2]="width"
+					stroke="#212121"
+					[attr.stroke-width]="1 * hx / scale"
+					vector-effect="non-scaling-size"
+				></svg:line>
+			</svg>
+
+			<svg *ngIf="canvas.guides.length" xmlns="http://www.w3.org/2000/svg"
+				class="savage-app-canvas-guides"
+				[appAttrs]="document"
+				[skipAttrs]="['overflow', 'pointer-events']"
+				[ngStyle]="{ 'pointer-events': 'none', overflow: 'visible' }"
+			>
+				<svg:line *ngFor="let guide of guides" class="savage-app-canvas-guides-line"
+					[attr.x1]="guide.x1"
+					[attr.x2]="guide.x2"
+					[attr.y1]="guide.y1"
+					[attr.y2]="guide.y2"
+					stroke="#212121"
+					[attr.stroke-width]="1 * wx / scale"
+					vector-effect="non-scaling-size"
+				></svg:line>
+			</svg>
+
 			<app-object-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" [scale]="scale" ></app-object-tool>
 			<app-path-tool [document]="document" [scrollable]="scrollable" [node]="canvas.selection" [scale]="scale" ></app-path-tool>
 			<app-line-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" [scale]="scale" ></app-line-tool>
@@ -32,20 +76,5 @@
 			<app-gradient-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" ></app-gradient-tool>
 		</div>
 		<app-text-tool *ngIf="!!document" [document]="document" [scrollable]="scrollable" [node]="canvas.selection" ></app-text-tool>
-		<ng-container *ngIf="!!document && canvas.grid.enabled" >
-			<div class="savage-app-canvas-gridline" *ngFor="let line of gridY" [style.transform]="'scale(' + scale + ')'" [style.top.px]="line" [style.width.%]="100" ></div>
-			<div class="savage-app-canvas-gridline" *ngFor="let line of gridX" [style.transform]="'scale(' + scale + ')'" [style.left.px]="line" [style.height.%]="100" ></div>
-		</ng-container>
-		<ng-container *ngIf="!!document" >
-			<div class="savage-app-canvas-guide" *ngFor="let guide of guides"
-				[style.transform]="'scale(' + scale + ')'"
-				[style.width.%]="guide.width"
-				[style.height.%]="guide.height"
-				[style.top.px]="guide.top"
-				[style.left.px]="guide.left"
-				[style.border-right]="guide.borderRight + 'px solid #212121'"
-				[style.border-bottom]="guide.borderBottom + 'px solid #212121'"
-			></div>
-		</ng-container>
 	</div>
 </div>
