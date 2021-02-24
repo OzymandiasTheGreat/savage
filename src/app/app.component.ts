@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
+import { BreakpointObserver, Breakpoints } from "@angular/cdk/layout";
 import { MatSidenav } from "@angular/material/sidenav";
 import googleFonts from "google-fonts-complete/google-fonts.json";
 
@@ -13,15 +14,20 @@ import { HistoryService } from "./services/history.service";
 })
 export class AppComponent implements OnInit {
 	title = "savage";
+	smallScreen: boolean;
 	@ViewChild("sidedrawer", { static: true }) sidedrawer: MatSidenav;
 	@ViewChild("sidebar", { static: true }) sidebar: MatSidenav;
 
 	constructor(
+		protected breakpoint: BreakpointObserver,
 		public hotkey: HotkeyService,
 		public history: HistoryService,
 	) { }
 
 	ngOnInit(): void {
+		this.breakpoint.observe([Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium]).subscribe((result) => {
+			this.smallScreen = result.matches;
+		});
 		setTimeout(async () => {
 			for (const [family, font] of Object.entries(googleFonts)) {
 				for (const [style, variant] of Object.entries(font.variants)) {

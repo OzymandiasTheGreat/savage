@@ -1,4 +1,4 @@
-<mat-toolbar color="accent" class="savage-app-menubar" [ngStyle]="{ 'height.px': smallScreen ? 96 : 48 }">
+<mat-toolbar color="accent" class="savage-app-menubar" [ngStyle]="{ 'min-height.px': smallScreen ? 96 : 48 }">
 	<mat-toolbar-row>
 		<span class="savage-app-menubar-left" >
 			<button mat-icon-button matTooltip="Open Sidedrawer" (click)="sidedrawer.toggle()" ><mat-icon svgIcon="menu" ></mat-icon></button>
@@ -84,7 +84,7 @@
 			</svg>
 		</span>
 	</mat-toolbar-row>
-	<mat-toolbar-row *ngIf="smallScreen" >
+	<mat-toolbar-row *ngIf="smallScreen" class="savage-app-menubar-center" >
 		<button mat-flat-button [matMenuTriggerFor]="gridMenu" >Grid <mat-icon svgIcon="menu-down" ></mat-icon></button>
 			<mat-menu #gridMenu >
 				<button mat-menu-item (click)="toggleGrid()" >Toggle grid</button>
