@@ -2,9 +2,12 @@ import { Component, OnInit, ViewChild } from "@angular/core";
 import { MatDrawer } from "@angular/material/sidenav";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { MatSelectionListChange } from "@angular/material/list";
+import { MatButtonToggleChange } from "@angular/material/button-toggle";
+import { MatIconRegistry } from "@angular/material/icon";
 import { stringify } from "svgson";
 import { html } from "js-beautify";
 import { getDiff, applyDiff } from "recursive-diff";
+import mdiIcons from "@mdi/svg/meta.json";
 
 import { Observable, recursiveUnobserve } from "../../types/observer";
 import { SavageSVG } from "../../types/svg";
@@ -13,6 +16,23 @@ import { SvgFileService } from "../../services/svg-file.service";
 import { HistoryService } from "../../services/history.service";
 import { HotkeyService } from "../../services/hotkey.service";
 import { CodeEditorSheetComponent } from "../code-editor-sheet/code-editor-sheet.component";
+
+
+export interface MDIIcon {
+	"id": string;
+	"name": string;
+	"codepoint": string;
+	"aliases": string[];
+	"tags": string[];
+	"author": string;
+	"version": string;
+}
+
+
+export interface Icon {
+	name: string;
+	query: string[];
+}
 
 
 @Component({
@@ -110,6 +130,8 @@ export class ToolbarComponent implements OnInit {
 			(<any> this.canvas.tools.SHAPE).donutWidth = val;
 		}
 	}
+	icons: Icon[];
+	stampResults: Icon[];
 
 	constructor(
 		public canvas: CanvasService,
@@ -117,9 +139,18 @@ export class ToolbarComponent implements OnInit {
 		public history: HistoryService,
 		public hotkey: HotkeyService,
 		protected sheet: MatBottomSheet,
+		protected registry: MatIconRegistry,
 	) { }
 
 	ngOnInit(): void {
+		this.icons = (<MDIIcon[]> mdiIcons).map((i) => {
+			let query: string[] = [];
+			query.push(i.name);
+			query = query.concat(i.aliases);
+			query = query.concat(i.tags);
+			return { name: i.name, query };
+		});
+		this.stampResults = this.icons.slice(0, 35);
 		this.file.openFile.subscribe((file) => {
 			this.document = file;
 			this.disabled = !file;
@@ -206,5 +237,23 @@ export class ToolbarComponent implements OnInit {
 
 	shapeModeChanged(change: MatSelectionListChange): void {
 		this.shapeMode = change.options.filter((o) => o.selected)[0].value;
+	}
+
+	onKeyDown(event: KeyboardEvent): void {
+		event.stopPropagation();
+	}
+
+	onStampQuery(event: InputEvent): void {
+		const query = (<HTMLInputElement> event.target).value;
+		event.stopPropagation();
+		this.stampResults = this.icons.filter((i) => i.query.some((q) => q.includes(query.toLowerCase()))).slice(0, 35);
+	}
+
+	onStampSelected(change: MatButtonToggleChange): void {
+		const icon: Icon = change.value;
+		this.registry.getNamedSvgIcon(icon.name).subscribe((svg) => {
+			(<any> this.canvas.tools.STAMP).d = (<SVGPathElement> svg.firstChild).getAttribute("d");
+			console.log((<any> this.canvas.tools.STAMP).d);
+		});
 	}
 }

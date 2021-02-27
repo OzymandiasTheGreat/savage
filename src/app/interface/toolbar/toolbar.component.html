@@ -50,11 +50,18 @@
 			<mat-icon svgIcon="signature-text" ></mat-icon>
 		</mat-button-toggle>
 		<mat-button-toggle matTooltip="Draw complex shapes"
-		[checked]="canvas.activeTool === 'SHAPE'"
-		(click)="setTool('SHAPE')"
-		(contextmenu)="setTool('SHAPE')"
+			[checked]="canvas.activeTool === 'SHAPE'"
+			(click)="setTool('SHAPE')"
+			(contextmenu)="setTool('SHAPE')"
 		>
 			<mat-icon svgIcon="shape-plus" ></mat-icon>
+		</mat-button-toggle>
+		<mat-button-toggle matTooltip="Draw predefined shapes"
+			[checked]="canvas.activeTool === 'STAMP'"
+			(click)="setTool('STAMP')"
+			(contextmenu)="setTool('STAMP')"
+		>
+			<mat-icon svgIcon="stamper" ></mat-icon>
 		</mat-button-toggle>
 		<mat-button-toggle matTooltip="Draw freehand lines and curves"
 			[checked]="canvas.activeTool === 'FREEHAND'"
@@ -214,6 +221,25 @@
 						</mat-list-item>
 					</mat-list>
 				</div>
+			</div>
+			<div *ngSwitchCase="'STAMP'"
+				class="savage-app-toolbar-options"
+			>
+				<div class="savage-app-toolbar-options-top" >
+					<div class="savage-app-toolbar-options-close" >
+						<button mat-icon-button
+							class="savage-app-toolbar-options-close-button"
+							(click)="options.close()"
+						><mat-icon svgIcon="close" ></mat-icon></button>
+					</div>
+				</div>
+				<mat-form-field>
+					<mat-label>Search</mat-label>
+					<input matInput (input)="onStampQuery($event)" (keydown)="onKeyDown($event)" type="text" name="stamp-search" >
+				</mat-form-field>
+				<mat-button-toggle-group (change)="onStampSelected($event)" [multiple]="false" >
+					<mat-button-toggle *ngFor="let icon of stampResults" [value]="icon" ><mat-icon [svgIcon]="icon.name" ></mat-icon></mat-button-toggle>
+				</mat-button-toggle-group>
 			</div>
 			<div *ngSwitchCase="'FREEHAND'"
 				class="savage-app-toolbar-options"

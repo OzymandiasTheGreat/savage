@@ -1,0 +1,14 @@
+<svg #overlay xmlns="http://www.w3.org/2000/svg"
+	class="savage-app-canvas-stamp-tool"
+	overflow="visible"
+	pointer-events="none"
+	[appAttrs]="document"
+	[skipAttrs]="['overflow', 'pointer-events']"
+>
+	<svg:path *ngIf="!!drawing"
+		[attr.d]="drawing.attributes.d"
+		fill="#21212133"
+		stroke="currentColor"
+		[attr.stroke-width]="this.wx"
+	></svg:path>
+</svg>

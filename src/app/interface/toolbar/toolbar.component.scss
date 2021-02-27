@@ -7,25 +7,25 @@
 	height: 100%;
 }
 
+.mat-button-toggle-group {
+	flex-flow: row wrap;
+	border-radius: 0;
+
+	.mat-button-toggle {
+		background-color: #ffffff33;
+	}
+
+	.mat-button-toggle-checked {
+		background-color: #ffffff99;
+	}
+}
+
 mat-toolbar {
 	width: 98px;
 	min-width: 98px;
 	height: 100%;
 	padding: 0;
 	flex-flow: column nowrap;
-
-	.mat-button-toggle-group {
-		flex-flow: row wrap;
-		border-radius: 0;
-
-		.mat-button-toggle {
-			background-color: #ffffff33;
-		}
-
-		.mat-button-toggle-checked {
-			background-color: #ffffff99;
-		}
-	}
 }
 
 .mat-drawer-container {
@@ -34,7 +34,8 @@ mat-toolbar {
 
 	.mat-drawer {
 		opacity: 0.75;
-		min-width: 232px;
+		min-width: 242px;
+		width: 277px;
 	}
 
 	.savage-app-toolbar-options {

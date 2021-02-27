@@ -28,6 +28,7 @@
     "@angular/service-worker": "~10.2.0",
     "@circlon/angular-tree-component": "^10.0.1",
     "@mdi/angular-material": "^5.9.55",
+    "@mdi/svg": "^5.9.55",
     "@ngneat/edit-in-place": "^1.1.0",
     "@thebespokepixel/es-tinycolor": "github:thebespokepixel/es-tinycolor",
     "canvg": "^3.0.7",
