@@ -132,6 +132,12 @@ export class ToolbarComponent implements OnInit {
 	}
 	icons: Icon[];
 	stampResults: Icon[];
+	get eyedropperField(): string { return (<any> this.canvas.tools.EYEDROPPER).field; }
+	set eyedropperField(val: string) {
+		if (this.canvas.tools.EYEDROPPER) {
+			(<any> this.canvas.tools.EYEDROPPER).field = val;
+		}
+	}
 
 	constructor(
 		public canvas: CanvasService,
@@ -255,5 +261,9 @@ export class ToolbarComponent implements OnInit {
 			(<any> this.canvas.tools.STAMP).d = (<SVGPathElement> svg.firstChild).getAttribute("d");
 			console.log((<any> this.canvas.tools.STAMP).d);
 		});
+	}
+
+	eyedropperFieldChanged(change: MatSelectionListChange): void {
+		this.eyedropperField = change.options.filter((o) => o.selected)[0].value;
 	}
 }

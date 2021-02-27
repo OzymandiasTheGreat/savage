@@ -46,7 +46,9 @@ export class StampToolComponent implements ICanvasTool, OnInit, OnDestroy {
 
 	ngOnInit(): void { }
 
-	ngOnDestroy(): void { }
+	ngOnDestroy(): void {
+		delete this.canvas.tools[this.name];
+	}
 
 	handleDrag(event: IDocumentEvent): void { }
 
@@ -100,5 +102,7 @@ export class StampToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		this.drawing = null;
 	}
 
-	handleKeyDown(event: IDocumentEvent): void { }
+	handleKeyDown(event: IDocumentEvent): void {
+		(<ObjectToolComponent> this.canvas.tools.OBJECT).handleKeyDown(event);
+	}
 }

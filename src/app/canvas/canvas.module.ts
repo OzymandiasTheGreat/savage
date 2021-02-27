@@ -20,6 +20,7 @@ import { FreehandToolComponent } from "./freehand-tool/freehand-tool.component";
 import { GradientToolComponent } from "./gradient-tool/gradient-tool.component";
 import { ShapeToolComponent } from "./shape-tool/shape-tool.component";
 import { StampToolComponent } from "./stamp-tool/stamp-tool.component";
+import { EyeDropperToolComponent } from "./eye-dropper-tool/eye-dropper-tool.component";
 
 
 @NgModule({
@@ -41,6 +42,7 @@ import { StampToolComponent } from "./stamp-tool/stamp-tool.component";
 		GradientToolComponent,
 		ShapeToolComponent,
 		StampToolComponent,
+		EyeDropperToolComponent,
 	],
 	imports: [
 		CommonModule,

@@ -77,6 +77,13 @@
 		>
 			<mat-icon svgIcon="gradient" ></mat-icon>
 		</mat-button-toggle>
+		<mat-button-toggle matTooltip="Pick color from canvas"
+			[checked]="canvas.activeTool === 'EYEDROPPER'"
+			(click)="setTool('EYEDROPPER')"
+			(contextmenu)="setTool('EYEDROPPER')"
+		>
+			<mat-icon svgIcon="eyedropper-variant" ></mat-icon>
+		</mat-button-toggle>
 	</mat-button-toggle-group>
 </mat-toolbar>
 <mat-drawer-container [hasBackdrop]="false" >
@@ -311,6 +318,23 @@
 						</mat-form-field>
 					</mat-list-item>
 				</mat-list>
+			</div>
+			<div *ngSwitchCase="'EYEDROPPER'"
+				class="savage-app-toolbar-options"
+			>
+				<div class="savage-app-toolbar-options-top" >
+					<div class="savage-app-toolbar-options-close" >
+						<button mat-icon-button
+							class="savage-app-toolbar-options-close-button"
+							(click)="options.close()"
+						><mat-icon svgIcon="close" ></mat-icon></button>
+					</div>
+				</div>
+				<mat-selection-list (selectionChange)="eyedropperFieldChanged($event)" [multiple]="false" >
+					<mat-list-option value="document" [selected]="eyedropperField === 'document'" >Document Color</mat-list-option>
+					<mat-list-option value="fill" [selected]="eyedropperField === 'fill'" >Selection Fill</mat-list-option>
+					<mat-list-option value="stroke" [selected]="eyedropperField === 'stroke'" >Selection Stroke</mat-list-option>
+				</mat-selection-list>
 			</div>
 		</ng-container>
 	</mat-drawer>

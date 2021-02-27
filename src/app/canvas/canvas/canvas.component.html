@@ -76,6 +76,7 @@
 			<app-stamp-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" [scale]="scale" ></app-stamp-tool>
 			<app-freehand-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" ></app-freehand-tool>
 			<app-gradient-tool [document]="document" [scrollable]="scrollable" [selection]="canvas.selection" ></app-gradient-tool>
+			<app-eye-dropper-tool [document]="document"[scrollable]="scrollable" [selection]="canvas.selection" [scale]="scale" ></app-eye-dropper-tool>
 		</div>
 		<app-text-tool *ngIf="!!document" [document]="document" [scrollable]="scrollable" [node]="canvas.selection" ></app-text-tool>
 	</div>
