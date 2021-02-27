@@ -254,8 +254,8 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 				ev.preventDefault();
 				for (const n of this.selection) {
 					parent = findParent(this.document, n.nid);
-					index = parent.children.findIndex((nd) => nd.nid === n.nid);
-					parent.children.splice(index, 1);
+					index = parent?.children.findIndex((nd) => nd.nid === n.nid);
+					parent?.children.splice(index, 1);
 					recursiveUnobserve(n);
 				}
 				this.history.snapshot("Remove element");
@@ -263,9 +263,9 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 			case "PageUp":
 				ev.preventDefault();
 				parent = findParent(this.document, node.nid);
-				index = parent.children.findIndex((n) => n.nid === node.nid);
-				parent.children.splice(index, 1);
-				parent.children.splice(index > 0 ? index - 1 : index, 0, node);
+				index = parent?.children.findIndex((n) => n.nid === node.nid);
+				parent?.children.splice(index, 1);
+				parent?.children.splice(index > 0 ? index - 1 : index, 0, node);
 				setTimeout(() => {
 					this.canvas.registry[node.nid]?.focus();
 				}, 150);
@@ -274,9 +274,9 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 			case "PageDown":
 				ev.preventDefault();
 				parent = findParent(this.document, node.nid);
-				index = parent.children.findIndex((n) => n.nid === node.nid);
-				parent.children.splice(index, 1);
-				parent.children.splice(index + 1, 0, node);
+				index = parent?.children.findIndex((n) => n.nid === node.nid);
+				parent?.children.splice(index, 1);
+				parent?.children.splice(index + 1, 0, node);
 				setTimeout(() => {
 					this.canvas.registry[node.nid]?.focus();
 				}, 150);
@@ -288,10 +288,10 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 					ev.stopPropagation();
 					for (const n of this.selection) {
 						parent = findParent(this.document, n.nid);
-						index = parent.children.findIndex((nd) => nd.nid === n.nid);
+						index = parent?.children.findIndex((nd) => nd.nid === n.nid);
 						const copy = klona(n);
 						copy.nid = nanoid(13);
-						parent.children.splice(index + 1, 0, copy);
+						parent?.children.splice(index + 1, 0, copy);
 					}
 					this.history.snapshot("Duplicate element");
 				}
@@ -303,8 +303,8 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 					let children: Observable<SavageSVG>[] = [];
 					for (node of this.selection) {
 						parent = findParent(this.document, node.nid);
-						index = parent.children.findIndex((n) => n.nid === node.nid);
-						children = children.concat(parent.children.splice(index, 1));
+						index = parent?.children.findIndex((n) => n.nid === node.nid);
+						children = children.concat(parent?.children.splice(index, 1));
 					}
 					const group: SavageSVG = {
 						name: "g",
@@ -331,13 +331,13 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 						ev.preventDefault();
 						ev.stopPropagation();
 						parent = findParent(this.document, node.nid);
-						index = parent.children.findIndex((n) => n.nid === node.nid);
-						parent.children.splice(index, 1);
+						index = parent?.children.findIndex((n) => n.nid === node.nid);
+						parent?.children.splice(index, 1);
 						node.unobserve();
 						node.attributes.unobserve();
 						node.children.unobserve();
 						for (const child of node.children) {
-							parent.children.push(child);
+							parent?.children.push(child);
 						}
 						this.canvas.selection = this.selection.filter((n) => n.nid !== node.nid);
 						this.canvas.selection = [...this.selection, ...node.children];

@@ -49,6 +49,13 @@
 		>
 			<mat-icon svgIcon="signature-text" ></mat-icon>
 		</mat-button-toggle>
+		<mat-button-toggle matTooltip="Draw complex shapes"
+		[checked]="canvas.activeTool === 'SHAPE'"
+		(click)="setTool('SHAPE')"
+		(contextmenu)="setTool('SHAPE')"
+		>
+			<mat-icon svgIcon="shape-plus" ></mat-icon>
+		</mat-button-toggle>
 		<mat-button-toggle matTooltip="Draw freehand lines and curves"
 			[checked]="canvas.activeTool === 'FREEHAND'"
 			(click)="setTool('FREEHAND')"
@@ -66,7 +73,7 @@
 	</mat-button-toggle-group>
 </mat-toolbar>
 <mat-drawer-container [hasBackdrop]="false" >
-	<mat-drawer #options [style.opacity]="0.75" >
+	<mat-drawer #options >
 		<ng-container [ngSwitch]="canvas.activeTool" >
 			<div *ngSwitchCase="'OBJECT'"
 				class="savage-app-toolbar-options"
@@ -125,6 +132,88 @@
 						</mat-form-field>
 					</mat-list-item>
 				</mat-list>
+			</div>
+			<div *ngSwitchCase="'SHAPE'"
+				class="savage-app-toolbar-options"
+			>
+				<div class="savage-app-toolbar-options-top" >
+					<div class="savage-app-toolbar-options-close" >
+						<button mat-icon-button
+							class="savage-app-toolbar-options-close-button"
+							(click)="options.close()"
+						><mat-icon svgIcon="close" ></mat-icon></button>
+					</div>
+				</div>
+				<mat-selection-list [multiple]="false" (selectionChange)="shapeModeChanged($event)" >
+					<mat-list-option value="spiral" [selected]="shapeMode === 'spiral'" >
+						<mat-icon mat-list-icon svgIcon="savage-spiral" ></mat-icon>
+						Spiral
+					</mat-list-option>
+					<mat-list-option value="arrow" [selected]="shapeMode === 'arrow'" >
+						<mat-icon mat-list-icon svgIcon="savage-arrow" ></mat-icon>
+						Arrow
+					</mat-list-option>
+					<mat-list-option value="heart" [selected]="shapeMode === 'heart'" >
+						<mat-icon mat-list-icon svgIcon="savage-heart" ></mat-icon>
+						Heart
+					</mat-list-option>
+					<mat-list-option value="donut" [selected]="shapeMode === 'donut'" >
+						<mat-icon mat-list-icon svgIcon="savage-donut" ></mat-icon>
+						Doughnut
+					</mat-list-option>
+					<mat-list-option value="cylinder" [selected]="shapeMode === 'cylinder'" >
+						<mat-icon mat-list-icon svgIcon="savage-cylinder" ></mat-icon>
+						Cylinder
+					</mat-list-option>
+					<mat-list-option value="cube" [selected]="shapeMode === 'cube'" >
+						<mat-icon mat-list-icon svgIcon="savage-cube" ></mat-icon>
+						Cube
+					</mat-list-option>
+					<mat-list-option value="pyramid" [selected]="shapeMode === 'pyramid'" >
+						<mat-icon mat-list-icon svgIcon="savage-pyramid" ></mat-icon>
+						Pyramid
+					</mat-list-option>
+					<mat-list-option value="cone" [selected]="shapeMode === 'cone'" >
+						<mat-icon mat-list-icon svgIcon="savage-cone" ></mat-icon>
+						Cone
+					</mat-list-option>
+				</mat-selection-list>
+				<div class="savage-app-toolbar-options-bottom" >
+					<mat-list>
+						<mat-list-item *ngIf="shapeMode === 'spiral'" >
+							<mat-form-field>
+								<mat-label>Segment Count</mat-label>
+								<input matInput [(ngModel)]="spiralSegmentCount" min="3" type="number" name="segment-count" >
+							</mat-form-field>
+						</mat-list-item>
+						<ng-container *ngIf="shapeMode === 'arrow'" >
+							<mat-list-item>
+								<mat-form-field>
+									<mat-label>Head Width</mat-label>
+									<input matInput [(ngModel)]="arrowHeadWidth" type="number" name="head-width" >
+								</mat-form-field>
+							</mat-list-item>
+							<mat-list-item>
+								<mat-form-field>
+									<mat-label>Head Height</mat-label>
+									<input matInput [(ngModel)]="arrowHeadHeight" type="number" name="head-height" >
+								</mat-form-field>
+							</mat-list-item>
+							<mat-list-item>
+								<mat-form-field>
+									<mat-label>Width</mat-label>
+									<input matInput [(ngModel)]="arrowWidth" type="number" name="arrow-width" >
+								</mat-form-field>
+							</mat-list-item>
+						</ng-container>
+						<mat-list-item *ngIf="shapeMode === 'donut'" >
+							<mat-form-field>
+								<mat-label>Width</mat-label>
+								<input matInput [(ngModel)]="donutWidth" type="number" name="donut-width" >
+							</mat-form-field>
+						</mat-list-item>
+					</mat-list>
+				</div>
 			</div>
 			<div *ngSwitchCase="'FREEHAND'"
 				class="savage-app-toolbar-options"

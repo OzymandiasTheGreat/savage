@@ -122,5 +122,37 @@ export class MaterialModule {
 		matIconRegistry.addSvgIconSet(
 			domSanitizer.bypassSecurityTrustResourceUrl("./assets/mdi.svg"),
 		);
+		matIconRegistry.addSvgIcon(
+			"savage-spiral",
+			domSanitizer.bypassSecurityTrustResourceUrl("./assets/previews/savage-spiral.svg"),
+		);
+		matIconRegistry.addSvgIcon(
+			"savage-arrow",
+			domSanitizer.bypassSecurityTrustResourceUrl("./assets/previews/savage-arrow.svg"),
+		);
+		matIconRegistry.addSvgIcon(
+			"savage-heart",
+			domSanitizer.bypassSecurityTrustResourceUrl("./assets/previews/savage-heart.svg"),
+		);
+		matIconRegistry.addSvgIcon(
+			"savage-donut",
+			domSanitizer.bypassSecurityTrustResourceUrl("./assets/previews/savage-donut.svg"),
+		);
+		matIconRegistry.addSvgIcon(
+			"savage-cylinder",
+			domSanitizer.bypassSecurityTrustResourceUrl("./assets/previews/savage-cylinder.svg"),
+		);
+		matIconRegistry.addSvgIcon(
+			"savage-cube",
+			domSanitizer.bypassSecurityTrustResourceUrl("./assets/previews/savage-cube.svg"),
+		);
+		matIconRegistry.addSvgIcon(
+			"savage-pyramid",
+			domSanitizer.bypassSecurityTrustResourceUrl("./assets/previews/savage-pyramid.svg"),
+		);
+		matIconRegistry.addSvgIcon(
+			"savage-cone",
+			domSanitizer.bypassSecurityTrustResourceUrl("./assets/previews/savage-cone.svg"),
+		);
 	}
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { MatDrawer } from "@angular/material/sidenav";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
+import { MatSelectionListChange } from "@angular/material/list";
 import { stringify } from "svgson";
 import { html } from "js-beautify";
 import { getDiff, applyDiff } from "recursive-diff";
@@ -71,6 +72,42 @@ export class ToolbarComponent implements OnInit {
 	set gradientStroke(val: boolean) {
 		if (this.canvas.tools.GRADIENT) {
 			(<any> this.canvas.tools.GRADIENT).stroke = val;
+		}
+	}
+	get shapeMode(): string { return (<any> this.canvas.tools.SHAPE).mode; }
+	set shapeMode(val: string) {
+		if (this.canvas.tools.SHAPE) {
+			(<any> this.canvas.tools.SHAPE).mode = val;
+		}
+	}
+	get spiralSegmentCount(): number { return (<any> this.canvas.tools.SHAPE).spiralSegmentCount; }
+	set spiralSegmentCount(val: number) {
+		if (this.canvas.tools.SHAPE) {
+			(<any> this.canvas.tools.SHAPE).spiralSegmentCount = val;
+		}
+	}
+	get arrowHeadWidth(): number { return (<any> this.canvas.tools.SHAPE).arrowHeadWidth; }
+	set arrowHeadWidth(val: number) {
+		if (this.canvas.tools.SHAPE) {
+			(<any> this.canvas.tools.SHAPE).arrowHeadWidth = val;
+		}
+	}
+	get arrowHeadHeight(): number { return (<any> this.canvas.tools.SHAPE).arrowHeadHeight; }
+	set arrowHeadHeight(val: number) {
+		if (this.canvas.tools.SHAPE) {
+			(<any> this.canvas.tools.SHAPE).arrowHeadHeight = val;
+		}
+	}
+	get arrowWidth(): number { return (<any> this.canvas.tools.SHAPE).arrowWidth; }
+	set arrowWidth(val: number) {
+		if (this.canvas.tools.SHAPE) {
+			(<any> this.canvas.tools.SHAPE).arrowWidth = val;
+		}
+	}
+	get donutWidth(): number { return (<any> this.canvas.tools.SHAPE).donutWidth; }
+	set donutWidth(val: number) {
+		if (this.canvas.tools.SHAPE) {
+			(<any> this.canvas.tools.SHAPE).donutWidth = val;
 		}
 	}
 
@@ -165,5 +202,9 @@ export class ToolbarComponent implements OnInit {
 				});
 			}
 		});
+	}
+
+	shapeModeChanged(change: MatSelectionListChange): void {
+		this.shapeMode = change.options.filter((o) => o.selected)[0].value;
 	}
 }

@@ -18,6 +18,7 @@ import { PolygonToolComponent } from "./polygon-tool/polygon-tool.component";
 import { LineToolComponent } from "./line-tool/line-tool.component";
 import { FreehandToolComponent } from "./freehand-tool/freehand-tool.component";
 import { GradientToolComponent } from "./gradient-tool/gradient-tool.component";
+import { ShapeToolComponent } from "./shape-tool/shape-tool.component";
 
 
 @NgModule({
@@ -37,6 +38,7 @@ import { GradientToolComponent } from "./gradient-tool/gradient-tool.component";
 		LineToolComponent,
 		FreehandToolComponent,
 		GradientToolComponent,
+		ShapeToolComponent,
 	],
 	imports: [
 		CommonModule,
