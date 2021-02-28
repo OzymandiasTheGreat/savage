@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1614130563252,
+  "timestamp": 1614489364429,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -13,7 +13,7 @@
       "urls": [
         "/favicon.ico",
         "/index.html",
-        "/main.6902fd971d01f0e9aeb1.js",
+        "/main.ca8b1b7cd6ff00a283b4.js",
         "/manifest.webmanifest",
         "/polyfills.5b1d01c8c5791f328043.js",
         "/runtime.acf0dec4155e77772545.js",
@@ -122,6 +122,14 @@
         "/assets/monaco/vs/language/typescript/tsMode.js",
         "/assets/monaco/vs/language/typescript/tsWorker.js",
         "/assets/monaco/vs/loader.js",
+        "/assets/previews/savage-arrow.svg",
+        "/assets/previews/savage-cone.svg",
+        "/assets/previews/savage-cube.svg",
+        "/assets/previews/savage-cylinder.svg",
+        "/assets/previews/savage-donut.svg",
+        "/assets/previews/savage-heart.svg",
+        "/assets/previews/savage-pyramid.svg",
+        "/assets/previews/savage-spiral.svg",
         "/assets/savage.svg"
       ],
       "patterns": []
@@ -234,10 +242,18 @@
     "/assets/monaco/vs/language/typescript/tsMode.js": "537dd775b3318eb462b41b0ccb626c82c44fdd14",
     "/assets/monaco/vs/language/typescript/tsWorker.js": "0175cd4cd93201d8446fdd32865191d5a816d617",
     "/assets/monaco/vs/loader.js": "6c3281f164b358a8cee96e826829f1758bd32201",
+    "/assets/previews/savage-arrow.svg": "128ede9db4df1a73dec8a664a6878862494c26f9",
+    "/assets/previews/savage-cone.svg": "91bcbec4ef4d62c0be2fbb6eb68577dd126d9267",
+    "/assets/previews/savage-cube.svg": "8859692a74603d7d443c24a5c0487b8237ff12bc",
+    "/assets/previews/savage-cylinder.svg": "834bd59bba958761d20ae839134dd9ae90e6ac95",
+    "/assets/previews/savage-donut.svg": "eba7265008f697504936a0cd2fd2ca34813ee1ef",
+    "/assets/previews/savage-heart.svg": "9071b21b9d2a42c46c922ae0cec868d7c7cc81db",
+    "/assets/previews/savage-pyramid.svg": "7dc8f160eb550c23ac695f521393418737ac6c6a",
+    "/assets/previews/savage-spiral.svg": "a59257dcc449e53800e91406d2c4e32ca596979e",
     "/assets/savage.svg": "e0f985e8ef2bdc67546d6937590b7660322bac16",
     "/favicon.ico": "fada3441688b134002fbf01f985d438bba5e8d34",
-    "/index.html": "18932c1c093cd30df6405cd691cb2578433d6524",
-    "/main.6902fd971d01f0e9aeb1.js": "99b1bbb0ab7bcf648895fa3980273e70d3e11539",
+    "/index.html": "d9af41f6df391e19b439e28be560d5a2e54a72ff",
+    "/main.ca8b1b7cd6ff00a283b4.js": "e7c721ff5ade46b4e85376c8712b1a5ee1fde2e5",
     "/manifest.webmanifest": "432ba0895441fa795632e55c8b6bd2385e0963aa",
     "/polyfills.5b1d01c8c5791f328043.js": "2598a02fe90a269920909ce1e0d72d0f92529d2a",
     "/runtime.acf0dec4155e77772545.js": "c2f19a5c64c718ebecb901ee3f30667ccab567b6",
