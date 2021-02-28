@@ -1,11 +1,11 @@
 import { Component, OnInit, OnDestroy, Input, ViewChild, ElementRef } from "@angular/core";
 import { nanoid } from "nanoid/non-secure";
-import { compose, fromDefinition, fromTransformAttribute, applyToPoint } from "transformation-matrix";
+import { applyToPoint } from "transformation-matrix";
 import partialCircle from "svg-partial-circle";
 import { DragEvent } from "@interactjs/types/index";
 
 import { Observable } from "../../types/observer";
-import { findParent, SavageSVG, screen2svg } from "../../types/svg";
+import { extractMatrix, findParent, SavageSVG, screen2svg } from "../../types/svg";
 import { ICanvasTool, CanvasService } from "../../services/canvas.service";
 import { HistoryService } from "../../services/history.service";
 import { IDocumentEvent } from "../document/document.component";
@@ -46,12 +46,12 @@ export class CircleToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	get wx(): number {
 		const viewBox = parseFloat(this.document.attributes.viewBox?.split(" ")[2]);
 		const width = parseFloat(this.document.attributes.width || `${viewBox}`);
-		return width / viewBox || 1.5;
+		return viewBox / width * 1.5 || 1.5;
 	}
 	get hx(): number {
 		const viewBox = parseFloat(this.document.attributes.viewBox?.split(" ")[3]);
 		const height = parseFloat(this.document.attributes.height || `${viewBox}`);
-		return height / viewBox || 1.5;
+		return viewBox / height * 1.5 || 1.5;
 	}
 	get arc(): SavageArc {
 		if (this.drawing) {
@@ -225,11 +225,8 @@ export class CircleToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	transformed(x: number, y: number): { x: number, y: number } {
-		if (this.selection.attributes.transform) {
-			const matrix = compose(fromDefinition(fromTransformAttribute(this.selection.attributes.transform)));
-			return applyToPoint(matrix, { x, y });
-		}
-		return { x, y };
+		const matrix = extractMatrix(this.selection, this.document);
+		return applyToPoint(matrix, { x, y });
 	}
 
 	parseAttr(attr: string): number {
@@ -237,11 +234,12 @@ export class CircleToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	move(event: DragEvent): void {
-		(<ObjectToolComponent> this.canvas.tools.OBJECT).moveNodeApplied(this.selection, event.delta);
+		const delta = { x: event.dx / this.scale, y: event.dy / this.scale };
+		(<ObjectToolComponent> this.canvas.tools.OBJECT).moveNodeApplied(this.selection, delta);
 		if (this.arc) {
 			const arc: Omit<SavageArc, "startX" | "startY" | "endX" | "endY"> = {
-				cx: this.arc.cx + event.dx,
-				cy: this.arc.cy + event.dy,
+				cx: this.arc.cx + delta.x,
+				cy: this.arc.cy + delta.y,
 				r: this.arc.r,
 				start: this.arc.start,
 				end: this.arc.end,
@@ -254,7 +252,7 @@ export class CircleToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	radius(axis: "r" | "rx" | "ry", event: DragEvent): void {
-		const d: any = { rx: event.dx, ry: event.dy };
+		const d: any = { rx: event.dx / this.scale, ry: event.dy / this.scale };
 		d.r = Math.abs(d.rx) > Math.abs(d.ry) ? d.rx : d.ry;
 		if (d[axis]) {
 			if (this.arc) {

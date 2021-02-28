@@ -5,7 +5,7 @@ import { nanoid } from "nanoid/non-secure";
 import { DragEvent } from "@interactjs/types/index";
 
 import { Change, Observable } from "../../types/observer";
-import { SavageSVG, screen2svg, find } from "../../types/svg";
+import { SavageSVG, screen2svg, find, extractMatrix } from "../../types/svg";
 import { ICanvasTool, CanvasService } from "../../services/canvas.service";
 import { IDocumentEvent } from "../document/document.component";
 import { HistoryService } from "../../services/history.service";
@@ -53,12 +53,8 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 		}
 		this._path = !!node ? PathItem.create(node.attributes.d) : null;
 		if (this._path) {
-			if (node?.attributes.transform) {
-				const m = compose(fromDefinition(fromTransformAttribute(node.attributes.transform)));
-				this._matrix = new Matrix(m.a, m.b, m.c, m.d, m.e, m.f);
-			} else {
-				this._matrix = new Matrix(1, 0, 0, 1, 0, 0);
-			}
+			const m = extractMatrix(node, this.document);
+			this._matrix = new Matrix(m.a, m.b, m.c, m.d, m.e, m.f);
 			this.path.transform(this._matrix);
 			node?.attributes.observe(this._transformObserver);
 			node?.attributes.observe(this._dObserver);
@@ -82,12 +78,12 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	get wx(): number {
 		const viewBox = parseFloat(this.document.attributes.viewBox?.split(" ")[2]);
 		const width = parseFloat(this.document.attributes.width || `${viewBox}`);
-		return width / viewBox || 1.5;
+		return viewBox / width * 1.5 || 1.5;
 	}
 	get hx(): number {
 		const viewBox = parseFloat(this.document.attributes.viewBox?.split(" ")[3]);
 		const height = parseFloat(this.document.attributes.height || `${viewBox}`);
-		return height / viewBox || 1.5;
+		return viewBox / height * 1.5 || 1.5;
 	}
 	@ViewChild("overlay", { static: true }) overlay: ElementRef<SVGSVGElement>;
 	selectbox: paper.Rectangle = null;
@@ -342,7 +338,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 
 	handleSegmentDrag(index: number, event: DragEvent): void {
 		for (const segment of this.selection) {
-			segment.point.set(segment.point.x + event.dx, segment.point.y + event.dy);
+			segment.point.set(segment.point.x + event.dx / this.scale, segment.point.y + event.dy / this.scale);
 		}
 		// this.segments[index].point.set(position.x, position.y);
 		const clone = this.path.clone({ insert: false });
@@ -357,7 +353,7 @@ export class PathToolComponent implements ICanvasTool, OnInit, OnDestroy {
 
 	handleHandleDrag(segment: paper.Segment, handle: "in" | "out", event: DragEvent): void {
 		const point = segment[handle === "in" ? "handleIn" : "handleOut"];
-		point.set(point.x + event.dx, point.y + event.dy);
+		point.set(point.x + event.dx / this.scale, point.y + event.dy / this.scale);
 		const clone = this.path.clone({ insert: false });
 		clone.transform(this._matrix.inverted());
 		this.external = false;

@@ -21,12 +21,12 @@ export class MeasureToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	get wx(): number {
 		const viewBox = parseFloat(this.document.attributes.viewBox?.split(" ")[2]);
 		const width = parseFloat(this.document.attributes.width || `${viewBox}`);
-		return width / viewBox || 1.5;
+		return viewBox / width * 1.5 || 1.5;
 	}
 	get hx(): number {
 		const viewBox = parseFloat(this.document.attributes.viewBox?.split(" ")[3]);
 		const height = parseFloat(this.document.attributes.height || `${viewBox}`);
-		return height / viewBox || 1.5;
+		return viewBox / height * 1.5 || 1.5;
 	}
 	@ViewChild("overlay", { static: true }) overlay: ElementRef<SVGSVGElement>;
 	draw: boolean;

@@ -3,14 +3,12 @@ import equal from "fast-deep-equal/es6";
 import { klona } from "klona";
 import { nanoid } from "nanoid/non-secure";
 import { CompoundPath, Point as PathPoint, Matrix as PathMatrix, Rectangle } from "paper";
-import {
-	compose, fromDefinition, fromTransformAttribute, Matrix, applyToPoint, applyToPoints,
-	translate, scale, toSVG, inverse, smoothMatrix, rotateDEG, skew } from "transformation-matrix";
+import { compose, Matrix, applyToPoints, translate, scale, toSVG, inverse, smoothMatrix, rotateDEG, skew } from "transformation-matrix";
 import { parse as pointsParse, serialize as pointsSerialize } from "svg-numbers";
 import { DragEvent } from "@interactjs/types/index";
 
 import { Observable, recursiveUnobserve } from "../../types/observer";
-import { find, findParent, SavageSVG, screen2svg, applyTransformed, applyTransformedPoly, Point } from "../../types/svg";
+import { find, findParent, SavageSVG, screen2svg, applyTransformed, applyTransformedPoly, Point, extractMatrix } from "../../types/svg";
 import { ICanvasTool, CanvasService } from "../../services/canvas.service";
 import { IDocumentEvent } from "../document/document.component";
 import { HistoryService } from "../../services/history.service";
@@ -46,12 +44,12 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	get wx(): number {
 		const viewBox = parseFloat(this.document.attributes.viewBox?.split(" ")[2]);
 		const width = parseFloat(this.document.attributes.width || `${viewBox}`);
-		return width / viewBox || 1.5;
+		return viewBox / width * 1.5 || 1.5;
 	}
 	get hx(): number {
 		const viewBox = parseFloat(this.document.attributes.viewBox?.split(" ")[3]);
 		const height = parseFloat(this.document.attributes.height || `${viewBox}`);
-		return height / viewBox || 1.5;
+		return viewBox / height * 1.5 || 1.5;
 	}
 	@ViewChild("overlay", { static: true }) overlay: ElementRef<SVGSVGElement>;
 	selectbox: paper.Rectangle = null;
@@ -400,19 +398,11 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 					return findParent(this.document, p.nid);
 				};
 				const parent = findText(node);
-				if (parent.attributes.transform) {
-					matrix = compose(fromDefinition(fromTransformAttribute(parent.attributes.transform)));
-				} else {
-					matrix = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
-				}
+				matrix = extractMatrix(parent, this.document);
 				parent.attributes.transform = toSVG(smoothMatrix(compose(translate(d.x, d.y), matrix), 10 ** 7));
 				break;
 			default:
-				if (node.attributes.transform) {
-					matrix = compose(fromDefinition(fromTransformAttribute(node.attributes.transform)));
-				} else {
-					matrix = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
-				}
+				matrix = extractMatrix(node, this.document);
 				node.attributes.transform = toSVG(smoothMatrix(compose(translate(d.x, d.y), matrix), 10 ** 7));
 				break;
 		}
@@ -421,11 +411,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	moveNodeApplied(node: Observable<SavageSVG>, d: Point): void {
 		let matrix: Matrix;
 		let point: Point;
-		if (node.attributes.transform) {
-			matrix = compose(fromDefinition(fromTransformAttribute(node.attributes.transform)));
-		} else {
-			matrix = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
-		}
+		matrix = extractMatrix(node, this.document);
 		switch (node.name) {
 			case "circle":
 			case "ellipse":
@@ -482,36 +468,33 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 
 	scaleNode(node: Observable<SavageSVG>, corner: "topLeft" | "topRight" | "bottomRight" | "bottomLeft", event: DragEvent): void {
 		const bbox = this.bbox(node);
+		const delta = { x: event.dx / this.scale, y: event.dy / this.scale };
 		let sx: number;
 		let sy: number;
 		if (scalableNodes.includes(node.name) && this.applyTransform) {
-			this.scaleNodeApplied(node, corner, event.delta, bbox);
+			this.scaleNodeApplied(node, corner, delta, bbox);
 		} else {
 			let matrix: Matrix;
-			if (node.attributes.transform) {
-				matrix = compose(fromDefinition(fromTransformAttribute(node.attributes.transform)));
-			} else {
-				matrix = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
-			}
+			matrix = extractMatrix(node, this.document);
 			switch (corner) {
 				case "topLeft":
-					sx = bbox.width / (bbox.width + event.dx);
-					sy = bbox.height / (bbox.height + event.dy);
+					sx = bbox.width / (bbox.width + delta.x);
+					sy = bbox.height / (bbox.height + delta.y);
 					matrix = compose(scale(sx, sy, bbox.right, bbox.bottom), matrix);
 					break;
 				case "topRight":
-					sx = bbox.width / (bbox.width - event.dx);
-					sy = bbox.height / (bbox.height + event.dy);
+					sx = bbox.width / (bbox.width - delta.x);
+					sy = bbox.height / (bbox.height + delta.y);
 					matrix = compose(scale(sx, sy, bbox.x, bbox.bottom), matrix);
 					break;
 				case "bottomLeft":
-					sx = bbox.width / (bbox.width + event.dx);
-					sy = bbox.height / (bbox.height - event.dy);
+					sx = bbox.width / (bbox.width + delta.x);
+					sy = bbox.height / (bbox.height - delta.y);
 					matrix = compose(scale(sx, sy, bbox.right, bbox.y), matrix);
 					break;
 				case "bottomRight":
-					sx = bbox.width / (bbox.width - event.dx);
-					sy = bbox.height / (bbox.height - event.dy);
+					sx = bbox.width / (bbox.width - delta.x);
+					sy = bbox.height / (bbox.height - delta.y);
 					matrix = compose(scale(sx, sy, bbox.x, bbox.y), matrix);
 					break;
 			}
@@ -527,11 +510,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	): void {
 		let matrix: Matrix;
 		let point: Point;
-		if (node.attributes.transform) {
-			matrix = compose(fromDefinition(fromTransformAttribute(node.attributes.transform)));
-		} else {
-			matrix = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
-		}
+		matrix = extractMatrix(node, this.document);
 		const cx = parseFloat(node.attributes.cx || "0");
 		const cy = parseFloat(node.attributes.cy || "0");
 		let sx: number;
@@ -825,7 +804,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	rotateNode(node: Observable<SavageSVG>, event: DragEvent): void {
-		const d = { x: event.dx, y: event.dy };
+		const d = { x: event.dx / this.scale, y: event.dy / this.scale };
 		const angle = Math.abs(d.x) > Math.abs(d.y) ? d.x : d.y;
 		const bbox = this.bbox(node);
 		const cx = bbox.x + bbox.width / 2;
@@ -834,11 +813,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 			this.rotateNodeApplied(node, angle, { x: cx, y: cy });
 		} else {
 			let matrix: Matrix;
-			if (node.attributes.transform) {
-				matrix = compose(fromDefinition(fromTransformAttribute(node.attributes.transform)));
-			} else {
-				matrix = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
-			}
+			matrix = extractMatrix(node, this.document);
 			node.attributes.transform = toSVG(smoothMatrix(compose(rotateDEG(angle, cx, cy), matrix), 10 ** 7));
 		}
 		if (event.type === "dragend") {
@@ -848,11 +823,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 
 	rotateNodeApplied(node: Observable<SavageSVG>, angle: number, c: Point): void {
 		let matrix: Matrix;
-		if (node.attributes.transform) {
-			matrix = compose(fromDefinition(fromTransformAttribute(node.attributes.transform)));
-		} else {
-			matrix = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
-		}
+		matrix = extractMatrix(node, this.document);
 		switch (node.name) {
 			case "line":
 				const x1 = parseFloat(node.attributes.x1 || "0");
@@ -893,16 +864,12 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	skewNode(node: Observable<SavageSVG>, axis: "x" | "y", event: DragEvent): void {
-		const angle = axis === "x" ? event.dx / 100 : event.dy / 100;
+		const angle = axis === "x" ? event.dx / 100 / this.scale : event.dy / 100 / this.scale;
 		if (skewableNodes.includes(node.name) && this.applyTransform) {
 			this.skewNodeApplied(node, axis, angle);
 		} else {
 			let matrix: Matrix;
-			if (node.attributes.transform) {
-				matrix = compose(fromDefinition(fromTransformAttribute(node.attributes.transform)));
-			} else {
-				matrix = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
-			}
+			matrix = extractMatrix(node, this.document);
 			node.attributes.transform = toSVG(smoothMatrix(
 				compose(skew(axis === "x" ? angle : 0, axis === "y" ? angle : 0), matrix), 10 ** 7));
 		}
@@ -913,11 +880,7 @@ export class ObjectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 
 	skewNodeApplied(node: Observable<SavageSVG>, axis: "x" | "y", angle: number): void {
 		let matrix: Matrix;
-		if (node.attributes.transform) {
-			matrix = compose(fromDefinition(fromTransformAttribute(node.attributes.transform)));
-		} else {
-			matrix = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
-		}
+		matrix = extractMatrix(node, this.document);
 		switch (node.name) {
 			case "line":
 				const x1 = parseFloat(node.attributes.x1 || "0");

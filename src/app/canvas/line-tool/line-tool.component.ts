@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy, Input, ViewChild, ElementRef } from "@angular/core";
 import { nanoid } from "nanoid/non-secure";
-import { compose, fromDefinition, fromTransformAttribute, Matrix, applyToPoint, inverse, scale } from "transformation-matrix";
+import { Matrix, applyToPoint, inverse, scale } from "transformation-matrix";
 import { parse as pointsParse, serialize as pointsSerialize } from "svg-numbers";
 import { Point, Rectangle, Size } from "paper";
 import { DragEvent } from "@interactjs/types/index";
 
 import { Observable, Change } from "../../types/observer";
-import { SavageSVG, screen2svg, findParent, find } from "../../types/svg";
+import { SavageSVG, screen2svg, findParent, find, extractMatrix } from "../../types/svg";
 import { ICanvasTool, CanvasService } from "../../services/canvas.service";
 import { HistoryService } from "../../services/history.service";
 import { IDocumentEvent } from "../document/document.component";
@@ -59,17 +59,17 @@ export class LineToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	get wx(): number {
 		const viewBox = parseFloat(this.document.attributes.viewBox?.split(" ")[2]);
 		const width = parseFloat(this.document.attributes.width || `${viewBox}`);
-		return width / viewBox || 1.5;
+		return viewBox / width * 1.5 || 1.5;
 	}
 	get hx(): number {
 		const viewBox = parseFloat(this.document.attributes.viewBox?.split(" ")[3]);
 		const height = parseFloat(this.document.attributes.height || `${viewBox}`);
-		return height / viewBox || 1.5;
+		return viewBox / height * 1.5 || 1.5;
 	}
 	get points(): PointArrayNotation[] { return this._points; }
 	get matrix(): Matrix {
-		if (this.selection?.attributes.transform) {
-			return compose(fromDefinition(fromTransformAttribute(this.selection.attributes.transform)));
+		if (this.selection) {
+			return extractMatrix(this.selection, this.document);
 		}
 		return { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
 	}
@@ -306,7 +306,7 @@ export class LineToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	handlePointDrag(index: number | "start" | "end", event: DragEvent): void {
-		this.pointsMove(event.delta);
+		this.pointsMove({ x: event.dx / this.scale, y: event.dy / this.scale });
 		if (event.type === "dragend") {
 			this.history.snapshot("Move point");
 		}

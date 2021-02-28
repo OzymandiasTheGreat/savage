@@ -148,7 +148,7 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
 		if (event.ctrlKey) {
 			event.preventDefault();
 			event.stopPropagation();
-			this.scale += 0.01 * -event.deltaY;
+			this.scale += Math.min(Math.max(0.01 * -event.deltaY, 0.25), 2.5);
 		}
 	}
 

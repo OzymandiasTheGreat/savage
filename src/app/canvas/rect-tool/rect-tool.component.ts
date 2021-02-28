@@ -30,12 +30,12 @@ export class RectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	get wx(): number {
 		const viewBox = parseFloat(this.document.attributes.viewBox?.split(" ")[2]);
 		const width = parseFloat(this.document.attributes.width || `${viewBox}`);
-		return width / viewBox || 1.5;
+		return viewBox / width * 1.5 || 1.5;
 	}
 	get hx(): number {
 		const viewBox = parseFloat(this.document.attributes.viewBox?.split(" ")[3]);
 		const height = parseFloat(this.document.attributes.height || `${viewBox}`);
-		return height / viewBox || 1.5;
+		return viewBox / height * 1.5 || 1.5;
 	}
 	get rx(): number {
 		return parseFloat(this.selection.attributes.rx) || parseFloat(this.selection.attributes.ry) || 0;
@@ -158,14 +158,15 @@ export class RectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	scaleSelection(corner: "topLeft" | "topRight" | "bottomRight" | "bottomLeft", event: DragEvent): void {
-		(<ObjectToolComponent> this.canvas.tools.OBJECT).scaleNodeApplied(this.selection, corner, event.delta, this.bbox);
+		const delta = { x: event.dx / this.scale, y: event.dy / this.scale };
+		(<ObjectToolComponent> this.canvas.tools.OBJECT).scaleNodeApplied(this.selection, corner, delta, this.bbox);
 		if (event.type === "dragend") {
 			this.history.snapshot("Scale element");
 		}
 	}
 
 	radius(axis: "rx" | "ry", event: DragEvent): void {
-		const d = { rx: -event.dx, ry: event.dy};
+		const d = { rx: -event.dx / this.scale, ry: event.dy / this.scale };
 		if (d[axis]) {
 			this.selection.attributes[axis] = `${this[axis] + d[axis]}`;
 		}
@@ -175,7 +176,8 @@ export class RectToolComponent implements ICanvasTool, OnInit, OnDestroy {
 	}
 
 	move(event: DragEvent): void {
-		(<ObjectToolComponent> this.canvas.tools.OBJECT).moveNodeApplied(this.selection, event.delta);
+		const delta = { x: event.dx / this.scale, y: event.dy / this.scale };
+		(<ObjectToolComponent> this.canvas.tools.OBJECT).moveNodeApplied(this.selection, delta);
 		if (event.type === "dragend") {
 			this.history.snapshot("Move (translate) element");
 		}

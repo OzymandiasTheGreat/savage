@@ -1,5 +1,5 @@
 import { INode} from "svgson";
-import { Matrix, inverse, applyToPoint, applyToPoints, Point as ArrayPoint } from "transformation-matrix";
+import { Matrix, inverse, applyToPoint, applyToPoints, Point as ArrayPoint, compose, fromDefinition, fromTransformAttribute } from "transformation-matrix";
 
 import { Observable } from "./observer";
 
@@ -41,6 +41,19 @@ export function findParent(root: Observable<SavageSVG>, nid: string): Observable
 		return node = findParent(n, nid);
 	});
 	return node || null;
+}
+
+
+export function extractMatrix(node: Observable<SavageSVG>, root: Observable<SavageSVG>): Matrix {
+	const matrices: Matrix[] = [];
+	let parent = node;
+	while (parent !== null) {
+		if (parent.attributes.transform) {
+			matrices.push(compose(fromDefinition(fromTransformAttribute(parent.attributes.transform))));
+		}
+		parent = findParent(root, parent.nid);
+	}
+	return compose({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 }, ...matrices);
 }
 
 
