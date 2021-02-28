@@ -21,6 +21,7 @@ import { GradientToolComponent } from "./gradient-tool/gradient-tool.component";
 import { ShapeToolComponent } from "./shape-tool/shape-tool.component";
 import { StampToolComponent } from "./stamp-tool/stamp-tool.component";
 import { EyeDropperToolComponent } from "./eye-dropper-tool/eye-dropper-tool.component";
+import { MeasureToolComponent } from "./measure-tool/measure-tool.component";
 
 
 @NgModule({
@@ -43,6 +44,7 @@ import { EyeDropperToolComponent } from "./eye-dropper-tool/eye-dropper-tool.com
 		ShapeToolComponent,
 		StampToolComponent,
 		EyeDropperToolComponent,
+		MeasureToolComponent,
 	],
 	imports: [
 		CommonModule,

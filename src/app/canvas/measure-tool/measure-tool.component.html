@@ -1,0 +1,83 @@
+<svg #overlay xmlns="http://www.w3.org/2000/svg"
+	class="savage-app-canvas-measure-tool"
+	overflow="visible"
+	pointer-events="none"
+	[appAttrs]="document"
+	[skipAttrs]="['overflow', 'pointer-events']"
+>
+	<ng-container *ngIf="!!drawing" >
+		<svg:rect
+			[attr.x]="drawing.left"
+			[attr.y]="drawing.top"
+			[attr.width]="drawing.right - drawing.left"
+			[attr.height]="drawing.bottom - drawing.top"
+			fill="#21212133"
+			stroke="#212121"
+			[attr.stroke-dasharray]="[1 * wx / scale, 1 * wx / scale].join(' ')"
+			[attr.stroke-width]="wx / scale"
+			vector-effect="non-scaling-size"
+		></svg:rect>
+		<svg:line
+			[attr.x1]="drawing.left"
+			[attr.x2]="drawing.right"
+			[attr.y1]="drawing.top"
+			[attr.y2]="drawing.bottom"
+			stroke="#212121"
+			[attr.stroke-width]="wx / scale"
+			[attr.stroke-dasharray]="[1 * wx / scale, 1 * wx / scale].join(' ')"
+			vector-effect="non-scaling-size"
+		></svg:line>
+		<svg:text
+			[attr.x]="drawing.left + (drawing.right - drawing.left) / 2"
+			[attr.y]="drawing.top - 12 / scale"
+			fill="#fff"
+			stroke="#212121"
+			[attr.stroke-width]="wx / scale"
+			[attr.font-size]="24 / scale"
+			font-weight="700"
+			text-anchor="middle"
+		>{{ drawing.top }}</svg:text>
+		<svg:text
+			[attr.x]="drawing.left - 24 / scale"
+			[attr.y]="drawing.top + (drawing.bottom - drawing.top) / 2"
+			fill="#fff"
+			stroke="#212121"
+			[attr.stroke-width]="wx / scale"
+			[attr.font-size]="24 / scale"
+			font-weight="700"
+			text-anchor="middle"
+			writing-mode="vertical-lr"
+		>{{ drawing.left }}</svg:text>
+		<svg:text
+			[attr.x]="drawing.left + (drawing.right - drawing.left) / 2"
+			[attr.y]="drawing.bottom + 24 / scale"
+			fill="#fff"
+			stroke="#212121"
+			[attr.stroke-width]="wx / scale"
+			[attr.font-size]="24 / scale"
+			font-weight="700"
+			text-anchor="middle"
+		>{{ drawing.bottom }}</svg:text>
+		<svg:text
+			[attr.x]="drawing.right + 24 / scale"
+			[attr.y]="drawing.top + (drawing.bottom - drawing.top) / 2"
+			fill="#fff"
+			stroke="#212121"
+			[attr.stroke-width]="wx / scale"
+			[attr.font-size]="24 / scale"
+			font-weight="700"
+			text-anchor="middle"
+			writing-mode="vertical-lr"
+		>{{ drawing.right }}</svg:text>
+		<svg:text
+			[attr.x]="drawing.left + (drawing.right - drawing.left) / 2"
+			[attr.y]="drawing.top + (drawing.bottom - drawing.top) / 2"
+			fill="#fff"
+			stroke="#212121"
+			[attr.stroke-width]="wx / scale"
+			[attr.font-size]="24 / scale"
+			font-weight="700"
+			text-anchor="middle"
+		>{{ drawing.dist }}</svg:text>
+	</ng-container>
+</svg>

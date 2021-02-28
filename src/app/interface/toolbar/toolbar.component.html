@@ -84,6 +84,13 @@
 		>
 			<mat-icon svgIcon="eyedropper-variant" ></mat-icon>
 		</mat-button-toggle>
+		<mat-button-toggle matTooltip="Measure distance on canvas"
+			[checked]="canvas.activeTool === 'MEASURE'"
+			(click)="setTool('MEASURE')"
+			(contextmenu)="setTool('MEASURE')"
+		>
+			<mat-icon svgIcon="math-compass" ></mat-icon>
+		</mat-button-toggle>
 	</mat-button-toggle-group>
 </mat-toolbar>
 <mat-drawer-container [hasBackdrop]="false" >
