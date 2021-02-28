@@ -37,8 +37,12 @@ The Savage toolbar is located along the left edge of the screen. Here you can se
 In freehand mode double click to set a point. Hold shift to insert point between nearest points. Drag to draw a selection rectangle. Hold shift to move multiple points. Control-click to deselect point.
 - Text tool. You can only select `<text>` elements with it. Edits to text content are reflected on canvas live.
 Setting a path converts `<tspan>` to `<textPath>`. Click empty space to create new `<text>` element.
+- Shape tool. Draw complex shapes with configurable parameters, such as spirals or arrows. Also supports basic 3D shapes.
+- Stamp tool. Draw predefined shapes. You can search and select a library of 5000+ icons to quickly insert them into your drawing.
 - Freehand tool. A simple brush to draw freehand shapes. In the options, you can configure how much the resulting path is simplified as well as smoothed.
 - Gradient tool. Click on shape and drag to set its' fill/stroke to a gradient. You can choose between radial gradient and linear gradient in the options. Adding more stops can be done in the elements panel. Setting stop color can be done in the properties panel.
+- Eye-dropper tool. Pick colors from canvas. Note that if the object is off-canvas Eye-dropper tool won't work correctly.
+- Measure tool. Draw a rectangle to measure its' position on canvas as well as the diagonal distance between its' corners.
 
 ### Sidebar panels
 
