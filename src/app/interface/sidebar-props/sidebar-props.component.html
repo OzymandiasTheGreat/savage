@@ -18,20 +18,11 @@
 					<button mat-icon-button (click)="help('href')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 				</mat-list-item>
 			</ng-container>
-			<ng-container *ngIf="['animateMotion', 'text', 'tspan'].includes(selection[0].name)" >
-				<mat-list-item>
-					<mat-form-field>
-						<mat-label>rotate</mat-label>
-						<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.rotate" type="text" name="rotate" >
-					</mat-form-field>
-					<button mat-icon-button (click)="help('rotate')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
-				</mat-list-item>
-			</ng-container>
 			<ng-container *ngIf="['animateMotion', 'textPath'].includes(selection[0].name)" >
 				<mat-list-item style="height: 130px;">
 					<mat-form-field>
 						<mat-label>path</mat-label>
-						<textarea matInput (input)="edited()" [(ngModel)]="selection[0].attributes.path" name="path" rows="5"></textarea>
+						<textarea matInput (input)="edited(true)" [(ngModel)]="selection[0].attributes.path" name="path" rows="5"></textarea>
 					</mat-form-field>
 					<button mat-icon-button (click)="help('path')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 				</mat-list-item>
@@ -40,30 +31,95 @@
 				<mat-list-item>
 					<mat-form-field>
 						<mat-label>attributeName</mat-label>
-						<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.attributeName" type="text" name="attributeName" >
+						<input matInput (input)="edited(true)" [(ngModel)]="selection[0].attributes.attributeName" type="text" name="attributeName" >
 					</mat-form-field>
 					<button mat-icon-button (click)="help('attributeName')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 				</mat-list-item>
 				<mat-list-item>
 					<mat-form-field>
 						<mat-label>keyPoints</mat-label>
-						<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.keyPoints" type="text" name="keyPoints" >
+						<input matInput (input)="edited(true)" [(ngModel)]="selection[0].attributes.keyPoints" type="text" name="keyPoints" >
 					</mat-form-field>
 					<button mat-icon-button (click)="help('keyPoints')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+				</mat-list-item>
+			</ng-container>
+			<ng-container *ngIf="['animate', 'animateMotion', 'animateTransform', 'set'].includes(selection[0].name)" >
+				<mat-list-item>
+					<mat-form-field>
+						<mat-label>dur</mat-label>
+						<input matInput (input)="edited(true)" [(ngModel)]="selection[0].attributes.dur" type="text" name="dur" >
+					</mat-form-field>
+					<button mat-icon-button (click)="help('dur')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+				</mat-list-item>
+				<mat-list-item>
+					<mat-form-field>
+						<mat-label>end</mat-label>
+						<input matInput (input)="edited(true)" [(ngModel)]="selection[0].attributes.end" type="text" name="end" >
+					</mat-form-field>
+					<button mat-icon-button (click)="help('end')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+				</mat-list-item>
+				<mat-list-item>
+					<mat-form-field>
+						<mat-label>min</mat-label>
+						<input matInput (input)="edited(true)" [(ngModel)]="selection[0].attributes.min" type="text" name="min" >
+					</mat-form-field>
+					<button mat-icon-button (click)="help('min')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+				</mat-list-item>
+				<mat-list-item>
+					<mat-form-field>
+						<mat-label>max</mat-label>
+						<input matInput (input)="edited(true)" [(ngModel)]="selection[0].attributes.max" type="text" name="max" >
+					</mat-form-field>
+					<button mat-icon-button (click)="help('max')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+				</mat-list-item>
+				<mat-list-item>
+					<mat-form-field>
+						<mat-label>restart</mat-label>
+						<mat-select (selectionChange)="edited(true)" [(ngModel)]="selection[0].attributes.restart" name="restart" >
+							<mat-option value="always" >always</mat-option>
+							<mat-option value="whenNotActive" >whenNotActive</mat-option>
+							<mat-option value="never" >never</mat-option>
+						</mat-select>
+					</mat-form-field>
+					<button mat-icon-button (click)="help('restart')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+				</mat-list-item>
+				<mat-list-item>
+					<mat-form-field>
+						<mat-label>repeatCount</mat-label>
+						<input matInput (input)="edited(true)" [(ngModel)]="selection[0].attributes.repeatCount" type="text" name="repeatCount" >
+					</mat-form-field>
+					<button mat-icon-button (click)="help('repeatCount')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+				</mat-list-item>
+				<mat-list-item>
+					<mat-form-field>
+						<mat-label>repeatDur</mat-label>
+						<input matInput (input)="edited(true)" [(ngModel)]="selection[0].attributes.repeatDur" type="text" name="repeatDur" >
+					</mat-form-field>
+					<button mat-icon-button (click)="help('repeatDur')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+				</mat-list-item>
+				<mat-list-item>
+					<mat-form-field>
+						<mat-label>fill</mat-label>
+						<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.fill" name="fill" >
+							<mat-option value="freeze" >freeze</mat-option>
+							<mat-option value="remove" >remove</mat-option>
+						</mat-select>
+					</mat-form-field>
+					<button mat-icon-button (click)="help('fill')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 				</mat-list-item>
 			</ng-container>
 			<ng-container *ngIf="['animate', 'animateMotion', 'animateTransform'].includes(selection[0].name)" >
 				<mat-list-item>
 					<mat-form-field>
 						<mat-label>by</mat-label>
-						<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.by" type="text" name="by">
+						<input matInput (input)="edited(true)" [(ngModel)]="selection[0].attributes.by" type="text" name="by">
 					</mat-form-field>
 					<button mat-icon-button (click)="help('by')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 				</mat-list-item>
 				<mat-list-item>
 					<mat-form-field>
 						<mat-label>from</mat-label>
-						<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.from" type="text" name="from" >
+						<input matInput (input)="edited(true)" [(ngModel)]="selection[0].attributes.from" type="text" name="from" >
 					</mat-form-field>
 					<button mat-icon-button (click)="help('from')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 				</mat-list-item>
@@ -72,7 +128,7 @@
 				<mat-list-item>
 					<mat-form-field>
 						<mat-label>to</mat-label>
-						<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.to" type="text" name="to" >
+						<input matInput (input)="edited(true)" [(ngModel)]="selection[0].attributes.to" type="text" name="to" >
 					</mat-form-field>
 					<button mat-icon-button (click)="help('to')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 				</mat-list-item>
@@ -81,7 +137,7 @@
 				<mat-list-item>
 					<mat-form-field>
 						<mat-label>type</mat-label>
-						<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.type" type="text" name="type" >
+						<input matInput (input)="edited(true)" [(ngModel)]="selection[0].attributes.type" type="text" name="type" >
 					</mat-form-field>
 					<button mat-icon-button (click)="help('type')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 				</mat-list-item>
@@ -124,21 +180,21 @@
 				<mat-list-item>
 					<mat-form-field>
 						<mat-label>values</mat-label>
-						<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.values" type="text" name="values" >
+						<input matInput (input)="edited(true)" [(ngModel)]="selection[0].attributes.values" type="text" name="values" >
 					</mat-form-field>
 					<button mat-icon-button (click)="help('values')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 				</mat-list-item>
 				<mat-list-item>
 					<mat-form-field>
 						<mat-label>keyTimes</mat-label>
-						<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.keyTimes" type="text" name="keyTimes" >
+						<input matInput (input)="edited(true)" [(ngModel)]="selection[0].attributes.keyTimes" type="text" name="keyTimes" >
 					</mat-form-field>
 					<button mat-icon-button (click)="help('keyTimes')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 				</mat-list-item>
 				<mat-list-item>
 					<mat-form-field>
 						<mat-label>keySplines</mat-label>
-						<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.keySplines" type="text" name="keySplines" >
+						<input matInput (input)="edited(true)" [(ngModel)]="selection[0].attributes.keySplines" type="text" name="keySplines" >
 					</mat-form-field>
 					<button mat-icon-button (click)="help('keySplines')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 				</mat-list-item>
@@ -147,74 +203,18 @@
 				<mat-list-item>
 					<mat-form-field>
 						<mat-label>begin</mat-label>
-						<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.begin" type="text" name="begin" >
+						<input matInput (input)="edited(true)" [(ngModel)]="selection[0].attributes.begin" type="text" name="begin" >
 					</mat-form-field>
 					<button mat-icon-button (click)="help('begin')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 				</mat-list-item>
 			</ng-container>
-			<ng-container *ngIf="['animate', 'animateMotion', 'animateTransform', 'set'].includes(selection[0].name)" >
+			<ng-container *ngIf="['animateMotion', 'text', 'tspan'].includes(selection[0].name)" >
 				<mat-list-item>
 					<mat-form-field>
-						<mat-label>dur</mat-label>
-						<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.dur" type="text" name="dur" >
+						<mat-label>rotate</mat-label>
+						<input matInput (input)="edited(true)" [(ngModel)]="selection[0].attributes.rotate" type="text" name="rotate" >
 					</mat-form-field>
-					<button mat-icon-button (click)="help('dur')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
-				</mat-list-item>
-				<mat-list-item>
-					<mat-form-field>
-						<mat-label>end</mat-label>
-						<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.end" type="text" name="end" >
-					</mat-form-field>
-					<button mat-icon-button (click)="help('end')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
-				</mat-list-item>
-				<mat-list-item>
-					<mat-form-field>
-						<mat-label>min</mat-label>
-						<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.min" type="text" name="min" >
-					</mat-form-field>
-					<button mat-icon-button (click)="help('min')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
-				</mat-list-item>
-				<mat-list-item>
-					<mat-form-field>
-						<mat-label>max</mat-label>
-						<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.max" type="text" name="max" >
-					</mat-form-field>
-					<button mat-icon-button (click)="help('max')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
-				</mat-list-item>
-				<mat-list-item>
-					<mat-form-field>
-						<mat-label>restart</mat-label>
-						<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.restart" name="restart" >
-							<mat-option value="always" >always</mat-option>
-							<mat-option value="whenNotActive" >whenNotActive</mat-option>
-							<mat-option value="never" >never</mat-option>
-						</mat-select>
-					</mat-form-field>
-					<button mat-icon-button (click)="help('restart')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
-				</mat-list-item>
-				<mat-list-item>
-					<mat-form-field>
-						<mat-label>repeatCount</mat-label>
-						<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.repeatCount" type="text" name="repeatCount" >
-					</mat-form-field>
-					<button mat-icon-button (click)="help('repeatCount')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
-				</mat-list-item>
-				<mat-list-item>
-					<mat-form-field>
-						<mat-label>repeatDur</mat-label>
-						<input matInput (input)="edited()" [(ngModel)]="selection[0].attributes.repeatDur" type="text" name="repeatDur" >
-					</mat-form-field>
-					<button mat-icon-button (click)="help('repeatDur')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
-				</mat-list-item>
-				<mat-list-item>
-					<mat-form-field>
-						<mat-label>fill</mat-label>
-						<mat-select (selectionChange)="edited()" [(ngModel)]="selection[0].attributes.fill" name="fill" >
-							<mat-option value="freeze" >freeze</mat-option>
-							<mat-option value="remove" >remove</mat-option>
-						</mat-select>
-					</mat-form-field>
-					<button mat-icon-button (click)="help('fill')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
+					<button mat-icon-button (click)="help('rotate')" ><mat-icon svgIcon="help-circle" ></mat-icon></button>
 				</mat-list-item>
 			</ng-container>
 			<ng-container *ngIf="['circle', 'ellipse', 'radialGradient'].includes(selection[0].name)">
