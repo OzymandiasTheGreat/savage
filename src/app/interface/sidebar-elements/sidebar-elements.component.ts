@@ -11,11 +11,11 @@ import { klona } from "klona";
 import Text2Svg from "text-to-svg";
 import googleFonts from "google-fonts-complete/google-fonts.json";
 import element2path from "element-to-path";
-import { PathItem, Matrix } from "paper";
+import { PathItem, Matrix, CompoundPath } from "paper";
 import { compose, fromDefinition, fromTransformAttribute } from "transformation-matrix";
 
 import {
-	findParent, CONTAINMENT_MAP, RENDER, RENDER_REF, ANIMATION, OBSOLETE, GRAPHICS, TEXT, PRIMITIVES, DESCRIPTION, find, findText,
+	findParent, CONTAINMENT_MAP, RENDER, RENDER_REF, ANIMATION, OBSOLETE, GRAPHICS, TEXT, PRIMITIVES, DESCRIPTION, find, findText, updateIds,
 } from "../../types/svg";
 import { Observable, Change, recursiveUnobserve } from "../../types/observer";
 import { SavageSVG } from "../../types/svg";
@@ -105,7 +105,7 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 			},
 			contextMenu: (tree, node, event: MouseEvent) => {
 				event.preventDefault();
-				node.setIsActive(true, event.ctrlKey);
+				// node.setIsActive(true, event.ctrlKey);
 				this.contextMenu.nativeElement.style.top = `${event.clientY}px`;
 				this.contextMenu.nativeElement.style.left = `${event.clientX}px`;
 				this.contextMenuData = { nodes: tree.activeNodes };
@@ -226,6 +226,9 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 			scrollOnActivate: true,
 			actionMapping: this.actionMap,
 			allowDrop: (element: TreeNode, { parent, index }: { parent: TreeNode, index: number }) => {
+				if (parent.level === 0) {
+					return CONTAINMENT_MAP.svg.includes(element.data.name);
+				}
 				if (Object.keys(CONTAINMENT_MAP).includes(parent.data.name)) {
 					return CONTAINMENT_MAP[parent.data.name].includes(element.data.name);
 				}
@@ -266,7 +269,12 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 			this.root.observe(this._treeObserver);
 		});
 		this.file.definitions.subscribe((defs) => this.definitions = defs);
-		this.history.operation.subscribe((start) => this.historyOp = start);
+		this.history.operation.subscribe((start) => {
+			this.historyOp = start;
+			if (!start) {
+				this.tree.treeModel.update();
+			}
+		});
 		this.hotkey.triggered.subscribe((key) => {
 			switch (key) {
 				case "elements":
@@ -318,6 +326,7 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 			if (node.name === "path") {
 				const def = this.definitions.paths.find((d) => d.nid === node.nid);
 				if (def) {
+					updateIds(this.root, def.id, id);
 					def.id = id;
 				} else {
 					this.definitions.paths.push({ nid: node.nid, id });
@@ -325,6 +334,7 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 			} else if (node.name === "clipPath") {
 				const def = this.definitions.clipPaths.find((d) => d.nid === node.nid);
 				if (def) {
+					updateIds(this.root, def.id, id);
 					def.id = id;
 				} else {
 					this.definitions.clipPaths.push({ nid: node.nid, id });
@@ -332,6 +342,7 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 			} else if (node.name === "filter") {
 				const def = this.definitions.filters.find((d) => d.nid === node.nid);
 				if (def) {
+					updateIds(this.root, def.id, id);
 					def.id = id;
 				} else {
 					this.definitions.filters.push({ nid: node.nid, id });
@@ -339,6 +350,7 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 			} else if (["linearGradient", "radialGradient"].includes(node.name)) {
 				const def = this.definitions.gradients.find((d) => d.nid === node.nid);
 				if (def) {
+					updateIds(this.root, def.id, id);
 					def.id = id;
 				} else {
 					this.definitions.gradients.push({ nid: node.nid, id });
@@ -346,6 +358,7 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 			} else if (node.name === "marker") {
 				const def = this.definitions.markers.find((d) => d.nid === node.nid);
 				if (def) {
+					updateIds(this.root, def.id, id);
 					def.id = id;
 				} else {
 					this.definitions.markers.push({ nid: node.nid, id });
@@ -353,6 +366,7 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 			} else if (node.name === "mask") {
 				const def = this.definitions.masks.find((d) => d.nid === node.nid);
 				if (def) {
+					updateIds(this.root, def.id, id);
 					def.id = id;
 				} else {
 					this.definitions.masks.push({ nid: node.nid, id });
@@ -360,6 +374,7 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 			} else if (node.name === "pattern") {
 				const def = this.definitions.patterns.find((d) => d.nid === node.nid);
 				if (def) {
+					updateIds(this.root, def.id, id);
 					def.id = id;
 				} else {
 					this.definitions.patterns.push({ nid: node.nid, id });
@@ -367,6 +382,7 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 			} else if (node.name === "symbol") {
 				const def = this.definitions.symbols.find((d) => d.nid === node.nid);
 				if (def) {
+					updateIds(this.root, def.id, id);
 					def.id = id;
 				} else {
 					this.definitions.symbols.push({ nid: node.nid, id });
@@ -526,11 +542,11 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 	}
 
 	canMove(nodes: TreeNode[]): boolean {
-		return nodes.length && nodes.length && !nodes.some((n) => ["defs", "symbol"].includes(n.data.name));
+		return nodes.length && !nodes.some((n) => ["defs", "symbol"].includes(n.data.name));
 	}
 
 	canRemove(nodes: TreeNode[]): boolean {
-		return nodes.length && nodes.length && !nodes.some((n) => n.data.name === "defs");
+		return nodes.length && !nodes.some((n) => n.data.name === "defs");
 	}
 
 	canText2Path(nodes: TreeNode[]): boolean {
@@ -538,7 +554,11 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 	}
 
 	canBoolean(nodes: TreeNode[]): boolean {
-		return nodes.length && nodes.length === 2 && nodes.every((n) => n.data.name === "path");
+		return nodes.length && nodes.length >= 2 && nodes.some((n) => n.data.name === "path");
+	}
+
+	canBreakApart(nodes: TreeNode[]): boolean {
+		return nodes.some((n) => n.data.name === "path");
 	}
 
 	groupNodes(nodes: TreeNode[]): void {
@@ -567,7 +587,11 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 		nodes.forEach((node) => {
 			const children = node.data.children;
 			node.data.children = [];
-			(<SavageSVG[]> node.parent.data.children).splice(node.index, 1, ...children);
+			if (node.parent === null || node.isRoot) {
+				this.root.children.splice(node.index, 1, ...children);
+			} else {
+				(<SavageSVG[]> node.parent.data.children).splice(node.index, 1, ...children);
+			}
 			recursiveUnobserve(node.data);
 		});
 		this.tree.treeModel.update();
@@ -616,12 +640,26 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 	addContainer(name: string, nodes: TreeNode[]): void {
 		const nid = nanoid(13);
 		const id = `${name}-${nanoid(7)}`;
+		const attributes: any = { id };
+		const viewBox = this.root.attributes.viewBox || `0 0 ${this.root.attributes.width} ${this.root.attributes.height}`;
+		if (name === "pattern") {
+			attributes.viewBox = viewBox;
+			attributes.width = "10%";
+			attributes.height = "10%";
+		} else if (name === "marker") {
+			attributes.viewBox = viewBox;
+			attributes.markerWidth = "5%";
+			attributes.markerHeight = "5%";
+			attributes.refX = "center";
+			attributes.refY = "center";
+			attributes.orient = "auto-start-reverse";
+		}
 		const container: SavageSVG = {
 			nid,
 			name,
 			type: "element",
 			value: "",
-			attributes: <any> { id },
+			attributes,
 			children: <any> [],
 		};
 		this.editableNode[nid] = new FormControl(id);
@@ -644,7 +682,7 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 		} else if (name === "clipPath") {
 			this.definitions.clipPaths.push({ nid, id });
 		}
-		this.history.snapshot("Add element");
+		this.history.snapshot("Add element to container");
 	}
 
 	removeNodes(nodes: TreeNode[]): void {
@@ -737,7 +775,7 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 				if (name === "image") {
 					node.attributes.crossorigin = "anonymous";
 				}
-				if (selection.isRoot && CONTAINMENT_MAP.svg.includes(name)) {
+				if ((!selection || selection?.isRoot) && CONTAINMENT_MAP.svg.includes(name)) {
 					this.data.push(<any> node);
 				} else if (CONTAINMENT_MAP[selection?.data.name].includes(name)) {
 					selection.data.children.push(<any> node);
@@ -832,7 +870,11 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 				delete path.attributes["font-style"];
 				delete path.attributes["font-weight"];
 				const index = treeNode.index;
-				treeNode.parent.data.children.splice(index, 1, path);
+				if (treeNode.parent === null || treeNode.isRoot) {
+					this.root.children.splice(index, 1, <any> path);
+				} else {
+					treeNode.parent.data.children.splice(index, 1, path);
+				}
 				recursiveUnobserve(<any> node);
 				this.tree.treeModel.update();
 			}
@@ -845,8 +887,10 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 				if (this.canText2Path([treeNode])) {
 					this.text2path(treeNode);
 				} else {
-					console.log("Cannot convert textPath to path");
+					console.warn("Cannot convert textPath to path");
 				}
+			} else if (["image", "use"].includes(treeNode.data.name)) {
+				console.warn("Can only convert shapes to path");
 			} else {
 				const node: SavageSVG = {
 					nid: treeNode.data.nid,
@@ -870,7 +914,11 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 				delete node.attributes.ry;
 				delete node.attributes.cx;
 				delete node.attributes.cy;
-				treeNode.parent.data.children.splice(treeNode.index, 1, node);
+				if (treeNode.parent === null || treeNode.isRoot) {
+					this.root.children.splice(treeNode.index, 1, <any> node);
+				} else {
+					treeNode.parent.data.children.splice(treeNode.index, 1, node);
+				}
 				recursiveUnobserve(treeNode.data);
 				this.tree.treeModel.update();
 			}
@@ -879,28 +927,65 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 	}
 
 	booleanOp(op: string, treeNodes: TreeNode[]): void {
-		if (treeNodes.length === 2 && treeNodes.every((n) => n.data.name === "path")){
-			const pathOne = PathItem.create(treeNodes[0].data.attributes.d);
-			const pathTwo = PathItem.create(treeNodes[1].data.attributes.d);
-			if (treeNodes[0].data.attributes.transform) {
-				const matrix = compose(fromDefinition(fromTransformAttribute(treeNodes[0].data.attributes.transform)));
+		const nodes = [...treeNodes.filter((n) => n.data.name === "path")];
+		nodes.reduce((node, summand) => {
+			const pathOne = PathItem.create(node.data.attributes.d);
+			const pathTwo = PathItem.create(summand.data.attributes.d);
+			if (node.data.attributes.transform) {
+				const matrix = compose(fromDefinition(fromTransformAttribute(node.data.attributes.transform)));
 				pathOne.transform(new Matrix(matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f));
 			}
-			if (treeNodes[1].data.attributes.transform) {
-				const matrix = compose(fromDefinition(fromTransformAttribute(treeNodes[1].data.attributes.transform)));
+			if (summand.data.attributes.transform) {
+				const matrix = compose(fromDefinition(fromTransformAttribute(summand.data.attributes.transform)));
 				pathTwo.transform(new Matrix(matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f));
 			}
-			const path: paper.PathItem = pathOne[op](pathTwo, { insert: false });
-			const node = treeNodes[1].parent.data.children.splice(treeNodes[1].index, 1)[0];
-			recursiveUnobserve(node);
+			let path: paper.PathItem;
+			if (op !== "combine") {
+				path = pathOne[op](pathTwo);
+			} else {
+				path = new CompoundPath(pathOne.pathData);
+				path.addChild(pathTwo);
+			}
+			recursiveUnobserve(summand.data);
+			if (summand.parent === null || summand.isRoot) {
+				this.root.children.splice(this.root.children.indexOf(summand.data), 1);
+			} else {
+				summand.parent.data.children.splice(summand.parent.data.children.indexOf(summand.data), 1);
+			}
 			pathOne.remove();
-			pathTwo.remove();
-			treeNodes[0].data.attributes.d = path.pathData;
-			delete treeNodes[0].data.attributes.transform;
-		} else {
-			console.warn("Boolean operations apply to 2 paths only");
-		}
+			node.data.attributes.d = path.pathData;
+			if (op === "combine") {
+				pathTwo.remove();
+			}
+			path.remove();
+			delete node.data.attributes.transform;
+			return node;
+		});
 		this.history.snapshot("Boolean operation");
+	}
+
+	breakApart(treeNodes: TreeNode[]): void {
+		treeNodes.filter((n) => n.data.name === "path").forEach((node) => {
+			const attributes = { ...node.data.attributes };
+			const cPath = new CompoundPath(node.data.attributes.d);
+			const paths: string[] = cPath.children.map((p: paper.Path) => p.pathData);
+			const nodes: SavageSVG[] = paths.map((p) => ({
+				nid: nanoid(13),
+				name: "path",
+				type: "element",
+				value: "",
+				children: <any> [],
+				attributes: { ...attributes, d: p },
+			}));
+			cPath.remove();
+			if (node.parent === null || node.isRoot) {
+				this.root.children.splice(node.index, 1, ...<any> nodes);
+			} else {
+				node.parent.data.children.splice(node.index, 1, ...nodes);
+			}
+			recursiveUnobserve(node.data);
+		});
+		this.history.snapshot("Break apart path(s)");
 	}
 
 	dupeNode(treeNodes: TreeNode[]): void {

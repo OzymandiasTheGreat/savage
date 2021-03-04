@@ -57,6 +57,25 @@ export function extractMatrix(node: Observable<SavageSVG>, root: Observable<Sava
 }
 
 
+export function updateIds(root: Observable<SavageSVG>, oldId: string, newId: string): void {
+	const attrs = ["clip-path", "cursor", "fill", "filter", "marker-end", "marker-mid", "marker-start", "mask", "stroke"];
+	const recurse = (node: Observable<SavageSVG>) => {
+		attrs.forEach((attr) => {
+			if (node.attributes[attr]) {
+				if (node.attributes[attr].includes(oldId)) {
+					node.attributes[attr] = `url(#${newId})`;
+				}
+			}
+		});
+		if (node.attributes.href && node.attributes.href === oldId) {
+			node.attributes.href = newId;
+		}
+		node.children.forEach((c) => recurse(c));
+	};
+	recurse(root);
+}
+
+
 export function findText(root: Observable<SavageSVG>): Observable<SavageSVG> {
 	let text: Observable<SavageSVG>;
 

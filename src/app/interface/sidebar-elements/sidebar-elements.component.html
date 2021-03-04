@@ -119,8 +119,7 @@
 		<button mat-icon-button matTooltip="Move to..." [disabled]="!canMove(tree.treeModel.activeNodes)" [matMenuTriggerFor]="moveMenu" [matMenuTriggerData]="{ nodes: tree.treeModel.activeNodes }" ><mat-icon svgIcon="image-move" ></mat-icon></button>
 		<button mat-icon-button matTooltip="Add element" [disabled]="tree.treeModel.activeNodes.length > 1" [matMenuTriggerFor]="addMenu" [matMenuTriggerData]="{ nodes: tree.treeModel.activeNodes }" ><mat-icon svgIcon="plus" ></mat-icon></button>
 		<button mat-icon-button matTooltip="Remove" [disabled]="!canRemove(tree.treeModel.activeNodes)" (click)="removeNodes(tree.treeModel.activeNodes)" ><mat-icon svgIcon="minus" ></mat-icon></button>
-		<button mat-icon-button matTooltip="Convert to path" [disabled]="!graphics(tree.treeModel.activeNodes)" (click)="shape2path(tree.treeModel.activeNodes)" ><mat-icon svgIcon="vector-triangle" ></mat-icon></button>
-		<button mat-icon-button matTooltip="Boolean operation" [disabled]="!canBoolean(tree.treeModel.activeNodes)" [matMenuTriggerFor]="booleanMenu" [matMenuTriggerData]="{ nodes: tree.treeModel.activeNodes }" ><mat-icon svgIcon="vector-difference" ></mat-icon></button>
+		<button mat-icon-button matTooltip="Path operations" [disabled]="!graphics(tree.treeModel.activeNodes)" [matMenuTriggerFor]="pathMenu" [matMenuTriggerData]="{ nodes: tree.treeModel.activeNodes }" ><mat-icon svgIcon="vector-triangle" ></mat-icon></button>
 	</div>
 	<div class="savage-app-sidebar-toolbar-right">
 		<button mat-icon-button *ngIf="!tree.treeModel.expandedNodes.length" (click)="tree.treeModel.expandAll()" ><mat-icon svgIcon="unfold-more-horizontal" ></mat-icon></button>
@@ -139,8 +138,7 @@
 		<button mat-menu-item *ngIf="canMove(nodes)" [matMenuTriggerFor]="moveMenu" [matMenuTriggerData]="{ nodes: nodes }" >Move to...</button>
 		<button mat-menu-item *ngIf="nodes.length < 2" [matMenuTriggerFor]="addMenu" [matMenuTriggerData]="{ nodes: nodes }" >Add element</button>
 		<button mat-menu-item *ngIf="canRemove(nodes)" (click)="removeNodes(nodes)" >Remove</button>
-		<button mat-menu-item *ngIf="graphics(nodes)" (click)="shape2path(nodes)" >Convert to path</button>
-		<button mat-menu-item *ngIf="canBoolean(nodes)" [matMenuTriggerFor]="booleanMenu" [matMenuTriggerData]="{ nodes: nodes }" >Boolean operation</button>
+		<button mat-menu-item *ngIf="graphics(nodes)" [matMenuTriggerFor]="pathMenu" [matMenuTriggerData]="{ nodes: nodes }" >Path operations</button>
 	</ng-template>
 </mat-menu>
 <mat-menu #moveMenu >
@@ -189,8 +187,8 @@
 		<button mat-menu-item *ngIf="render.includes(node?.data.name) || node?.data.name === 'animateMotion'" [matMenuTriggerFor]="animationMenu" [matMenuTriggerData]="{ node: node }" >Animation</button>
 		<button mat-menu-item *ngIf="node?.data.name === 'defs' || checkParent('defs', node)" (click)="addNode('filter', node)" >Filter</button>
 		<button mat-menu-item *ngIf="node?.data.name === 'filter' || checkParent('filter', node)" [matMenuTriggerFor]="primitiveMenu" [matMenuTriggerData]="{ node: node }" >Filter primitive</button>
-		<button mat-menu-item *ngIf="activeView === 'shapes' && containmentMap[node?.data.name]?.includes('image')" (click)="addNodeHref('image', node)" >Image</button>
-		<button mat-menu-item *ngIf="activeView === 'shapes' && containmentMap[node?.data.name]?.includes('use')" (click)="addNodeHref('use', node)" >Symbol ref (&lt;use&gt;)</button>
+		<button mat-menu-item *ngIf="activeView === 'shapes'" (click)="addNodeHref('image', node)" >Image</button>
+		<button mat-menu-item *ngIf="activeView === 'shapes'" (click)="addNodeHref('use', node)" >Symbol ref (&lt;use&gt;)</button>
 		<button mat-menu-item *ngIf="['text', 'textPath', 'tspan'].includes(node?.data.name)" (click)="addNode('tspan', node)" >Text span (&lt;tspan&gt;)</button>
 		<button mat-menu-item *ngIf="node?.data.name === 'text'" (click)="addNodeHref('textPath', node)" >Text path</button>
 	</ng-template>
@@ -216,6 +214,14 @@
 			</ng-container>
 		</ng-template>
 	</mat-menu>
+</mat-menu>
+<mat-menu #pathMenu >
+	<ng-template matMenuContent let-nodes="nodes" >
+		<button mat-menu-item *ngIf="graphics(nodes)" (click)="shape2path(nodes)" >Convert to path</button>
+		<button mat-menu-item *ngIf="canBoolean(nodes)" (click)="booleanOp('combine', nodes)" >Combine</button>
+		<button mat-menu-item *ngIf="canBreakApart(nodes)" (click)="breakApart(nodes)" >Break apart</button>
+		<button mat-menu-item *ngIf="canBoolean(nodes)" [matMenuTriggerFor]="booleanMenu" [matMenuTriggerData]="{ nodes: nodes }" >Boolean operation</button>
+	</ng-template>
 </mat-menu>
 <mat-menu #booleanMenu >
 	<ng-template matMenuContent let-nodes="nodes" >
