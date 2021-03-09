@@ -705,14 +705,30 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 	addNode(name: string, selection: TreeNode): void {
 		const nid = nanoid(13);
 		const id = `${name}-${nanoid(7)}`;
-		const children: SavageSVG[] = [];
+		const attributes: any = { id };
+		const children: any = [];
+		if (["animate", "animateMotion", "animateTransform"].includes(name)) {
+			attributes.dur = "10s";
+			attributes.repeatCount = "1";
+		}
+		if (name === "animate") {
+			attributes.attributeName = "dx";
+			attributes.values = "0 1";
+		} else if (name === "animateMotion") {
+			attributes.path = "M 0,0 H 1 Z";
+		} else if (name === "animateTransform") {
+			attributes.attributeName = "transform";
+			attributes.type = "translate";
+			attributes.from = "0";
+			attributes.to = "1";
+		}
 		const node: SavageSVG = {
 			name,
 			type: "element",
 			value: "",
 			nid,
-			attributes: <any> { id },
-			children: <any> children,
+			attributes,
+			children,
 		};
 		this.editableNode[nid] = new FormControl(id);
 		if (["textPath", "tspan"].includes(name)) {
@@ -725,10 +741,10 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 				children: <any> [],
 			});
 		}
-		if (selection.isRoot && selection.data.name !== "defs" && CONTAINMENT_MAP.svg.includes(name)) {
-			this.data.push(<any> node);
-		} else if (CONTAINMENT_MAP[selection?.data.name].includes(name)) {
+		if (CONTAINMENT_MAP[selection?.data.name].includes(name)) {
 			selection.data.children.push(<any> node);
+		} else if (selection.isRoot && selection.data.name !== "defs" && CONTAINMENT_MAP.svg.includes(name)) {
+			this.data.push(<any> node);
 		} else {
 			const parent = this.findParent(name, selection);
 			parent?.data.children.push(<any> node);
@@ -1010,5 +1026,12 @@ export class SidebarElementsComponent implements OnInit, OnChanges {
 			treeNode.parent.data.children.splice(treeNode.index + 1, 0, clone);
 		});
 		this.history.snapshot("Duplicate element");
+	}
+
+	reloadAnim(node: TreeNode): void {
+		const parent = findParent(this.root, node.data.nid);
+		const index = parent.children.indexOf(node.data);
+		const data = parent.children.splice(index, 1)[0];
+		parent.children.splice(index, 0, data);
 	}
 }

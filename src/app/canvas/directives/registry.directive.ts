@@ -6,7 +6,7 @@ import { CanvasService } from "../../services/canvas.service";
 @Directive({
 	selector: "[appRegistry]"
 })
-export class RegistryDirective implements OnInit, OnDestroy {
+export class RegistryDirective implements OnInit {
 	@Input("appRegistry") nid: string;
 
 	constructor(
@@ -18,7 +18,9 @@ export class RegistryDirective implements OnInit, OnDestroy {
 		this.canvas.registry[this.nid] = this.host.nativeElement;
 	}
 
-	ngOnDestroy(): void {
-		delete this.canvas.registry[this.nid];
-	}
+	// Race condition: when rearranging elements new element get created before
+	// existing element is removed, removing both from the registry
+	// ngOnDestroy(): void {
+	// 	delete this.canvas.registry[this.nid];
+	// }
 }

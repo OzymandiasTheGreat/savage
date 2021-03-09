@@ -22,42 +22,29 @@
 		</span>
 		<mat-divider [vertical]="true" ></mat-divider>
 		<span *ngIf="!smallScreen" class="savage-app-menubar-center" >
-			<button mat-flat-button [matMenuTriggerFor]="gridMenu" >Grid <mat-icon svgIcon="menu-down" ></mat-icon></button>
-			<mat-menu #gridMenu >
+			<button mat-flat-button [disabled]="!document" [matMenuTriggerFor]="guideMenu" >Guides <mat-icon svgIcon="menu-down" ></mat-icon></button>
+			<mat-menu #guideMenu >
+				<div mat-menu-item >
+					<mat-slide-toggle [checked]="canvas.snapping" (toggleChange)="toggleSnapping()" >Snap</mat-slide-toggle>
+				</div>
+				<mat-divider ></mat-divider>
 				<button mat-menu-item (click)="toggleGrid()" >Toggle grid</button>
 				<button mat-menu-item (click)="setGrid()" >Set grid size</button>
-			</mat-menu>
-			<button mat-flat-button [matMenuTriggerFor]="guideMenu" >Guides <mat-icon svgIcon="menu-down" ></mat-icon></button>
-			<mat-menu #guideMenu >
+				<mat-divider ></mat-divider>
 				<button mat-menu-item (click)="addGuide('horizontal')">Add horizontal guide</button>
 				<button mat-menu-item (click)="addGuide('vertical')">Add vertical guide</button>
 				<button mat-menu-item *ngFor="let guide of canvas.guides" (click)="removeGuide(guide)" >Remove {{ !!guide.x ? "vertical" : "horizontal" }} guide at {{ guide.x || guide.y }}</button>
 			</mat-menu>
-			<mat-slide-toggle [checked]="canvas.snapping" (toggleChange)="toggleSnapping()" >Snap</mat-slide-toggle>
-			<ng-container *ngIf="!!document" >
-				<mat-divider [vertical]="true" ></mat-divider>
-				<mat-form-field>
-					<mat-label>Width</mat-label>
-					<input matInput [(ngModel)]="document.attributes.width" min="1" type="number" name="width" >
-				</mat-form-field>
-				<mat-form-field>
-					<mat-label>Height</mat-label>
-					<input matInput [(ngModel)]="document.attributes.height" min="1" type="number" name="height" >
-				</mat-form-field>
-				<mat-form-field>
-					<mat-label>ViewBox</mat-label>
-					<input matInput [(ngModel)]="document.attributes.viewBox" type="text" name="viewbox" >
-				</mat-form-field>
-				<mat-form-field>
-					<mat-label>Color</mat-label>
-					<input matInput [(ngModel)]="document.attributes.color" mccColorPickerOrigin #color="mccColorPickerOrigin" type="text" name="color" >
-					<mcc-color-picker matSuffix mccConnectedColorPicker [mccConnectedColorPickerOrigin]="color" alpha ></mcc-color-picker>
-				</mat-form-field>
-				<mat-form-field>
-					<mat-label>Zoom</mat-label>
-					<input matInput [(ngModel)]="zoom" min="25" max="1000" step="25" type="number" name="zoom" >
-				</mat-form-field>
-			</ng-container>
+			<button mat-flat-button [disabled]="!document" (click)="openView()" ><mat-icon svgIcon="panorama-wide-angle" ></mat-icon> View</button>
+			<mat-form-field>
+				<mat-label>Color</mat-label>
+				<input matInput [disabled]="!document" [(ngModel)]="document?.attributes.color" mccColorPickerOrigin #color="mccColorPickerOrigin" type="text" name="color" >
+				<mcc-color-picker matSuffix [disabled]="!document" mccConnectedColorPicker [mccConnectedColorPickerOrigin]="color" alpha ></mcc-color-picker>
+			</mat-form-field>
+			<mat-form-field>
+				<mat-label>Zoom</mat-label>
+				<input matInput [disabled]="!document" [(ngModel)]="zoom" min="25" max="2500" step="25" type="number" name="zoom" >
+			</mat-form-field>
 			<mat-divider [vertical]="true" ></mat-divider>
 		</span>
 		<span class="savage-app-menubar-right" >
@@ -85,41 +72,28 @@
 		</span>
 	</mat-toolbar-row>
 	<mat-toolbar-row *ngIf="smallScreen" class="savage-app-menubar-center" >
-		<button mat-flat-button [matMenuTriggerFor]="gridMenu" >Grid <mat-icon svgIcon="menu-down" ></mat-icon></button>
-			<mat-menu #gridMenu >
-				<button mat-menu-item (click)="toggleGrid()" >Toggle grid</button>
-				<button mat-menu-item (click)="setGrid()" >Set grid size</button>
-			</mat-menu>
-			<button mat-flat-button [matMenuTriggerFor]="guideMenu" >Guides <mat-icon svgIcon="menu-down" ></mat-icon></button>
-			<mat-menu #guideMenu >
-				<button mat-menu-item (click)="addGuide('horizontal')">Add horizontal guide</button>
-				<button mat-menu-item (click)="addGuide('vertical')">Add vertical guide</button>
-				<button mat-menu-item *ngFor="let guide of canvas.guides" (click)="removeGuide(guide)" >Remove {{ !!guide.x ? "vertical" : "horizontal" }} guide at {{ guide.x || guide.y }}</button>
-			</mat-menu>
-			<mat-slide-toggle [checked]="canvas.snapping" (toggleChange)="toggleSnapping()" >Snap</mat-slide-toggle>
-			<ng-container *ngIf="!!document" >
-				<mat-divider [vertical]="true" ></mat-divider>
-				<mat-form-field>
-					<mat-label>Width</mat-label>
-					<input matInput [(ngModel)]="document.attributes.width" min="1" type="number" name="width" >
-				</mat-form-field>
-				<mat-form-field>
-					<mat-label>Height</mat-label>
-					<input matInput [(ngModel)]="document.attributes.height" min="1" type="number" name="height" >
-				</mat-form-field>
-				<mat-form-field>
-					<mat-label>ViewBox</mat-label>
-					<input matInput [(ngModel)]="document.attributes.viewBox" type="text" name="viewbox" >
-				</mat-form-field>
-				<mat-form-field>
-					<mat-label>Color</mat-label>
-					<input matInput [(ngModel)]="document.attributes.color" mccColorPickerOrigin #color="mccColorPickerOrigin" type="text" name="color" >
-					<mcc-color-picker matSuffix mccConnectedColorPicker [mccConnectedColorPickerOrigin]="color" alpha ></mcc-color-picker>
-				</mat-form-field>
-				<mat-form-field>
-					<mat-label>Zoom</mat-label>
-					<input matInput [(ngModel)]="zoom" min="25" max="1000" step="25" type="number" name="zoom" >
-				</mat-form-field>
-			</ng-container>
+		<button mat-flat-button [disabled]="!document" [matMenuTriggerFor]="guideMenu" >Guides <mat-icon svgIcon="menu-down" ></mat-icon></button>
+		<mat-menu #guideMenu >
+			<div mat-menu-item >
+				<mat-slide-toggle [checked]="canvas.snapping" (toggleChange)="toggleSnapping()" >Snap</mat-slide-toggle>
+			</div>
+			<mat-divider ></mat-divider>
+			<button mat-menu-item (click)="toggleGrid()" >Toggle grid</button>
+			<button mat-menu-item (click)="setGrid()" >Set grid size</button>
+			<mat-divider ></mat-divider>
+			<button mat-menu-item (click)="addGuide('horizontal')">Add horizontal guide</button>
+			<button mat-menu-item (click)="addGuide('vertical')">Add vertical guide</button>
+			<button mat-menu-item *ngFor="let guide of canvas.guides" (click)="removeGuide(guide)" >Remove {{ !!guide.x ? "vertical" : "horizontal" }} guide at {{ guide.x || guide.y }}</button>
+		</mat-menu>
+		<button mat-flat-button [disabled]="!document" (click)="openView()" ><mat-icon svgIcon="panorama-wide-angle" ></mat-icon> View</button>
+		<mat-form-field>
+			<mat-label>Color</mat-label>
+			<input matInput [disabled]="!document" [(ngModel)]="document?.attributes.color" mccColorPickerOrigin #color="mccColorPickerOrigin" type="text" name="color" >
+			<mcc-color-picker matSuffix [disabled]="!document" mccConnectedColorPicker [mccConnectedColorPickerOrigin]="color" alpha ></mcc-color-picker>
+		</mat-form-field>
+		<mat-form-field>
+			<mat-label>Zoom</mat-label>
+			<input matInput [disabled]="!document" [(ngModel)]="zoom" min="25" max="2500" step="25" type="number" name="zoom" >
+		</mat-form-field>
 	</mat-toolbar-row>
 </mat-toolbar>

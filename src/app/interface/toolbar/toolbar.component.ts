@@ -4,8 +4,6 @@ import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { MatSelectionListChange } from "@angular/material/list";
 import { MatButtonToggleChange } from "@angular/material/button-toggle";
 import { MatIconRegistry } from "@angular/material/icon";
-import { stringify } from "svgson";
-import { html } from "js-beautify";
 import { getDiff, applyDiff } from "recursive-diff";
 import mdiIcons from "@mdi/svg/meta.json";
 
@@ -216,10 +214,7 @@ export class ToolbarComponent implements OnInit {
 
 	rawEdit(): void {
 		const ref = this.sheet.open(CodeEditorSheetComponent, {
-			data: { data: html(stringify(<any> this.document), {
-				end_with_newline: true,
-				max_preserve_newlines: 3,
-			}) },
+			data: { data: this.document },
 			panelClass: "savage-app-bottom-sheet",
 		});
 

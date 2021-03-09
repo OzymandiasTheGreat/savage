@@ -23,6 +23,8 @@ import { StampToolComponent } from "./stamp-tool/stamp-tool.component";
 import { EyeDropperToolComponent } from "./eye-dropper-tool/eye-dropper-tool.component";
 import { MeasureToolComponent } from "./measure-tool/measure-tool.component";
 
+import { PipeModule } from "../pipes/pipe.module";
+
 
 @NgModule({
 	declarations: [
@@ -49,6 +51,7 @@ import { MeasureToolComponent } from "./measure-tool/measure-tool.component";
 	imports: [
 		CommonModule,
 		MaterialModule,
+		PipeModule,
 	],
 	exports: [
 		AttrsDirective,

@@ -438,14 +438,14 @@
 			[skipAttrs]="['tabindex', 'pointer-events']"
 			[appRegistry]="node.nid"
 			tabindex="-1"
-			[innerHTML]="stringify(node)"
+			[innerHTML]="stringify(node) | safeHtml"
 			(click)="onClick($event, node)"
 			(dblclick)="onDblClick($event, node)"
 			(mousedown)="onMouseDown($event, node)"
 			(keydown)="onKeyDown($event, node)"
 		>
 		</svg:foreignObject>
-		<style *ngSwitchCase="'style'" [appAttrs]="node" [innerHTML]="stringify(node)" ></style>
+		<svg:defs *ngSwitchCase="'style'" [innerHTML]="style(node) | safeHtml" ></svg:defs>
 	</ng-container>
 </ng-template>
 

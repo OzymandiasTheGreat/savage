@@ -1,0 +1,20 @@
+<h1 mat-dialog-title >View Properties</h1>
+<div matDialogContent >
+	<div>
+		<mat-form-field>
+			<mat-label>Width</mat-label>
+			<input matInput [(ngModel)]="data.document?.attributes.width" min="1" type="number" name="width" >
+		</mat-form-field>
+		x
+		<mat-form-field>
+			<mat-label>Height</mat-label>
+			<input matInput [(ngModel)]="data.document?.attributes.height" min="1" type="number" name="height" >
+		</mat-form-field>
+	</div>
+	<div>
+		<mat-form-field>
+			<mat-label>ViewBox</mat-label>
+			<input matInput [(ngModel)]="data.document?.attributes.viewBox" type="text" name="viewbox" >
+		</mat-form-field>
+	</div>
+</div>

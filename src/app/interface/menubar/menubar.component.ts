@@ -13,6 +13,7 @@ import { SvgFileService } from "../../services/svg-file.service";
 import { HotkeyService } from "../../services/hotkey.service";
 import { GuideDialogComponent } from "../guide-dialog/guide-dialog.component";
 import { ShortcutsDialogComponent } from "../shortcuts-dialog/shortcuts-dialog.component";
+import { ViewDialogComponent } from "../view-dialog/view-dialog.component";
 
 
 @Component({
@@ -74,6 +75,10 @@ export class MenubarComponent implements OnInit {
 		this.breakpoint.observe([Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium]).subscribe((result) => {
 			this.smallScreen = result.matches;
 		});
+	}
+
+	openView(): void {
+		const ref = this.dialog.open(ViewDialogComponent, { data: { document: this.document } });
 	}
 
 	download(): void {

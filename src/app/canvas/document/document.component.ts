@@ -86,4 +86,8 @@ export class DocumentComponent implements OnInit {
 	stringify(node: INode): string {
 		return node.children.map((n) => stringify(n)).join("\n");
 	}
+
+	style(node: INode): string {
+		return stringify(node);
+	}
 }

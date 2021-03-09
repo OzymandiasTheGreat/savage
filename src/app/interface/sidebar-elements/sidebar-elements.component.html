@@ -101,6 +101,9 @@
 									[style.opacity]="node.data.attributes.display === 'none' ? 0.35 : 1" >
 								</mat-icon>
 							</button>
+							<button *ngIf="animation.includes(node.data.name)" mat-icon-button (click)="reloadAnim(node)" >
+								<mat-icon svgIcon="reload" ></mat-icon>
+							</button>
 						</div>
 					</div>
 				</div>

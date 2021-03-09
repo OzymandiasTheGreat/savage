@@ -59,10 +59,11 @@ export class SidebarPropsComponent implements OnInit {
 			// animation doesn't start when attributes are edited
 			// We need to remove and re-add the whole animation element
 			// But this is a big performance hit
-			const parent = findParent(this.document, this.selection[0].nid);
-			const index = parent.children.indexOf(this.selection[0]);
-			parent.children.splice(index, 1);
-			parent.children.splice(index, 0, this.selection[0]);
+			// Breaks too many things
+			// const parent = findParent(this.document, this.selection[0].nid);
+			// const index = parent.children.indexOf(this.selection[0]);
+			// const node = parent.children.splice(index, 1)[0];
+			// parent.children.splice(index, 0, node);
 		}
 		this.history.snapshot("Property edited");
 	}
