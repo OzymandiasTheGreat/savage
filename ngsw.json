@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1614489364429,
+  "timestamp": 1615272466662,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -13,11 +13,11 @@
       "urls": [
         "/favicon.ico",
         "/index.html",
-        "/main.ca8b1b7cd6ff00a283b4.js",
+        "/main.3b93fc36dad8e444829b.js",
         "/manifest.webmanifest",
         "/polyfills.5b1d01c8c5791f328043.js",
         "/runtime.acf0dec4155e77772545.js",
-        "/styles.3ddd1ff04efba015f6a8.css"
+        "/styles.e48b97c7afaeb81b4ee3.css"
       ],
       "patterns": []
     },
@@ -252,12 +252,12 @@
     "/assets/previews/savage-spiral.svg": "a59257dcc449e53800e91406d2c4e32ca596979e",
     "/assets/savage.svg": "e0f985e8ef2bdc67546d6937590b7660322bac16",
     "/favicon.ico": "fada3441688b134002fbf01f985d438bba5e8d34",
-    "/index.html": "d9af41f6df391e19b439e28be560d5a2e54a72ff",
-    "/main.ca8b1b7cd6ff00a283b4.js": "e7c721ff5ade46b4e85376c8712b1a5ee1fde2e5",
+    "/index.html": "03b9d61b4a9c165038b7a5620e61d7c16b38d4e3",
+    "/main.3b93fc36dad8e444829b.js": "a7c8bbef977c942787b26886c48cb037654f6f1c",
     "/manifest.webmanifest": "432ba0895441fa795632e55c8b6bd2385e0963aa",
     "/polyfills.5b1d01c8c5791f328043.js": "2598a02fe90a269920909ce1e0d72d0f92529d2a",
     "/runtime.acf0dec4155e77772545.js": "c2f19a5c64c718ebecb901ee3f30667ccab567b6",
-    "/styles.3ddd1ff04efba015f6a8.css": "97c1dd99317cb3c6b3bb26f2b7fff187daf6ea24"
+    "/styles.e48b97c7afaeb81b4ee3.css": "437b1f1acf3c7c9806dc0e97274dae7d43dd4546"
   },
   "navigationUrls": [
     {
